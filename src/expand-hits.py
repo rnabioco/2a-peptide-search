@@ -27,18 +27,16 @@ def main(aln_fname, db_fname):
             if record.id in ids:
                 id = ids[record.id]
                 seq = record.seq[id.start-20:id.end+20]
-                print(f'>{id.orig_id}\n{seq}')
+                print(f'>{id.fasta_id}\n{seq}')
 
-Id = namedtuple('Id', ['fasta_id', 'orig_id', 'uniprot_id', 'org', 'start', 'end'])
+Id = namedtuple('Id', ['fasta_id', 'start', 'end'])
 def parse_id(id, descrip):
     ''' tr|X4YD30|X4YD30_9PICO/692-706 '''
  
     fasta_id, coords = id.split('/')
-    orig_id = fasta_id + ' ' + descrip
     start, end = map(int, coords.split('-'))
-    uniprot_id, org = fasta_id.split('|')[2].split('_')
 
-    return Id(fasta_id, orig_id, uniprot_id, org, start, end)
+    return Id(fasta_id, start, end)
 
 if __name__ == '__main__':
     main()
