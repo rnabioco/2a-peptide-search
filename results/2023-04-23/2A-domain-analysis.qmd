@@ -56,6 +56,16 @@ domains_tbl <- bind_rows(
     !(hit_id == "2A-class-2" & class == 1),
     !(hit_id == "2A-class-1" & class == 2)
   )
+
+# calculate the number of annoated domains for each record
+record_counts <- count(domains_tbl, record_id) |>
+  rename(n_dom = n)
+
+domains_tbl <- left_join(
+  domains_tbl,
+  record_counts,
+  by = "record_id"
+)
 ```
 
 ### Remove synthetic sequences
@@ -74,21 +84,14 @@ synthetic_uniparc_tbl <-
   filter(
     uniparc_ids_tbl,
     str_detect(org, "synthetic") |
-      str_detect(org, "[Cc]loning") |
-      str_detect(org, "[Vv]ector") |
-      str_detect(org, "Homo sapiens")
+    str_detect(org, "[Cc]loning") |
+    str_detect(org, "[Vv]ector") |
+    str_detect(org, "Homo sapiens")
   )
 
 domains_tbl <- anti_join(
   domains_tbl,
   synthetic_uniparc_tbl,
-  by = "record_id"
-)
-
-record_counts <- count(domains_tbl, record_id)
-domains_tbl <- left_join(
-  domains_tbl,
-  record_counts,
   by = "record_id"
 )
 ```
@@ -103,13 +106,13 @@ Uniparc and MGnify have several sequences with a single 2A domain and no other a
 Here are the counts of singletons. The majority of these sequences dervive from the MGnify and Uniparc databases, with relatively fewer in Uniprot, supporting the ideas above that there are annotation issues with these sequences.
 
 ```{r}
-filter(domains_tbl, n == 1) |> count(db)
+filter(domains_tbl, n_dom == 1) |> count(db)
 ```
 
 Let's remove the singletons for now, will clean up interpretations later.
 
 ```{r}
-domains_tbl <- filter(domains_tbl, n > 1)
+domains_tbl <- filter(domains_tbl, n_dom > 1)
 ```
 
 
@@ -137,5 +140,3 @@ domain_org |>
   count(db, nterm, hit_id, cterm, sort = TRUE) |>
   DT::datatable()
 ```
-
-
