@@ -14,6 +14,8 @@ library(tidyverse)
 library(here)
 library(janitor)
 library(DT)
+library(cowplot)
+library(glue)
 ```
 
 ## Data cleaning
@@ -86,7 +88,9 @@ synthetic_uniparc_tbl <-
     str_detect(org, "synthetic") |
     str_detect(org, "[Cc]loning") |
     str_detect(org, "[Vv]ector") |
-    str_detect(org, "Homo sapiens")
+    str_detect(org, "Homo sapiens") |
+    str_detect(org, "unidentified") |
+    is.na(org) 
   )
 
 domains_tbl <- anti_join(
@@ -115,8 +119,35 @@ Let's remove the singletons for now, will clean up interpretations later.
 domains_tbl <- filter(domains_tbl, n_dom > 1)
 ```
 
-
 ## Domain organization
+
+### Counts
+
+This is the distribution of numbers of domains per protein. The spike at 12 is from the large number of viral polyproteins with similar / identical structures.
+
+```{r}
+domain_cnts <- domains_tbl |>
+  select(record_id, n_dom) |>
+  unique() |>
+  count(n_dom)
+
+total_n <- sum(domain_cnts$n)
+ggplot(
+  filter(
+    domain_cnts, n >= 5),
+    aes(x = n_dom, y = n)
+  ) +
+  geom_col(fill = 'blue') +
+  theme_cowplot() +
+  labs(
+    x = "number of domains",
+    y = "count",
+    title = "Domains per protein",
+    subtitle = glue("total records = {scales::comma(total_n)} (plot excludes counts < 5)")
+  )
+```
+
+### Neighbors
 
 The following tallies the organization of domains nearby 2A peptides. The following tabulates domains on the N-terminal and C-terminal sides of each 2A peptide.
 
