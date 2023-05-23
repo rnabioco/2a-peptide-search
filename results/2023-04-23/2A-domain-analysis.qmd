@@ -10,6 +10,7 @@ editor_options:
 ## 2A domain analysis
 
 ```{r}
+#| label: libs
 library(tidyverse)
 library(here)
 library(janitor)
@@ -21,6 +22,7 @@ library(glue)
 ## Data cleaning
 
 ```{r}
+#| label: data_clean
 domains_c1_tbl <- read_tsv(
   here("results/2023-04-22/class-1.domain.hits.tsv.gz"),
   show_col_types = FALSE
@@ -47,7 +49,6 @@ domains_tbl <- bind_rows(
       .default = "unknown"
     )
   ) |>
-
   mutate(
     db = as_factor(db),
     hit_id = as_factor(hit_id)
@@ -78,7 +79,8 @@ domains_tbl <-
 
 ```{r}
 uniparc_ids_tbl <- read_tsv(
-  here("results/2023-04-23/uniparc.orgs.tsv.gz")
+  here("results/2023-04-23/uniparc.orgs.tsv.gz"),
+  show_col_types = FALSE
 ) |>
   rename(record_id = From, org = Organisms) |>
   select(record_id, org) |>
@@ -87,7 +89,8 @@ uniparc_ids_tbl <- read_tsv(
   mutate(db = 'uniparc')
 
 uniprot_ids_tbl <- read_tsv(
-  here("results/2023-05-22/uniprot.orgs.tsv.gz")
+  here("results/2023-05-22/uniprot.orgs.tsv.gz"),
+  show_col_types = FALSE
 ) |>
   janitor::clean_names() |>
   select(record_id = entry_name, org = organism) |>
@@ -96,7 +99,8 @@ uniprot_ids_tbl <- read_tsv(
 
 mgnify_ids_tbl <- read_tsv(
   here("results/2023-04-24/mgy.orgs.tsv.gz"),
-  col_names = c('record_id', 'count', 'org')
+  col_names = c('record_id', 'count', 'org'),
+  show_col_types = FALSE
 ) |>
   select(record_id, org) |>
   mutate(db = 'mgnify')
@@ -105,7 +109,9 @@ org_info <- bind_rows(
   uniparc_ids_tbl,
   uniprot_ids_tbl,
   mgnify_ids_tbl
-) |> select(db, everything())
+) |>
+  select(db, everything()) |>
+  ungroup()
 ```
 
 ### Remove synthetic sequences
@@ -144,10 +150,13 @@ Here are the counts of singletons. The majority of these sequences dervive from 
 
 ```{r}
 domain_cnts <-
-  group_by(domains_tbl, record_id, db) |>
-  count(hit_id, sort = TRUE) |>
-  rename(n_dom = n) |>
-  ungroup()
+  count(
+    domains_tbl,
+    record_id,
+    db,
+    sort = TRUE,
+    name = 'n_dom'
+  )
 ```
 
 ```{r}
@@ -169,24 +178,27 @@ domains_tbl <- filter(domain_cnts, n_dom > 1) |>
 # calculate the number of proteins with each number of domains
 protein_domain_cnts <- domain_cnts |>
   select(record_id, n_dom) |>
-  filter(n_dom > 1) |>
-  unique() |>
-  count(n_dom)
-
-total_n <- sum(protein_domain_cnts$n)
+  mutate(
+    n_dom = as_factor(n_dom),
+    n_dom_lumps = fct_lump_n(
+      # there happens to be a break at 13
+      n_dom, 13, other_level = '>13'
+    )
+  ) |>
+  count(n_dom_lumps)
 
 ggplot(
   filter(
     protein_domain_cnts),
-    aes(x = n_dom, y = n)
+    aes(x = n_dom_lumps, y = n)
   ) +
-  geom_col(fill = 'blue') +
+  geom_col(fill = 'grey50') +
   theme_cowplot() +
   labs(
     x = "number of domains",
-    y = "count",
-    title = "Domains per protein",
-    subtitle = glue("total records = {scales::comma(total_n)}")
+    y = "number of proteins",
+    title = "Annotated Pfam domains per protein",
+    subtitle = glue("total records = {scales::comma(nrow(domain_cnts))}")
   )
 ```
 
