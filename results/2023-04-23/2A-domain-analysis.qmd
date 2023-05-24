@@ -26,54 +26,170 @@ library(glue)
 ## Data cleaning
 
 ```{r}
-#| label: data_clean
-domains_c1_tbl <- read_tsv(
+#| label: data_clean_ipr
+ipr_colnames <-
+  c(
+    'protein_acc',
+    'seq_md5',
+    'seq_len',
+    'sig_db',
+    'sig_acc',
+    'sig_desc',
+    'start_loc',
+    'stop_loc',
+    'score',
+    'status',
+    'date',
+    'ipr_annot_acc',
+    'ipr_annot_desc'
+  )
+
+iprscan_c1_tbl <-
+  read_tsv(
+    here("results/2023-05-23/interproscan.class-1.tsv.gz"),
+    col_names = ipr_colnames,
+    show_col_types = FALSE
+  ) |>
+  mutate(class = 1)
+
+iprscan_c2_tbl <-
+  read_tsv(
+    here("results/2023-05-23/interproscan.class-2.tsv.gz"),
+    col_names = ipr_colnames,
+    show_col_types = FALSE
+  ) |>
+  mutate(class = 2)
+
+ipr_domains_tbl <-
+  bind_rows(
+    iprscan_c1_tbl, iprscan_c2_tbl
+  ) |>
+  select(-c(seq_md5, status, date, starts_with('ipr'), seq_len)) |>
+  select(protein_acc, starts_with('sig'), starts_with('query'), everything()) |>
+  rename(
+    dom_evalue = score,
+    query_start = start_loc,
+    query_end = stop_loc
+    ) |>
+  mutate(dom_evalue = as.numeric(dom_evalue)) |>
+  mutate(
+    seq_db = case_when(
+      str_detect(protein_acc, "^tr") ~ "uniprot",
+      str_detect(protein_acc, "^MGY") ~ "mgnify",
+      str_detect(protein_acc, "^UPI") ~ "uniparc",
+      .default = "unknown"
+    )
+  ) |>
+  mutate(
+    seq_db = as_factor(seq_db),
+    sig_db = as_factor(sig_db)
+  )
+
+# pull out interpro accessions and add as their own sig_db
+ipr_db_tbl <-
+  bind_rows(
+    iprscan_c1_tbl, iprscan_c2_tbl
+  ) |>
+  select(
+    protein_acc,
+    sig_acc = ipr_annot_acc,
+    sig_desc = ipr_annot_desc,
+    query_start = start_loc,
+    query_end = stop_loc,
+    dom_evalue = score,
+    class
+  ) |>
+  filter(sig_acc != '-') |>
+  mutate(sig_db = 'Interpro', dom_evalue = as.numeric(dom_evalue)) |>
+  mutate(
+    seq_db = case_when(
+      str_detect(protein_acc, "^tr") ~ "uniprot",
+      str_detect(protein_acc, "^MGY") ~ "mgnify",
+      str_detect(protein_acc, "^UPI") ~ "uniparc",
+      .default = "unknown"
+    )
+  ) |>
+  mutate(
+    seq_db = as_factor(seq_db),
+    sig_db = as_factor(sig_db)
+  ) |>
+  select(names(domains_tbl))
+```
+
+```{r}
+#| label: data_clean_pfam_2A
+
+# These tsv files contain all Pfam hits, but include the class 1/2 2A models. We'll
+# mainly use the interproscan results from above for domains, so we just need the 
+# 2A domain hits
+
+pfam_domains_c1_tbl <- read_tsv(
   here("results/2023-04-22/class-1.domain.hits.tsv.gz"),
   show_col_types = FALSE
 ) |>
   mutate(class = 1)
 
-domains_c2_tbl <- read_tsv(
+pfam_domains_c2_tbl <- read_tsv(
   here("results/2023-04-22/class-2.domain.hits.tsv.gz"),
   show_col_types = FALSE
 ) |>
   mutate(class = 2)
 
-domains_tbl <- bind_rows(
-  domains_c1_tbl, domains_c2_tbl
+twoa_domains_tbl <- bind_rows(
+  pfam_domains_c1_tbl, pfam_domains_c2_tbl
 ) |>
   unique() |>
-  rename(record_id = `# record_id`) |>
+  rename(
+    protein_acc = `# record_id`,
+    sig_acc = hit_id 
+    ) |>
   janitor::clean_names() |>
+  arrange(protein_acc, query_start) |>
+  filter(dom_evalue <= 0.01) |>
+  # removes a few entries caused by cross-talk between the models
+  filter(
+    !(sig_acc == "2A-class-2" & class == 1),
+    !(sig_acc == "2A-class-1" & class == 2)
+  ) |>
+  filter(
+    sig_acc %in% c('2A-class-1', '2A-class-2')
+  ) |>
   mutate(
-    db = case_when(
-      str_detect(record_id, "^tr") ~ "uniprot",
-      str_detect(record_id, "^MGY") ~ "mgnify",
-      str_detect(record_id, "^UPI") ~ "uniparc",
+    sig_db = 'Hmmer3-custom',
+    sig_desc = '2A peptide (skips peptide bond)'
+  ) |>
+  mutate(
+    seq_db = case_when(
+      str_detect(protein_acc, "^tr") ~ "uniprot",
+      str_detect(protein_acc, "^MGY") ~ "mgnify",
+      str_detect(protein_acc, "^UPI") ~ "uniparc",
       .default = "unknown"
     )
   ) |>
   mutate(
-    db = as_factor(db),
-    hit_id = as_factor(hit_id)
+    seq_db = as_factor(seq_db),
+    sig_db = as_factor(sig_db)
   ) |>
-  arrange(record_id, query_start) |>
-  filter(dom_evalue <= 0.01) |>
-  # removes a few entries caused by cross-talk between the models
-  filter(
-    !(hit_id == "2A-class-2" & class == 1),
-    !(hit_id == "2A-class-1" & class == 2)
-  )
+  select(names(ipr_domains_tbl))
+```
+
+```{r}
+#| label: domains_tbl
+domains_tbl <- 
+  bind_rows(
+    ipr_domains_tbl, twoa_domains_tbl, ipr_db_tbl
+  ) |>
+  arrange(protein_acc, query_start)
 
 # fixup uniprot ids
 uniprot_ids_tbl <-
-  filter(domains_tbl, db == 'uniprot') |>
+  filter(domains_tbl, seq_db == 'uniprot') |>
   rowwise() |>
-  mutate(record_id = str_split(record_id, '\\|')[[1]][[3]])
+  mutate(protein_acc = str_split(protein_acc, '\\|')[[1]][[3]])
 
 domains_tbl <-
   bind_rows(
-    filter(domains_tbl, db != 'uniprot'),
+    filter(domains_tbl, seq_db != 'uniprot'),
     uniprot_ids_tbl
   ) |> 
   unique()
@@ -90,35 +206,35 @@ uniparc_ids_tbl <- read_tsv(
   here("results/2023-04-23/uniparc.orgs.tsv.gz"),
   show_col_types = FALSE
 ) |>
-  rename(record_id = From, org = Organisms) |>
-  select(record_id, org) |>
+  rename(protein_acc = From, org = Organisms) |>
+  select(protein_acc, org) |>
   rowwise() |>
   mutate(org = str_split_i(org, ';', 1)[[1]]) |>
-  mutate(db = 'uniparc')
+  mutate(seq_db = 'uniparc')
 
 uniprot_ids_tbl <- read_tsv(
   here("results/2023-05-22/uniprot.orgs.tsv.gz"),
   show_col_types = FALSE
 ) |>
   janitor::clean_names() |>
-  select(record_id = entry_name, org = organism) |>
+  select(protein_acc = entry_name, org = organism) |>
   unique() |>
-  mutate(db = 'uniprot')
+  mutate(seq_db = 'uniprot')
 
 mgnify_ids_tbl <- read_tsv(
   here("results/2023-04-24/mgy.orgs.tsv.gz"),
-  col_names = c('record_id', 'count', 'org'),
+  col_names = c('protein_acc', 'count', 'org'),
   show_col_types = FALSE
 ) |>
-  select(record_id, org) |>
-  mutate(db = 'mgnify')
+  select(protein_acc, org) |>
+  mutate(seq_db = 'mgnify')
 
 org_info <- bind_rows(
   uniparc_ids_tbl,
   uniprot_ids_tbl,
   mgnify_ids_tbl
 ) |>
-  select(db, everything()) |>
+  select(seq_db, everything()) |>
   ungroup()
 ```
 
@@ -141,18 +257,17 @@ synthetic_uniparc_tbl <-
 domains_tbl <- anti_join(
   domains_tbl,
   synthetic_uniparc_tbl,
-  by = "record_id"
+  by = "protein_acc"
 ) |> 
   unique()
 ```
-
 
 ### 2A singletons
 
 Uniparc and MGnify have several sequences with a single 2A domain and no other annotated domains. This could be due to:
 
-- the sequences being truncated (Is this likely? would need to know whether stop codons are required for protein annotations)
-- the domains that the 2A peptide separates are unannotated by Pfam domains (would need to expand annotations, by downloading from the relevant database)
+-   the sequences being truncated (Is this likely? would need to know whether stop codons are required for protein annotations)
+-   the domains that the 2A peptide separates are unannotated by Pfam domains (would need to expand annotations, by downloading from the relevant database)
 
 Here are the counts of singletons. The majority of these sequences dervive from the MGnify and Uniparc databases, with relatively fewer in Uniprot, supporting the ideas above that there are annotation issues with these sequences.
 
@@ -160,22 +275,22 @@ Here are the counts of singletons. The majority of these sequences dervive from 
 domain_cnts <-
   count(
     domains_tbl,
-    record_id,
-    db,
+    protein_acc,
+    seq_db,
     sort = TRUE,
     name = 'n_dom'
   )
 ```
 
 ```{r}
-filter(domain_cnts, n_dom == 1) |> count(db)
+filter(domain_cnts, n_dom == 1) |> count(seq_db)
 ```
 
-Let's remove the singletons for now, will clean up interpretations later.
-
 ```{r}
+#| label: remove_singletons
+#| eval: false
 domains_tbl <- filter(domain_cnts, n_dom > 1) |>
-  semi_join(x = domains_tbl, y = _, by = 'record_id')
+  semi_join(x = domains_tbl, y = _, by = 'protein_acc')
 ```
 
 ## Domain organization
@@ -183,22 +298,35 @@ domains_tbl <- filter(domain_cnts, n_dom > 1) |>
 ### Counts
 
 ```{r}
+# start with Interpro domains and heuristic annotations (Mobi & Coils)
+domains_filt_tbl <- 
+  filter(domains_tbl, sig_db %in% c('Interpro','Hmmer3-custom') | is.na(dom_evalue))
+
+domain_filt_cnts <-
+  count(
+    domains_filt_tbl,
+    protein_acc,
+    seq_db,
+    sort = TRUE,
+    name = 'n_dom'
+  )
+
 # calculate the number of proteins with each number of domains
-protein_domain_cnts <- domain_cnts |>
-  select(record_id, n_dom) |>
+protein_domain_cnts <- domain_filt_cnts |>
+  select(protein_acc, n_dom) |>
   mutate(
-    n_dom = as_factor(n_dom),
-    n_dom_lumps = fct_lump_n(
+    n_dom = as_factor(n_dom)
+    # n_dom_lumps = fct_lump_n(
       # there happens to be a break at 13
-      n_dom, 13, other_level = '>13'
-    )
+      # n_dom, 13, other_level = '>13'
+    # )
   ) |>
-  count(n_dom_lumps)
+  count(n_dom)
 
 ggplot(
   filter(
     protein_domain_cnts),
-    aes(x = n_dom_lumps, y = n)
+    aes(x = n_dom, y = n)
   ) +
   geom_col(fill = 'grey50') +
   theme_cowplot() +
@@ -215,22 +343,23 @@ ggplot(
 The following tallies the organization of domains nearby 2A peptides. The following tabulates domains on the N-terminal and C-terminal sides of each 2A peptide.
 
 ```{r domain_org}
-domain_org <- domains_tbl |>
-  select(record_id, hit_id, starts_with("query"), db) |>
-  arrange(record_id, query_start) |>
+domain_org <- domains_filt_tbl |>
+  select(protein_acc, starts_with('sig'), starts_with("query"), seq_db) |>
+  filter(sig_db != 'Gene3D') |>
+  arrange(protein_acc, query_start) |>
   mutate(
-    nterm = lag(hit_id),
+    nterm = lag(sig_acc),
     # negative values are overlaps
     nterm_dist = query_start - lag(query_end),
-    cterm = lead(hit_id),
+    cterm = lead(sig_acc),
     # negative values are overlaps
     cterm_dist = lead(query_start) - query_end,
-    .by = record_id
+    .by = protein_acc
   )
 
 domain_org |>
-  filter(str_detect(hit_id, "2A-class")) |>
-  select(record_id, db, nterm, hit_id, cterm) |>
-  count(db, nterm, hit_id, cterm, sort = TRUE) |>
+  filter(str_detect(sig_acc, "2A-class")) |>
+  select(protein_acc, seq_db, nterm, sig_acc, cterm) |>
+  count(seq_db, nterm, sig_acc, cterm, sort = TRUE) |>
   DT::datatable()
 ```
