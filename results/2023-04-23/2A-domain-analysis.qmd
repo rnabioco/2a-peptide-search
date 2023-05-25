@@ -113,7 +113,7 @@ ipr_db_tbl <-
     seq_db = as_factor(seq_db),
     sig_db = as_factor(sig_db)
   ) |>
-  select(names(domains_tbl))
+  select(names(ipr_domains_tbl))
 ```
 
 ```{r}
