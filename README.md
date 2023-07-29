@@ -6,7 +6,9 @@ The 2A peptide is a short (~15 residue) cis-acting oligopeptide that causes the
 ribosome to skip a peptide bond between a Gly-Pro dipeptide. 2A peptides are
 thought to interact with specific residues in the ribosome exit channel.
 Previous studies described 2A and 2A-like peptides that are broadly distributed
-in other RNA viruses, including dsRNA viruses of the totiviridae family.
+in other RNA viruses, and typically occur between proteins with specific
+functions, including viral coat proteins and enzymes involved in viral
+replication.
 
 2A peptides have conserved sequence features making them amenable to
 construction of profile hidden Markov models, which capture sequence elements in
@@ -19,32 +21,34 @@ skipping activity.
 We performed a systematic search for 2A peptides using the [hmmer
 software](http://hmmer.org/).  Starting from a small set of previously described
 2A peptides in picornaviruses, we iteratively built and searched three protein
-databases (UniProt, UniParc, and MGnify), identifying thousands of 2A peptides,
-mainly in RNA viruses.
+databases (UniProt, UniParc, and MGnify), identifying thousands of 2A
+peptides.
 
 Visual inspection of multiple sequence alignments revealed a novel 2A
 peptide with features resembling the original 2A peptide. The original,
 class 1 sequences contain some key features:
 
-- a stretch of leucyl codons and the N-terminus
+- a stretch of leucine residues at the N-terminus
 - a central region with a conserved GDVE motif
 - C-terminal NPGP redidues, with skipping occuring between the Gly-Pro residues.
 
 <figure>
-  <img src="img/class-1.logo.png">
+  <img src="img/class-1.trimmed.logo.png">
   <figcaption>Logo of 2A peptide Class 1 sequences</figcaption>
 </figure>
 
+<br>
+
 Class 2 2A peptides are similar to class 1 with some key distinctions.
 
-- An absolutely conserved tryptophan residue at the N-terminus
+- An absolutely conserved tryptophan residue at the N-terminus.
 - No runs of leucine codons, but specific conserved residues in the
   central region similar to class 1 (e.g., GDVE in class 1, EEGIE in class
   2)
-- Both NPGP and HPGP residues at the C-terminus
+- Examples with PNPGP and PHPGP residues at the C-terminus.
 
 <figure>
-  <img src="img/class-2.logo.png">
+  <img src="img/class-2.trimmed logo.png">
   <figcaption>Logo of 2A peptide Class 2 sequences</figcaption>
 </figure>
 
