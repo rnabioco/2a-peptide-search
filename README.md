@@ -25,7 +25,15 @@ mainly in RNA viruses.
 Visual inspection of multiple sequence alignments revealed a novel 2A
 peptide with features resembling the original 2A peptide (Figure).  
 
-![class-1](img/class-1.logo.png) ![class-2](img/class-2.logo.png)
+<figure>
+  <img src="img/class-1.logo.png">
+  <figcaption>2A peptide Class 1</figcaption>
+</figure>
+
+<figure>
+  <img src="img/class-2.logo.png">
+  <figcaption>2A peptide Class 2</figcaption>
+</figure>
 
 ### Multiple sequence alignments
 
