@@ -24,6 +24,8 @@ software](http://hmmer.org/).  Starting from a small set of previously described
 databases (UniProt, UniParc, and MGnify), identifying thousands of 2A
 peptides.
 
+### Class 1 2A peptides
+
 Visual inspection of multiple sequence alignments revealed a novel 2A
 peptide with features resembling the original 2A peptide. The original,
 class 1 sequences contain some key features:
@@ -37,7 +39,7 @@ class 1 sequences contain some key features:
   <figcaption>Logo of 2A peptide Class 1 sequences</figcaption>
 </figure>
 
-<br>
+### Class 2 2A peptides
 
 Class 2 2A peptides are similar to class 1 with some key distinctions.
 
@@ -48,9 +50,16 @@ Class 2 2A peptides are similar to class 1 with some key distinctions.
 - Examples with PNPGP and PHPGP residues at the C-terminus.
 
 <figure>
-  <img src="img/class-2.trimmed logo.png">
+  <img src="img/class-2.trimmed.logo.png">
   <figcaption>Logo of 2A peptide Class 2 sequences</figcaption>
 </figure>
+
+### Todo
+
+- [ ] Examine distribution of proteins on N- and C-terminal sides of 2A
+  peptides
+- [ ] Examine codon usage across 2A peptides. This is only straightforward
+  (possible?) with Uniprot entries.
 
 ## Methods
 
