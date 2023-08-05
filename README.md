@@ -87,7 +87,8 @@ We created multiple sequence alignments using `hmmalign` and visualized them
 with [Jalview](https://www.jalview.org/). Neighbor-joing trees were calulcated
 for sequences in the MSA and the MSA was tree-sorted to identify sequence
 similarities. Seed alignments were also calculated by eliminating redundant
-sequences from the aligment.
+sequences from the aligment. Sequence logos in `img/` were created with
+[Skylign](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-15-7).
 
 ## References
 
