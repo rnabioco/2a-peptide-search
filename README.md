@@ -16,13 +16,20 @@ a statistical model suitable for searching large protien sequence databases. In
 particular, the Pro-Gly-Pro residues at its C-terminus are critical for 2A
 skipping activity.
 
+## Models
+
+Profile HMMs of class 1 and 2 2A peptides are in `curated-models/`.
+
+The `full` and `seed` alignments are the complete and non-redundant
+sequence matches to the UniProt, MGnify, and UniParc databases. Profile
+HMMs for use with [HMMER](hmmer.org) are build from the seed alignments.
+
 ## Results
 
 We performed a systematic search for 2A peptides using the [hmmer
-software](http://hmmer.org/).  Starting from a small set of previously described
+software](http://hmmer.org/). Starting from a small set of previously described
 2A peptides in picornaviruses, we iteratively built and searched three protein
-databases (UniProt, UniParc, and MGnify), identifying thousands of 2A
-peptides.
+databases (UniProt, UniParc, and MGnify), identifying thousands of 2A peptides.
 
 ### Class 1 2A peptides
 
@@ -76,7 +83,7 @@ We created multiple sequence alignments using `hmmalign` and visualized them
 with [Jalview](https://www.jalview.org/). Neighbor-joing trees were calulcated
 for sequences in the MSA and the MSA was tree-sorted to identify sequence
 similarities. Seed alignments were also calculated by eliminating redundant
-sequences from the aligment. In total, we identified 
+sequences from the aligment.
 
 ## References
 
