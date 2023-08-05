@@ -22,7 +22,7 @@ Profile HMMs of class 1 and 2 2A peptides are in `curated-models/`.
 
 The `full` and `seed` alignments are the complete and non-redundant
 sequence matches to the UniProt, MGnify, and UniParc databases. Profile
-HMMs for use with [HMMER](hmmer.org) are build from the seed alignments.
+HMMs for use with [HMMER](http://hmmer.org/) are build from the seed alignments.
 
 ## Results
 
