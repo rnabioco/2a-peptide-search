@@ -24,6 +24,10 @@ The `full` and `seed` alignments are the complete and non-redundant
 sequence matches to the UniProt, MGnify, and UniParc databases. Profile
 HMMs for use with [HMMER](http://hmmer.org/) are build from the seed alignments.
 
+Searches with the class 1 and 2 models will identify e.g. partial matches
+between the class 2 model and class 1 sequences and vice-versa, due to
+similarities between the models.
+
 ## Results
 
 We performed a systematic search for 2A peptides using the [hmmer
