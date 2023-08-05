@@ -16,7 +16,7 @@ a statistical model suitable for searching large protien sequence databases. In
 particular, the Pro-Gly-Pro residues at its C-terminus are critical for 2A
 skipping activity.
 
-## Models
+## Data availability
 
 Profile HMMs of class 1 and 2 2A peptides are in `curated-models/`.
 
