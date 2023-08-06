@@ -12,21 +12,17 @@ replication.
 
 2A peptides have conserved sequence features making them amenable to
 construction of profile hidden Markov models, which capture sequence elements in
-a statistical model suitable for searching large protien sequence databases. In
+a statistical model suitable for searching large protein sequence databases. In
 particular, the Pro-Gly-Pro residues at its C-terminus are critical for 2A
 skipping activity.
 
 ## Data availability
 
-Profile HMMs of class 1 and 2 2A peptides are in `curated-models/`.
+Alignments and profile HMMs of class 1 and 2 2A peptides are in `curated-models/`
 
-The `full` and `seed` alignments are the complete and non-redundant
-sequence matches to the UniProt, MGnify, and UniParc databases. Profile
-HMMs for use with [HMMER](http://hmmer.org/) are build from the seed alignments.
-
-Searches with the class 1 and 2 models will identify e.g. partial matches
-between the class 2 model and class 1 sequences and vice-versa, due to
-similarities between the models.
+Searches with the 2A models will identify e.g. partial matches between the class
+2 model and class 1 sequences and vice versa, due to similarities between the
+models.
 
 ## Results
 
@@ -54,7 +50,7 @@ class 1 sequences contain some key features:
 
 Class 2 2A peptides are similar to class 1 with some key distinctions.
 
-- An absolutely conserved tryptophan residue at the N-terminus.
+- An invariant tryptophan residue at the N-terminus.
 - No runs of leucine codons, but specific conserved residues in the
   central region similar to class 1 (e.g., GDVE in class 1, EEGIE in class
   2)
@@ -78,8 +74,7 @@ Class 2 2A peptides are similar to class 1 with some key distinctions.
 
 - [Uniprot](https://www.uniprot.org/help/about) - highly curated reference proteins, pan-organism
 - [Uniparc](https://www.uniprot.org/help/uniparc) - non-redundant, uncurated, pan-organism
-- [MGnify](https://www.ebi.ac.uk/metagenomics/about) sequences from enrivonmental samples
-
+- [MGnify](https://www.ebi.ac.uk/metagenomics/about) - sequences from enrivonmental samples
 
 ### Multiple sequence alignments
 
