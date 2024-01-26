@@ -1,0 +1,60 @@
+---
+title: "lit annotation comparison"
+format: html
+---
+
+```{r}
+#| message: false
+library(tidyverse)
+library(cowplot)
+library(glue)
+library(here)
+
+col_names <- c("target_name", "target_accession", "query_name", "query_accession", 
+               "full_e_value", "full_score", "full_bias",
+               "dom_e_value", "dom_score", "dom_bias",
+               "exp", "reg", "clu", "ov", "env", "dom",
+               "rep", "inc", "desc") 
+
+load_table <- function(x) {
+  xx <- read.table(x)
+  names(xx) <- col_names
+  as_tibble(xx)
+}
+
+tab1 <- load_table(here("results/2024-01-23/lit-annotations.class-1.hmmsearch.tab")) |>
+  filter(inc == 1)
+
+tab2 <- load_table(here("results/2024-01-23/lit-annotations.class-2.hmmsearch.tab")) |>
+  filter(inc == 1)
+```
+
+```{r}
+#| label: correlate-matches
+x1 <- select(tab1, target_name, dom_e_value) |>
+  rename(a_match = dom_e_value) |> 
+  mutate(a_match = -10 * log10(a_match))
+
+x2 <- select(tab2, target_name, dom_e_value) |>
+  rename(b_match = dom_e_value) |> 
+  mutate(b_match = -10 * log10(b_match))
+
+tab <- left_join(x1, x2, by = "target_name") |>
+  replace_na(list(a_match = 0, b_match = 0))
+
+nr <- length(unique(tab$target_name))
+
+ggplot(
+  tab,
+  aes(x = a_match, y = b_match)
+) +
+  geom_point(size = 0.5) +
+  theme_minimal_grid() +
+  labs(
+    title = "Model comparision between class A and B 2A sequences", 
+    subtitle = glue("Scores (-10*log10(E-value)) for n = {scales::comma(nr)} sequences"),
+    x = "Class A",
+    y = "Class B"
+  )
+```
+
