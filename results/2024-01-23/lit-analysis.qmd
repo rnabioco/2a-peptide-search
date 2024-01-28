@@ -44,6 +44,8 @@ tab <- left_join(x1, x2, by = "target_name") |>
 
 nr <- length(unique(tab$target_name))
 
+xmax <- max(tab$a_match)
+
 ggplot(
   tab,
   aes(x = a_match, y = b_match)
@@ -55,6 +57,8 @@ ggplot(
     subtitle = glue("Scores (-10*log10(E-value)) for n = {scales::comma(nr)} sequences"),
     x = "Class A",
     y = "Class B"
-  )
+  ) +
+  xlim(0, xmax) +
+  geom_abline(intercept = 0, slope = 1, color = "red", linetype = "dashed")
 ```
 
