@@ -78,8 +78,8 @@ similarities. Seed alignments were also calculated by eliminating redundant
 sequences from the aligment. Sequence logos in `img/` were created with
 [Skylign](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-15-7).
 
-** Mutliple sequence alignments of searches with the 2A models against
-proteome databases are in `db-searches/`. **
+**Mutliple sequence alignments of searches with the 2A models against
+proteome databases are in `db-searches/`.**
 
 ## References
 
