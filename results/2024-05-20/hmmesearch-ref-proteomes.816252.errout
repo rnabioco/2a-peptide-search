@@ -1,0 +1,6 @@
++ class=class-2
++ project=/beevol/home/jhessel/devel/rnabioco/2a-peptide-search
++ hmm=/beevol/home/jhessel/devel/rnabioco/2a-peptide-search/curated-models/2A-class-2.hmm
++ seq=/beevol/home/jhessel/devel/rnabioco/2a-peptide-search/data/ref/uniprot/reference_proteomes/reference_proteomes.fasta.gz
++ hmmsearch --tblout ref-proteomes.class-2.hmmsearch.tab -A ref-proteomes.class-2.sto --noali /beevol/home/jhessel/devel/rnabioco/2a-peptide-search/curated-models/2A-class-2.hmm /beevol/home/jhessel/devel/rnabioco/2a-peptide-search/data/ref/uniprot/reference_proteomes/reference_proteomes.fasta.gz
++ gzip -c
