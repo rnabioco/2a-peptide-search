@@ -1967,7 +1967,6 @@
 #=GS B193|2168|tr|A0A0E3JKM3|A0A0E3JKM3_9VIRU/303-326/14-20             DE [subseq from] B193|2168|tr|A0A0E3JKM3|A0A0E3JKM3_9VIRU/303-326
 #=GS B185|2160|tr|A0A2P1GN74|A0A2P1GN74_9VIRU/780-803/15-21             DE [subseq from] B185|2160|tr|A0A2P1GN74|A0A2P1GN74_9VIRU/780-803
 #=GS B199|2174|MGYP001451496680/137-159/14-20                           DE [subseq from] B199|2174|MGYP001451496680/137-159
-#=GS IFV|13|NA/14-20                                                    DE [subseq from] IFV|13|NA
 #=GS STR-34_SP|77|NA/18-25                                              DE [subseq from] STR-34_SP|77|NA
 
 A85|397|tr|A0A3G4S8L6|A0A3G4S8L6_9PICO/94-112/1-16                         FDLLKQAGDVESNPGP-
@@ -5898,8 +5897,6 @@ B185|2160|tr|A0A2P1GN74|A0A2P1GN74_9VIRU/780-803/15-21                     -----
 #=GR B185|2160|tr|A0A2P1GN74|A0A2P1GN74_9VIRU/780-803/15-21             PP .........8******.
 B199|2174|MGYP001451496680/137-159/14-20                                   ---------IESNPGP-
 #=GR B199|2174|MGYP001451496680/137-159/14-20                           PP .........7******.
-IFV|13|NA/14-20                                                            ---------IESNPGP-
-#=GR IFV|13|NA/14-20                                                    PP .........8******.
 STR-34_SP|77|NA/18-25                                                      ---LLLSGDVE------
 #=GR STR-34_SP|77|NA/18-25                                              PP ...9******9......
 #=GC PP_cons                                                               889*************6
