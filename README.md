@@ -18,11 +18,19 @@ skipping activity.
 
 ## Data availability
 
-Alignments and profile HMMs of class 1 and 2 2A peptides are in `curated-models/`
+Alignments and profile HMMs of class 1 and 2 2A peptides are in `curated-models/`.
 
-Searches with the 2A models will identify e.g. partial matches between the class
+`hmmsearch` results with the models against major protein databases are in `db-searches`.
+
+N.B. searches with the 2A models will identify e.g. partial matches between the class
 2 model and class 1 sequences and vice versa, due to similarities between the
-models.
+models (i.e., the C-terminal PGP
+
+### Pfam onboarding
+
+I have tried to no avail to incorporate these models into Pfam, now hosted by Interpro.
+They claim to not be able to build HMM models that are specific (due to the sequences being short),
+despite starting with the collection of seqeuences that are identified using the models provided here. 
 
 ## Results
 
