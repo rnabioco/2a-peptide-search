@@ -1,0 +1,24 @@
+# STOCKHOLM 1.0
+#=GF ID 2A-class-1
+#=GF DE 2A peptide (class 1)
+#=GF AU hmmsearch (HMMER 3.3.2)
+
+#=GS Chlorella_variabilis/15-30       DE [subseq from] Chlorella_variabilis
+#=GS Biomphalaria_glabrata/17-30      DE [subseq from] Biomphalaria_glabrata
+#=GS Caenorhabditis_elegans_2A1/16-30 DE [subseq from] Caenorhabditis_elegans_2A1
+#=GS Caenorhabditis_elegans_2A2/16-30 DE [subseq from] Caenorhabditis_elegans_2A2
+#=GS Caenorhabditis_elegans_2A3/16-30 DE [subseq from] Caenorhabditis_elegans_2A3
+
+Chlorella_variabilis/15-30               RMKLLLSGDVEENPGP-
+#=GR Chlorella_variabilis/15-30       PP 688*************.
+Biomphalaria_glabrata/17-30              --LILIAGDVESNPGP-
+#=GR Biomphalaria_glabrata/17-30      PP ..99************.
+Caenorhabditis_elegans_2A1/16-30         -KLLVRSGDVESNPGP-
+#=GR Caenorhabditis_elegans_2A1/16-30 PP .5999***********.
+Caenorhabditis_elegans_2A2/16-30         -KLLVRSGDVESNPGP-
+#=GR Caenorhabditis_elegans_2A2/16-30 PP .5999***********.
+Caenorhabditis_elegans_2A3/16-30         -KLLVRSGDVESNPGP-
+#=GR Caenorhabditis_elegans_2A3/16-30 PP .5999***********.
+#=GC PP_cons                             66999***********.
+#=GC RF                                  xxxxxxxxxxxxxxxxx
+//

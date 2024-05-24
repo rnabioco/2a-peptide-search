@@ -1,0 +1,21 @@
+# STOCKHOLM 1.0
+#=GF ID 2A-class-2
+#=GF DE 2A peptide (class 2)
+#=GF AU hmmsearch (HMMER 3.3.2)
+
+#=GS Caenorhabditis_elegans_2A1/20-30 DE [subseq from] Caenorhabditis_elegans_2A1
+#=GS Caenorhabditis_elegans_2A2/20-30 DE [subseq from] Caenorhabditis_elegans_2A2
+#=GS Caenorhabditis_elegans_2A3/20-30 DE [subseq from] Caenorhabditis_elegans_2A3
+#=GS Biomphalaria_glabrata/22-30      DE [subseq from] Biomphalaria_glabrata
+
+Caenorhabditis_elegans_2A1/20-30         ---------RSGdVESNPGP-----
+#=GR Caenorhabditis_elegans_2A1/20-30 PP .........5688*******.....
+Caenorhabditis_elegans_2A2/20-30         ---------RSGdVESNPGP-----
+#=GR Caenorhabditis_elegans_2A2/20-30 PP .........5688*******.....
+Caenorhabditis_elegans_2A3/20-30         ---------RSGdVESNPGP-----
+#=GR Caenorhabditis_elegans_2A3/20-30 PP .........5688*******.....
+Biomphalaria_glabrata/22-30              -----------GdVESNPGP-----
+#=GR Biomphalaria_glabrata/22-30      PP ...........44*******.....
+#=GC PP_cons                             .........567.*******.....
+#=GC RF                                  xxxxxxxxxxxx.xxxxxxxxxxxx
+//

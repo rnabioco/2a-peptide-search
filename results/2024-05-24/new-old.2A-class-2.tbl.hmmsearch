@@ -1,0 +1,17 @@
+#                                                                     --- full sequence ---- --- best 1 domain ---- --- domain number estimation ----
+# target name              accession  query name           accession    E-value  score  bias   E-value  score  bias   exp reg clu  ov env dom rep inc description of target
+#      ------------------- ---------- -------------------- ---------- --------- ------ ----- --------- ------ -----   --- --- --- --- --- --- --- --- ---------------------
+Caenorhabditis_elegans_2A1 -          2A-class-2           -            7.6e-06   14.0   0.0     1e-05   13.6   0.0   1.2   1   0   0   1   1   1   1 -
+Caenorhabditis_elegans_2A2 -          2A-class-2           -            7.6e-06   14.0   0.0     1e-05   13.6   0.0   1.2   1   0   0   1   1   1   1 -
+Caenorhabditis_elegans_2A3 -          2A-class-2           -            7.6e-06   14.0   0.0     1e-05   13.6   0.0   1.2   1   0   0   1   1   1   1 -
+Biomphalaria_glabrata      -          2A-class-2           -            2.2e-05   12.5   0.1   2.2e-05   12.5   0.1   1.4   2   0   0   2   2   2   1 -
+#
+# Program:         hmmsearch
+# Version:         3.3.2 (Nov 2020)
+# Pipeline mode:   SEARCH
+# Query file:      ../../curated-models/2A-class-2.hmm
+# Target file:     new-old.fa
+# Option settings: hmmsearch -A new-old.2A-class-2.sto --tblout new-old.2A-class-2.tbl.hmmsearch ../../curated-models/2A-class-2.hmm new-old.fa 
+# Current dir:     /Users/jayhesselberth/devel/2a-peptide-search/results/2024-05-24
+# Date:            Fri May 24 17:40:09 2024
+# [ok]
