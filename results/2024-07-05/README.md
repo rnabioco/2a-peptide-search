@@ -13,9 +13,11 @@ The class 2 hits seems to have some insertions at key points in the middle (two 
 The DD sequences do have one extra Asp residue in the middle of the 2A sequence. Compare:
 
 <figure>
-  <img src="DD-clade/DD-clade.logo.png">
+  <img src="DD-clade/DD-clade.logo.trimmed.png">
   <figcaption>Logo of class 2-DD 2A peptide sequences</figcaption>
 </figure>
+
+<br/>
 
 <figure>
   <img src="../../img/class-2.trimmed.logo.png">
