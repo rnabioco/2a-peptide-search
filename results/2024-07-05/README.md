@@ -4,6 +4,9 @@ https://genome.jgi.doe.gov/portal/pages/dynamicOrganismDownload.jsf?organism=IMG
 
 ## DD clade
 
+TLDR: this separate clade was present in the original 2A class 2 at a lower frequency. AFAICT
+no examples of this sub-class were tested in the LAT.
+
 The class 2 hits seems to have some insertions at key points in the middle (two Asp residues).
 
 1. used Jalview to select out relevant sequences with DD insertions (in `DD-clade`).
