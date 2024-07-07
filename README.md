@@ -77,6 +77,7 @@ Class 2 2A peptides are similar to class 1 with some key distinctions.
 - [Uniparc](https://www.uniprot.org/help/uniparc) - non-redundant, uncurated, pan-organism
 - [MGnify](https://www.ebi.ac.uk/metagenomics/about) - sequences from enrivonmental samples
 - [Reference Proteomes](https://www.uniprot.org/help/reference_proteome) — a subset of Uniprot used to build models for Pfam.
+- [IMGVR](https://genome.jgi.doe.gov/portal/IMG_VR/IMG_VR.home.html) - large database of cultivated an uncultivated viruses
 
 ### Multiple sequence alignments
 
