@@ -30,7 +30,7 @@ models (i.e., the C-terminal PGP
 
 I have tried to no avail to incorporate these models into Pfam, now hosted by Interpro.
 They claim to not be able to build HMM models that are specific (due to the sequences being short),
-despite starting with the collection of seqeuences that are identified using the models provided here. 
+despite them starting with the collection of seqeuences that are identified using the models provided here 🤦‍♂️. 
 
 ## Results
 
