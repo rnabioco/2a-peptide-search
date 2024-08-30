@@ -13,54 +13,55 @@ Query:       2A-class-1  [M=17]
 Description: 2A peptide (class 1)
 Scores for complete sequences (score includes all domains):
    --- full sequence ---   --- best 1 domain ---    -#dom-
-    E-value  score  bias    E-value  score  bias    exp  N  Sequence    Description
-    ------- ------ -----    ------- ------ -----   ---- --  --------    -----------
-    9.1e-06   16.1   0.6    9.1e-06   16.1   0.6    2.0  3  CR1-8_NV     
-    0.00017   12.0   0.2    0.00026   11.4   0.2    1.4  1  CR1-18_BF    
-    0.00017   12.0   0.2    0.00026   11.4   0.2    1.4  1  CR1-3_BF     
-    0.00018   12.0   3.6     0.0013    9.2   3.6    1.9  1  STR-61_SP    
-    0.00031   11.2   2.0    0.00031   11.2   2.0    1.9  2  CR1-19_NV    
-    0.00033   11.1   0.2    0.00033   11.1   0.2    2.7  3  CR1-21_NV    
-    0.00045   10.7   1.0    0.00045   10.7   1.0    2.7  3  L2-2_XT      
-    0.00055   10.4  11.9    0.00035   11.0   2.2    2.7  2  CR1-2_NV     
-    0.00061   10.3   0.3    0.00061   10.3   0.3    2.2  2  Crack-28_BF  
-    0.00084    9.8   0.5     0.0013    9.2   0.5    1.4  1  Crack-10_BF  
-      0.002    8.6   4.5     0.0036    7.8   4.5    1.5  1  DHV-1        
-      0.004    7.6  11.7      0.044    4.4  11.7    2.0  1  STR-32_SP    
+    E-value  score  bias    E-value  score  bias    exp  N  Sequence        Description
+    ------- ------ -----    ------- ------ -----   ---- --  --------        -----------
+    9.5e-06   16.1   0.6    9.5e-06   16.1   0.6    2.0  3  CR1-8_NV         
+    0.00018   12.0   0.2    0.00028   11.4   0.2    1.4  1  CR1-18_BF        
+    0.00018   12.0   0.2    0.00028   11.4   0.2    1.4  1  CR1-3_BF         
+    0.00019   12.0   3.6     0.0013    9.2   3.6    1.9  1  STR-61_SP        
+    0.00033   11.2   2.0    0.00033   11.2   2.0    1.9  2  CR1-19_NV        
+    0.00035   11.1   0.2    0.00035   11.1   0.2    2.7  3  CR1-21_NV        
+    0.00048   10.7   1.0    0.00048   10.7   1.0    2.7  3  L2-2_XT          
+    0.00058   10.4  11.9    0.00037   11.0   2.2    2.7  2  CR1-2_NV         
+    0.00065   10.3   0.3    0.00065   10.3   0.3    2.2  2  Crack-28_BF      
+    0.00088    9.8   0.5     0.0014    9.2   0.5    1.4  1  Crack-10_BF      
+     0.0021    8.6   4.5     0.0038    7.8   4.5    1.5  1  DHV-1            
+     0.0043    7.6  11.7      0.046    4.4  11.7    2.0  1  STR-32_SP        
+     0.0065    7.1   0.6      0.008    6.8   0.6    1.2  1  T_maritima_augA  
   ------ inclusion threshold ------
-      0.021    5.4   7.7     0.0013    9.2   0.5    2.1  2  CR1-17_BF    
-      0.021    5.3   8.2      0.012    6.1   0.1    2.1  2  L2-3_XT      
-      0.024    5.2   8.0       0.27    1.8   8.0    2.1  1  STR-55_SP    
-      0.042    4.4   5.0      0.084    3.5   5.0    1.5  1  CR1-31_BF    
-       0.37    1.4  13.4      0.017    5.6   1.3    2.5  2  L2-4_XT      
-       0.42    1.2  10.7      0.053    4.1   0.2    2.2  2  STR-197_SP   
-          1    0.0  15.1      0.017    5.6   1.4    2.6  2  CR1-L2-1_XT  
+      0.022    5.4   7.7     0.0014    9.2   0.5    2.1  2  CR1-17_BF        
+      0.022    5.3   8.2      0.013    6.1   0.1    2.1  2  L2-3_XT          
+      0.026    5.2   8.0       0.28    1.8   8.0    2.1  1  STR-55_SP        
+      0.045    4.4   5.0      0.089    3.5   5.0    1.5  1  CR1-31_BF        
+       0.39    1.4  13.4      0.018    5.6   1.3    2.5  2  L2-4_XT          
+       0.44    1.2  10.7      0.055    4.1   0.2    2.2  2  STR-197_SP       
+        1.1    0.0  15.1      0.018    5.6   1.4    2.6  2  CR1-L2-1_XT      
 
 
 Domain annotation for each sequence (and alignments):
 >> CR1-8_NV  
    #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
  ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
-   1 ?   -2.7   0.1         7         7      15      17 .]       9      11 ..       9      11 .. 0.79
-   2 ?   -1.2   0.4       2.4       2.4       2       5 ..      15      18 ..      15      19 .. 0.66
-   3 !   16.1   0.6   9.1e-06   9.1e-06       8      15 ..      21      28 ..      21      28 .. 0.98
+   1 ?   -2.7   0.1       7.4       7.4      15      17 .]       9      11 ..       9      11 .. 0.79
+   2 ?   -1.2   0.4       2.5       2.5       2       5 ..      15      18 ..      15      19 .. 0.66
+   3 !   16.1   0.6   9.5e-06   9.5e-06       8      15 ..      21      28 ..      21      28 .. 0.98
 
   Alignments for each domain:
-  == domain 1  score: -2.7 bits;  conditional E-value: 7
+  == domain 1  score: -2.7 bits;  conditional E-value: 7.4
                 xxx RF
   2A-class-1 15 GPt 17
                 GP+
     CR1-8_NV  9 GPS 11
                 995 PP
 
-  == domain 2  score: -1.2 bits;  conditional E-value: 2.4
+  == domain 2  score: -1.2 bits;  conditional E-value: 2.5
                 xxxx RF
   2A-class-1  2 dLLl 5 
                 +LLl
     CR1-8_NV 15 MLLL 18
                 5777 PP
 
-  == domain 3  score: 16.1 bits;  conditional E-value: 9.1e-06
+  == domain 3  score: 16.1 bits;  conditional E-value: 9.5e-06
                 xxxxxxxx RF
   2A-class-1  8 GDVEsNPG 15
                 GDVE+NPG
@@ -70,10 +71,10 @@ Domain annotation for each sequence (and alignments):
 >> CR1-18_BF  
    #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
  ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
-   1 !   11.4   0.2   0.00026   0.00026       9      16 ..      23      30 .]      23      30 .] 0.91
+   1 !   11.4   0.2   0.00028   0.00028       9      16 ..      23      30 .]      23      30 .] 0.91
 
   Alignments for each domain:
-  == domain 1  score: 11.4 bits;  conditional E-value: 0.00026
+  == domain 1  score: 11.4 bits;  conditional E-value: 0.00028
                 xxxxxxxx RF
   2A-class-1  9 DVEsNPGP 16
                 D E+NPGP
@@ -83,10 +84,10 @@ Domain annotation for each sequence (and alignments):
 >> CR1-3_BF  
    #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
  ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
-   1 !   11.4   0.2   0.00026   0.00026       9      16 ..      23      30 .]      23      30 .] 0.91
+   1 !   11.4   0.2   0.00028   0.00028       9      16 ..      23      30 .]      23      30 .] 0.91
 
   Alignments for each domain:
-  == domain 1  score: 11.4 bits;  conditional E-value: 0.00026
+  == domain 1  score: 11.4 bits;  conditional E-value: 0.00028
                 xxxxxxxx RF
   2A-class-1  9 DVEsNPGP 16
                 D E+NPGP
@@ -109,18 +110,18 @@ Domain annotation for each sequence (and alignments):
 >> CR1-19_NV  
    #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
  ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
-   1 !   11.2   2.0   0.00031   0.00031       3      10 ..      17      24 ..      16      24 .. 0.91
-   2 ?   -1.6   2.1       3.2       3.2      14      16 ..      28      30 .]      28      30 .] 0.96
+   1 !   11.2   2.0   0.00033   0.00033       3      10 ..      17      24 ..      16      24 .. 0.91
+   2 ?   -1.6   2.1       3.3       3.3      14      16 ..      28      30 .]      28      30 .] 0.96
 
   Alignments for each domain:
-  == domain 1  score: 11.2 bits;  conditional E-value: 0.00031
+  == domain 1  score: 11.2 bits;  conditional E-value: 0.00033
                 xxxxxxxx RF
   2A-class-1  3 LLlLaGDV 10
                 LLlL+GD+
    CR1-19_NV 17 LLLLCGDI 24
                 9******7 PP
 
-  == domain 2  score: -1.6 bits;  conditional E-value: 3.2
+  == domain 2  score: -1.6 bits;  conditional E-value: 3.3
                 xxx RF
   2A-class-1 14 PGP 16
                 PGP
@@ -130,26 +131,26 @@ Domain annotation for each sequence (and alignments):
 >> CR1-21_NV  
    #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
  ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
-   1 ?   -1.2   0.4       2.5       2.5      12      14 ..       8      10 ..       8      10 .. 0.92
-   2 !   11.1   0.2   0.00033   0.00033       1      10 [.      15      24 ..      15      24 .. 0.95
-   3 ?    5.2   1.0     0.023     0.023      12      16 ..      26      30 .]      26      30 .] 0.89
+   1 ?   -1.2   0.4       2.6       2.6      12      14 ..       8      10 ..       8      10 .. 0.92
+   2 !   11.1   0.2   0.00035   0.00035       1      10 [.      15      24 ..      15      24 .. 0.95
+   3 ?    5.2   1.0     0.024     0.024      12      16 ..      26      30 .]      26      30 .] 0.89
 
   Alignments for each domain:
-  == domain 1  score: -1.2 bits;  conditional E-value: 2.5
+  == domain 1  score: -1.2 bits;  conditional E-value: 2.6
                 xxx RF
   2A-class-1 12 sNP 14
                 sNP
    CR1-21_NV  8 SNP 10
                 8*9 PP
 
-  == domain 2  score: 11.1 bits;  conditional E-value: 0.00033
+  == domain 2  score: 11.1 bits;  conditional E-value: 0.00035
                 xxxxxxxxxx RF
   2A-class-1  1 FdLLlLaGDV 10
                 F LL L+GD+
    CR1-21_NV 15 FRLLILSGDI 24
                 99*******7 PP
 
-  == domain 3  score: 5.2 bits;  conditional E-value: 0.023
+  == domain 3  score: 5.2 bits;  conditional E-value: 0.024
                 xxxxx RF
   2A-class-1 12 sNPGP 16
                 +NPGP
@@ -159,26 +160,26 @@ Domain annotation for each sequence (and alignments):
 >> L2-2_XT  
    #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
  ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
-   1 ?   -1.0   0.4       2.1       2.1       1       4 [.      11      14 ..      11      14 .. 0.90
-   2 !   10.7   1.0   0.00045   0.00045       1      10 [.      15      24 ..      15      24 .. 0.97
-   3 ?    0.8   4.9      0.56      0.56      13      16 ..      27      30 .]      26      30 .] 0.92
+   1 ?   -1.0   0.4       2.2       2.2       1       4 [.      11      14 ..      11      14 .. 0.90
+   2 !   10.7   1.0   0.00048   0.00048       1      10 [.      15      24 ..      15      24 .. 0.97
+   3 ?    0.8   4.9      0.59      0.59      13      16 ..      27      30 .]      26      30 .] 0.92
 
   Alignments for each domain:
-  == domain 1  score: -1.0 bits;  conditional E-value: 2.1
+  == domain 1  score: -1.0 bits;  conditional E-value: 2.2
                 xxxx RF
   2A-class-1  1 FdLL 4 
                 F+LL
      L2-2_XT 11 FSLL 14
                 9999 PP
 
-  == domain 2  score: 10.7 bits;  conditional E-value: 0.00045
+  == domain 2  score: 10.7 bits;  conditional E-value: 0.00048
                 xxxxxxxxxx RF
   2A-class-1  1 FdLLlLaGDV 10
                 F+LLl aGDV
      L2-2_XT 15 FLLLLAAGDV 24
                 99*******9 PP
 
-  == domain 3  score: 0.8 bits;  conditional E-value: 0.56
+  == domain 3  score: 0.8 bits;  conditional E-value: 0.59
                 xxxx RF
   2A-class-1 13 NPGP 16
                 NPGP
@@ -188,18 +189,18 @@ Domain annotation for each sequence (and alignments):
 >> CR1-2_NV  
    #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
  ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
-   1 !   11.0   2.2   0.00035   0.00035       3      10 ..      17      24 ..      16      24 .. 0.91
-   2 ?    5.2   1.0     0.023     0.023      12      16 ..      26      30 .]      26      30 .] 0.89
+   1 !   11.0   2.2   0.00037   0.00037       3      10 ..      17      24 ..      16      24 .. 0.91
+   2 ?    5.2   1.0     0.024     0.024      12      16 ..      26      30 .]      26      30 .] 0.89
 
   Alignments for each domain:
-  == domain 1  score: 11.0 bits;  conditional E-value: 0.00035
+  == domain 1  score: 11.0 bits;  conditional E-value: 0.00037
                 xxxxxxxx RF
   2A-class-1  3 LLlLaGDV 10
                 LLlL+GD+
     CR1-2_NV 17 LLLLCGDI 24
                 9******7 PP
 
-  == domain 2  score: 5.2 bits;  conditional E-value: 0.023
+  == domain 2  score: 5.2 bits;  conditional E-value: 0.024
                 xxxxx RF
   2A-class-1 12 sNPGP 16
                 +NPGP
@@ -209,18 +210,18 @@ Domain annotation for each sequence (and alignments):
 >> Crack-28_BF  
    #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
  ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
-   1 !   10.3   0.3   0.00061   0.00061       4      10 ..      18      24 ..      17      24 .. 0.96
-   2 ?    0.8   4.9      0.56      0.56      13      16 ..      27      30 .]      26      30 .] 0.92
+   1 !   10.3   0.3   0.00065   0.00065       4      10 ..      18      24 ..      17      24 .. 0.96
+   2 ?    0.8   4.9      0.59      0.59      13      16 ..      27      30 .]      26      30 .] 0.92
 
   Alignments for each domain:
-  == domain 1  score: 10.3 bits;  conditional E-value: 0.00061
+  == domain 1  score: 10.3 bits;  conditional E-value: 0.00065
                  xxxxxxx RF
    2A-class-1  4 LlLaGDV 10
                  LlLaGDV
   Crack-28_BF 18 LLLAGDV 24
                  9*****9 PP
 
-  == domain 2  score: 0.8 bits;  conditional E-value: 0.56
+  == domain 2  score: 0.8 bits;  conditional E-value: 0.59
                  xxxx RF
    2A-class-1 13 NPGP 16
                  NPGP
@@ -230,10 +231,10 @@ Domain annotation for each sequence (and alignments):
 >> Crack-10_BF  
    #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
  ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
-   1 !    9.2   0.5    0.0013    0.0013       9      16 ..      23      30 .]      23      30 .] 0.95
+   1 !    9.2   0.5    0.0014    0.0014       9      16 ..      23      30 .]      23      30 .] 0.95
 
   Alignments for each domain:
-  == domain 1  score: 9.2 bits;  conditional E-value: 0.0013
+  == domain 1  score: 9.2 bits;  conditional E-value: 0.0014
                  xxxxxxxx RF
    2A-class-1  9 DVEsNPGP 16
                  D+  NPGP
@@ -243,10 +244,10 @@ Domain annotation for each sequence (and alignments):
 >> DHV-1  
    #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
  ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
-   1 !    7.8   4.5    0.0036    0.0036      10      16 ..      24      30 .]      23      30 .] 0.96
+   1 !    7.8   4.5    0.0038    0.0038      10      16 ..      24      30 .]      23      30 .] 0.96
 
   Alignments for each domain:
-  == domain 1  score: 7.8 bits;  conditional E-value: 0.0036
+  == domain 1  score: 7.8 bits;  conditional E-value: 0.0038
                 xxxxxxx RF
   2A-class-1 10 VEsNPGP 16
                 VE NPGP
@@ -256,31 +257,44 @@ Domain annotation for each sequence (and alignments):
 >> STR-32_SP  
    #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
  ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
-   1 ?    4.4  11.7     0.044     0.044       3      16 ..      17      30 .]      16      30 .] 0.93
+   1 ?    4.4  11.7     0.046     0.046       3      16 ..      17      30 .]      16      30 .] 0.93
 
   Alignments for each domain:
-  == domain 1  score: 4.4 bits;  conditional E-value: 0.044
+  == domain 1  score: 4.4 bits;  conditional E-value: 0.046
                 xxxxxxxxxxxxxx RF
   2A-class-1  3 LLlLaGDVEsNPGP 16
                 LLlL+G VE NPGP
    STR-32_SP 17 LLLLSGOVEPNPGP 30
                 9999999******* PP
 
+>> T_maritima_augA  
+   #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
+ ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
+   1 !    6.8   0.6     0.008     0.008      11      16 ..      15      20 .]      15      20 .] 0.85
+
+  Alignments for each domain:
+  == domain 1  score: 6.8 bits;  conditional E-value: 0.008
+                     xxxxxx RF
+       2A-class-1 11 EsNPGP 16
+                     E NPGP
+  T_maritima_augA 15 EFNPGP 20
+                     66**** PP
+
 >> CR1-17_BF  
    #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
  ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
-   1 ?   -0.0   1.4         1         1       1       5 [.      13      17 ..      13      18 .. 0.69
-   2 ?    9.2   0.5    0.0013    0.0013       9      16 ..      23      30 .]      23      30 .] 0.95
+   1 ?   -0.0   1.4       1.1       1.1       1       5 [.      13      17 ..      13      18 .. 0.69
+   2 ?    9.2   0.5    0.0014    0.0014       9      16 ..      23      30 .]      23      30 .] 0.95
 
   Alignments for each domain:
-  == domain 1  score: -0.0 bits;  conditional E-value: 1
+  == domain 1  score: -0.0 bits;  conditional E-value: 1.1
                 xxxxx RF
   2A-class-1  1 FdLLl 5 
                 F+LLl
    CR1-17_BF 13 FLLLL 17
                 67777 PP
 
-  == domain 2  score: 9.2 bits;  conditional E-value: 0.0013
+  == domain 2  score: 9.2 bits;  conditional E-value: 0.0014
                 xxxxxxxx RF
   2A-class-1  9 DVEsNPGP 16
                 D+  NPGP
@@ -290,18 +304,18 @@ Domain annotation for each sequence (and alignments):
 >> L2-3_XT  
    #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
  ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
-   1 ?    6.1   0.1     0.012     0.012       3      10 ..      17      24 ..      16      24 .. 0.92
-   2 ?    0.8   4.9      0.56      0.56      13      16 ..      27      30 .]      26      30 .] 0.92
+   1 ?    6.1   0.1     0.013     0.013       3      10 ..      17      24 ..      16      24 .. 0.92
+   2 ?    0.8   4.9      0.59      0.59      13      16 ..      27      30 .]      26      30 .] 0.92
 
   Alignments for each domain:
-  == domain 1  score: 6.1 bits;  conditional E-value: 0.012
+  == domain 1  score: 6.1 bits;  conditional E-value: 0.013
                 xxxxxxxx RF
   2A-class-1  3 LLlLaGDV 10
                 LLl aGD+
      L2-3_XT 17 LLLAAGDI 24
                 9******7 PP
 
-  == domain 2  score: 0.8 bits;  conditional E-value: 0.56
+  == domain 2  score: 0.8 bits;  conditional E-value: 0.59
                 xxxx RF
   2A-class-1 13 NPGP 16
                 NPGP
@@ -311,10 +325,10 @@ Domain annotation for each sequence (and alignments):
 >> STR-55_SP  
    #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
  ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
-   1 ?    1.8   8.0      0.27      0.27       4      16 ..      18      30 .]      16      30 .] 0.88
+   1 ?    1.8   8.0      0.28      0.28       4      16 ..      18      30 .]      16      30 .] 0.88
 
   Alignments for each domain:
-  == domain 1  score: 1.8 bits;  conditional E-value: 0.27
+  == domain 1  score: 1.8 bits;  conditional E-value: 0.28
                 xxxxxxxxxxxxx RF
   2A-class-1  4 LlLaGDVEsNPGP 16
                 Ll +GDV  NPGP
@@ -324,10 +338,10 @@ Domain annotation for each sequence (and alignments):
 >> CR1-31_BF  
    #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
  ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
-   1 ?    3.5   5.0     0.084     0.084      11      16 ..      25      30 .]      25      30 .] 0.95
+   1 ?    3.5   5.0     0.089     0.089      11      16 ..      25      30 .]      25      30 .] 0.95
 
   Alignments for each domain:
-  == domain 1  score: 3.5 bits;  conditional E-value: 0.084
+  == domain 1  score: 3.5 bits;  conditional E-value: 0.089
                 xxxxxx RF
   2A-class-1 11 EsNPGP 16
                 E NPGP
@@ -337,18 +351,18 @@ Domain annotation for each sequence (and alignments):
 >> L2-4_XT  
    #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
  ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
-   1 ?    5.6   1.3     0.017     0.017       3      10 ..      17      24 ..      15      24 .. 0.86
-   2 ?    0.8   4.9      0.56      0.56      13      16 ..      27      30 .]      26      30 .] 0.92
+   1 ?    5.6   1.3     0.018     0.018       3      10 ..      17      24 ..      15      24 .. 0.86
+   2 ?    0.8   4.9      0.59      0.59      13      16 ..      27      30 .]      26      30 .] 0.92
 
   Alignments for each domain:
-  == domain 1  score: 5.6 bits;  conditional E-value: 0.017
+  == domain 1  score: 5.6 bits;  conditional E-value: 0.018
                 xxxxxxxx RF
   2A-class-1  3 LLlLaGDV 10
                 LLl aGD+
      L2-4_XT 17 LLLAAGDI 24
                 99999997 PP
 
-  == domain 2  score: 0.8 bits;  conditional E-value: 0.56
+  == domain 2  score: 0.8 bits;  conditional E-value: 0.59
                 xxxx RF
   2A-class-1 13 NPGP 16
                 NPGP
@@ -358,11 +372,11 @@ Domain annotation for each sequence (and alignments):
 >> STR-197_SP  
    #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
  ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
-   1 ?    4.1   0.2     0.053     0.053       4      10 ..      18      24 ..      18      24 .. 0.89
+   1 ?    4.1   0.2     0.055     0.055       4      10 ..      18      24 ..      18      24 .. 0.89
    2 ?   -0.1   5.9       1.1       1.1      13      16 ..      27      30 .]      25      30 .] 0.93
 
   Alignments for each domain:
-  == domain 1  score: 4.1 bits;  conditional E-value: 0.053
+  == domain 1  score: 4.1 bits;  conditional E-value: 0.055
                 xxxxxxx RF
   2A-class-1  4 LlLaGDV 10
                 Ll +GD+
@@ -379,18 +393,18 @@ Domain annotation for each sequence (and alignments):
 >> CR1-L2-1_XT  
    #    score  bias  c-Evalue  i-Evalue hmmfrom  hmm to    alifrom  ali to    envfrom  env to     acc
  ---   ------ ----- --------- --------- ------- -------    ------- -------    ------- -------    ----
-   1 ?    5.6   1.4     0.017     0.017       3      10 ..      17      24 ..      14      24 .. 0.86
-   2 ?    0.8   4.9      0.56      0.56      13      16 ..      27      30 .]      26      30 .] 0.92
+   1 ?    5.6   1.4     0.018     0.018       3      10 ..      17      24 ..      14      24 .. 0.86
+   2 ?    0.8   4.9      0.59      0.59      13      16 ..      27      30 .]      26      30 .] 0.92
 
   Alignments for each domain:
-  == domain 1  score: 5.6 bits;  conditional E-value: 0.017
+  == domain 1  score: 5.6 bits;  conditional E-value: 0.018
                  xxxxxxxx RF
    2A-class-1  3 LLlLaGDV 10
                  LLl aGD+
   CR1-L2-1_XT 17 LLLAAGDI 24
                  99999997 PP
 
-  == domain 2  score: 0.8 bits;  conditional E-value: 0.56
+  == domain 2  score: 0.8 bits;  conditional E-value: 0.59
                  xxxx RF
    2A-class-1 13 NPGP 16
                  NPGP
@@ -402,14 +416,14 @@ Domain annotation for each sequence (and alignments):
 Internal pipeline statistics summary:
 -------------------------------------
 Query model(s):                            1  (17 nodes)
-Target sequences:                         19  (569 residues searched)
-Passed MSV filter:                        19  (1); expected 19.0 (1)
-Passed bias filter:                       19  (1); expected 19.0 (1)
-Passed Vit filter:                        19  (1); expected 19.0 (1)
-Passed Fwd filter:                        19  (1); expected 19.0 (1)
-Initial search space (Z):                 19  [actual number of targets]
-Domain search space  (domZ):              19  [number of targets reported over threshold]
+Target sequences:                         20  (589 residues searched)
+Passed MSV filter:                        20  (1); expected 20.0 (1)
+Passed bias filter:                       20  (1); expected 20.0 (1)
+Passed Vit filter:                        20  (1); expected 20.0 (1)
+Passed Fwd filter:                        20  (1); expected 20.0 (1)
+Initial search space (Z):                 20  [actual number of targets]
+Domain search space  (domZ):              20  [number of targets reported over threshold]
 # CPU time: 0.00u 0.00s 00:00:00.00 Elapsed: 00:00:00.00
-# Mc/sec: 3.29
+# Mc/sec: 5.98
 //
 [ok]
