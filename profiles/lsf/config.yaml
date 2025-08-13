@@ -1,0 +1,11 @@
+# Snakemake profile for LSF cluster execution
+
+cluster: "python3 ../../lsf-submit.py {jobscript} --cluster-config ../../cluster.yaml"
+cluster-config: "../../cluster.yaml"
+jobs: 50
+latency-wait: 60
+keep-going: true
+rerun-incomplete: true
+printshellcmds: true
+reason: true
+show-failed-logs: true

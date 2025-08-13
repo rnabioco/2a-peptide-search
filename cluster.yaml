@@ -1,0 +1,49 @@
+# Cluster configuration for SLURM
+# Usage: snakemake --cluster-config cluster.yaml --cluster "sbatch --partition={cluster.partition} --time={cluster.time} --mem={cluster.mem} --cpus-per-task={cluster.cpus} --job-name={cluster.name} --output={cluster.output} --error={cluster.error}"
+
+__default__:
+  partition: "general"
+  time: "2:00:00"
+  mem: "8G"
+  cpus: 1
+  name: "{rule}"
+  output: "logs/{rule}_{wildcards}.out"
+  error: "logs/{rule}_{wildcards}.err"
+
+download_interproscan:
+  time: "1:00:00"
+  mem: "4G"
+
+build_hmm_models:
+  time: "0:30:00"
+  mem: "4G"
+
+hmmsearch_single:
+  partition: "general"
+  time: "4:00:00"
+  mem: "16G"
+  cpus: 12
+
+hmmsearch_mgnify:
+  partition: "general"
+  time: "8:00:00"
+  mem: "32G"
+  cpus: 12
+
+hmmsearch_max_sensitivity:
+  partition: "general"  
+  time: "6:00:00"
+  mem: "24G"
+  cpus: 12
+
+merge_alignments:
+  time: "1:00:00"
+  mem: "8G"
+
+expand_hits:
+  time: "1:00:00"
+  mem: "8G"
+
+create_logos:
+  time: "0:30:00"
+  mem: "4G"

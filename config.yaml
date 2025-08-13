@@ -1,0 +1,42 @@
+# Configuration file for 2A peptide search pipeline
+
+# Database paths - update these to match your actual file locations
+databases:
+  uniprot: "ref/uniprot.2023_01.fa.gz"
+  ref_proteomes: "ref/ref_proteomes.fa.gz"  
+  imgvr: "ref/imgvr.fa.gz"
+  mgnify_pattern: "ref/mgy/mgy_{chunk}.fa.gz"  # Pattern for MGnify chunks 1-30
+
+# hmmsearch parameters
+hmmsearch:
+  cpu: 12
+  evalue: 1e-5
+
+# Optional: cluster configuration (for SLURM/LSF submission)
+cluster:
+  # Example SLURM configuration
+  default:
+    partition: "general"
+    time: "2:00:00"
+    mem: "8G"
+  
+  # Resource-intensive rules
+  hmmsearch_single:
+    time: "4:00:00"
+    mem: "16G"
+    cpus: 12
+  
+  hmmsearch_mgnify:
+    time: "8:00:00"
+    mem: "32G" 
+    cpus: 12
+  
+  hmmsearch_max_sensitivity:
+    time: "6:00:00"
+    mem: "24G"
+    cpus: 12
+
+# Software paths (if not in PATH)
+software:
+  hmmer: ""  # Leave empty if in PATH, otherwise specify full path to hmmer binaries
+  easel: ""  # Leave empty if in PATH, otherwise specify full path to easel binaries
