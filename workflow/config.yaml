@@ -2,18 +2,19 @@
 
 # Output directories
 # For local runs, these will be relative to the working directory
-# For Alpine, set to scratch for intermediate files
+# For Alpine, everything goes to scratch for fast I/O
+# Move important results to /projects manually after pipeline completes
 output_dirs:
-  # Scratch directory for intermediate files (searches, alignments)
+  # Base scratch directory - ALL outputs go here
   # Fast I/O, 90-day purge on Alpine
-  scratch: "/scratch/alpine/${USER}/2a-peptide-search"
+  # Move key results to /projects after completion
+  scratch: "scratch"
 
-  # Permanent storage for final results (models, reports)
-  # Slower but permanent on Alpine
-  results: "results"
+  # Results directory (relative to scratch)
+  results: "scratch/results"
 
-  # Downloaded databases (can be on scratch or projects)
-  data: "data"
+  # Downloaded databases (relative to scratch)
+  data: "scratch/data"
 
 # Protein databases to search
 databases:

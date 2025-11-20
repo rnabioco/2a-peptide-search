@@ -2,18 +2,34 @@
 # Use this config for running on CU Boulder Alpine cluster
 
 # Output directories for Alpine
+# ALL outputs go to scratch for fast I/O during pipeline execution
+# Move important results to /projects manually after completion
 output_dirs:
-  # Scratch directory for intermediate files (searches, alignments)
-  # Fast I/O, 90-day purge policy
+  # Base scratch directory
   scratch: "/scratch/alpine/${USER}/2a-peptide-search"
 
-  # Permanent storage for final results (models, reports)
-  # Use /projects for long-term storage
-  results: "/projects/${USER}/2a-peptide-search/results"
+  # Results directory (on scratch)
+  results: "/scratch/alpine/${USER}/2a-peptide-search/results"
 
-  # Downloaded databases (recommend scratch for large files)
+  # Downloaded databases (on scratch)
   data: "/scratch/alpine/${USER}/2a-peptide-search/data"
 
+# After pipeline completion, move key results to permanent storage:
+#
+# Example commands:
+#   cd /scratch/alpine/$USER/2a-peptide-search
+#
+#   # Move final models
+#   mkdir -p /projects/$USER/2a-peptide-search
+#   cp -r results/models/final /projects/$USER/2a-peptide-search/
+#
+#   # Move final report
+#   cp results/reports/*.html /projects/$USER/2a-peptide-search/
+#
+#   # Archive search results (optional)
+#   tar -czf searches.tar.gz results/searches
+#   mv searches.tar.gz /projects/$USER/2a-peptide-search/
+#
 # Import other settings from base config
 # (Use with: snakemake --configfile workflow/config-alpine.yaml)
 

@@ -183,6 +183,7 @@ scancel --name=2a-
 ```bash
 # Configure account in cluster/slurm/config.yaml
 # Configure databases in workflow/config.yaml (start with UniProt only)
+# Note: ALL outputs go to scratch by default
 ```
 
 ### 2. Dry Run
@@ -240,6 +241,30 @@ snakemake --profile cluster/slurm
 # - Build final production HMMs
 # - Run final comprehensive searches
 # - Generate HTML report
+```
+
+### 8. Archive Results to /projects
+```bash
+# After pipeline completion, archive important results
+./scripts/archive_to_projects.sh
+
+# This will:
+# - Copy final models, reports, curated alignments to /projects
+# - Compress large intermediate files (searches, alignments)
+# - Create manifest of archived files
+# - Leave originals on scratch (90-day purge)
+
+# Manual archiving (alternative):
+cd /scratch/alpine/$USER/2a-peptide-search
+mkdir -p /projects/$USER/2a-peptide-search
+
+# Copy essential files
+cp -r results/models/final /projects/$USER/2a-peptide-search/
+cp results/reports/*.html /projects/$USER/2a-peptide-search/
+
+# Archive large files
+tar -czf searches.tar.gz scratch/searches
+mv searches.tar.gz /projects/$USER/2a-peptide-search/
 ```
 
 ## Troubleshooting

@@ -18,12 +18,13 @@ import os
 configfile: "workflow/config.yaml"
 
 # Set up output directories
-# Use environment variable or config, default to local paths
+# ALL outputs go to scratch by default (fast I/O)
+# User moves important results to /projects after completion
 SCRATCH_DIR = os.environ.get('SCRATCH_DIR', config.get('output_dirs', {}).get('scratch', 'scratch'))
-RESULTS_DIR = config.get('output_dirs', {}).get('results', 'results')
-DATA_DIR = config.get('output_dirs', {}).get('data', 'data')
+RESULTS_DIR = os.environ.get('RESULTS_DIR', config.get('output_dirs', {}).get('results', 'scratch/results'))
+DATA_DIR = os.environ.get('DATA_DIR', config.get('output_dirs', {}).get('data', 'scratch/data'))
 
-# Expand user and make absolute if needed
+# Expand environment variables (e.g., ${USER})
 SCRATCH_DIR = os.path.expandvars(SCRATCH_DIR)
 RESULTS_DIR = os.path.expandvars(RESULTS_DIR)
 DATA_DIR = os.path.expandvars(DATA_DIR)
