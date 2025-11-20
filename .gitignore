@@ -26,3 +26,6 @@ logs/
 
 # Conda environments
 .conda/
+
+# Pixi environments (keep pixi.lock for reproducibility)
+.pixi/
