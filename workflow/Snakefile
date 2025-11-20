@@ -1,0 +1,109 @@
+"""
+Snakemake pipeline for identifying 2A peptides in protein databases.
+
+This pipeline performs:
+1. Download of protein databases
+2. Iterative HMM search and refinement
+3. Manual curation checkpoints
+4. Final report generation
+
+Usage:
+    snakemake --use-conda --cores 12
+"""
+
+from pathlib import Path
+
+# Load configuration
+configfile: "workflow/config.yaml"
+
+
+# Database file mapping
+DB_FILES = {
+    "uniprot": "uniprot/uniprot_sprot.fasta.gz",
+    "reference_proteomes": "reference_proteomes/reference_proteomes.fasta.gz",
+    "uniparc": "uniparc/uniparc_active.fasta.gz",
+    "mgnify": "mgnify/mgnify_proteins.fasta.gz"
+}
+
+
+# Include rule modules
+include: "rules/download.smk"
+include: "rules/refine.smk"
+include: "rules/search.smk"
+include: "rules/report.smk"
+
+
+# Default target: generate full report
+rule all:
+    input:
+        "results/reports/2A-peptide-analysis.html"
+    default_target: True
+
+
+# Quick test target with just UniProt
+rule test:
+    input:
+        expand(
+            "results/searches/uniprot/seed/2A-{peptide_class}.hmmsearch.gz",
+            peptide_class=["class-1", "class-2"]
+        )
+
+
+# Download all databases
+rule download_all:
+    input:
+        expand("data/{db}/{file}",
+            zip,
+            db=config["databases_to_search"],
+            file=[DB_FILES[db] for db in config["databases_to_search"]]
+        )
+
+
+# Build seed models from curated alignments
+rule build_seeds:
+    input:
+        expand(
+            "results/models/seed/2A-{peptide_class}.hmm",
+            peptide_class=["class-1", "class-2"]
+        )
+
+
+# Complete iteration 1 (automated)
+rule iter1:
+    input:
+        expand(
+            "results/models/iter1_refined/2A-{peptide_class}.hmm",
+            peptide_class=["class-1", "class-2"]
+        )
+
+
+# Complete iteration 2 (requires checkpoint)
+rule iter2:
+    input:
+        "results/checkpoints/iter2.curated"
+
+
+# Workflow for each iteration
+def get_iteration_outputs(iteration):
+    """Get all outputs for a given iteration."""
+    if iteration == "seed":
+        return {
+            "models": expand(
+                "results/models/seed/2A-{peptide_class}.hmm",
+                peptide_class=["class-1", "class-2"]
+            )
+        }
+    else:
+        return {
+            "searches": expand(
+                "results/searches/{database}/{iteration}/2A-{peptide_class}.hmmsearch.gz",
+                database=config["databases_to_search"],
+                iteration=iteration,
+                peptide_class=["class-1", "class-2"]
+            ),
+            "merged": expand(
+                "results/alignments/{iteration}/2A-{peptide_class}.merged.sto",
+                iteration=iteration,
+                peptide_class=["class-1", "class-2"]
+            )
+        }
