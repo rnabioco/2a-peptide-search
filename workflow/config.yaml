@@ -1,5 +1,20 @@
 # Configuration for 2A peptide search pipeline
 
+# Output directories
+# For local runs, these will be relative to the working directory
+# For Alpine, set to scratch for intermediate files
+output_dirs:
+  # Scratch directory for intermediate files (searches, alignments)
+  # Fast I/O, 90-day purge on Alpine
+  scratch: "/scratch/alpine/${USER}/2a-peptide-search"
+
+  # Permanent storage for final results (models, reports)
+  # Slower but permanent on Alpine
+  results: "results"
+
+  # Downloaded databases (can be on scratch or projects)
+  data: "data"
+
 # Protein databases to search
 databases:
   uniprot:

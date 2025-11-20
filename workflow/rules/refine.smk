@@ -7,7 +7,7 @@ rule build_seed_models:
     input:
         alignment="resources/seed-alignments/2A-{peptide_class}.sto.gz"
     output:
-        hmm="results/models/seed/2A-{peptide_class}.hmm"
+        hmm=RESULTS_DIR + "/models/seed/2A-{peptide_class}.hmm"
     params:
         name=lambda w: f"2A-{w.peptide_class}"
     log:
@@ -23,9 +23,9 @@ rule build_seed_models:
 rule build_refined_model:
     """Build refined HMM from merged alignment."""
     input:
-        alignment="results/alignments/{iteration}/2A-{peptide_class}.merged.sto"
+        alignment=SCRATCH_DIR + "/alignments/{iteration}/2A-{peptide_class}.merged.sto"
     output:
-        hmm="results/models/{iteration}_refined/2A-{peptide_class}.hmm"
+        hmm=RESULTS_DIR + "/models/{iteration}_refined/2A-{peptide_class}.hmm"
     params:
         name=lambda w: f"2A-{w.peptide_class}"
     log:
@@ -42,11 +42,11 @@ rule create_checkpoint:
     """Create checkpoint for manual curation."""
     input:
         alignments=expand(
-            "results/alignments/{{iteration}}/2A-{peptide_class}.merged.sto",
+            SCRATCH_DIR + "/alignments/{{iteration}}/2A-{peptide_class}.merged.sto",
             peptide_class=["class-1", "class-2"]
         )
     output:
-        checkpoint=touch("results/checkpoints/{iteration}.curated")
+        checkpoint=touch(RESULTS_DIR + "/checkpoints/{iteration}.curated")
     message:
         "Manual curation required for iteration {wildcards.iteration}. "
         "Review alignments in results/alignments/{wildcards.iteration}/ and "
@@ -56,10 +56,10 @@ rule create_checkpoint:
 rule build_final_models:
     """Build final production HMMs after manual curation."""
     input:
-        alignment="results/alignments/final/2A-{peptide_class}.curated.sto",
-        checkpoint="results/checkpoints/iter2.curated"
+        alignment=RESULTS_DIR + "/alignments/final/2A-{peptide_class}.curated.sto",
+        checkpoint=RESULTS_DIR + "/checkpoints/iter2.curated"
     output:
-        hmm="results/models/final/2A-{peptide_class}.hmm"
+        hmm=RESULTS_DIR + "/models/final/2A-{peptide_class}.hmm"
     params:
         name=lambda w: f"2A-{w.peptide_class}"
     log:

@@ -5,12 +5,12 @@ Rules for searching protein databases with HMM models.
 rule hmmsearch:
     """Search protein database with HMM model."""
     input:
-        hmm="results/models/{iteration}/2A-{peptide_class}.hmm",
-        db="data/{database}/{database_file}"
+        hmm=RESULTS_DIR + "/models/{iteration}/2A-{peptide_class}.hmm",
+        db=DATA_DIR + "/{database}/{database_file}"
     output:
-        hmmsearch="results/searches/{database}/{iteration}/2A-{peptide_class}.hmmsearch.gz",
-        tblout="results/searches/{database}/{iteration}/2A-{peptide_class}.tblout.gz",
-        alignment="results/searches/{database}/{iteration}/2A-{peptide_class}.sto.gz"
+        hmmsearch=SCRATCH_DIR + "/searches/{database}/{iteration}/2A-{peptide_class}.hmmsearch.gz",
+        tblout=SCRATCH_DIR + "/searches/{database}/{iteration}/2A-{peptide_class}.tblout.gz",
+        alignment=SCRATCH_DIR + "/searches/{database}/{iteration}/2A-{peptide_class}.sto.gz"
     log:
         "logs/hmmsearch/{database}_{iteration}_{peptide_class}.log"
     conda:
@@ -32,10 +32,10 @@ rule hmmsearch:
 rule filter_alignment:
     """Filter alignment by E-value threshold."""
     input:
-        alignment="results/searches/{database}/{iteration}/2A-{peptide_class}.sto.gz",
-        tblout="results/searches/{database}/{iteration}/2A-{peptide_class}.tblout.gz"
+        alignment=SCRATCH_DIR + "/searches/{database}/{iteration}/2A-{peptide_class}.sto.gz",
+        tblout=SCRATCH_DIR + "/searches/{database}/{iteration}/2A-{peptide_class}.tblout.gz"
     output:
-        filtered="results/alignments/{database}/{iteration}/2A-{peptide_class}.filtered.sto"
+        filtered=SCRATCH_DIR + "/alignments/{database}/{iteration}/2A-{peptide_class}.filtered.sto"
     params:
         evalue=config["thresholds"]["evalue"]
     log:
@@ -59,11 +59,11 @@ rule merge_database_alignments:
     """Merge alignments from all databases for a given iteration."""
     input:
         alignments=expand(
-            "results/alignments/{database}/{{iteration}}/2A-{{peptide_class}}.filtered.sto",
+            SCRATCH_DIR + "/alignments/{database}/{{iteration}}/2A-{{peptide_class}}.filtered.sto",
             database=config["databases_to_search"]
         )
     output:
-        merged="results/alignments/{iteration}/2A-{peptide_class}.merged.sto"
+        merged=SCRATCH_DIR + "/alignments/{iteration}/2A-{peptide_class}.merged.sto"
     log:
         "logs/merge/{iteration}_{peptide_class}.log"
     conda:

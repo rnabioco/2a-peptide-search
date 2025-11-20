@@ -1,0 +1,22 @@
+# Alpine-specific configuration
+# Use this config for running on CU Boulder Alpine cluster
+
+# Output directories for Alpine
+output_dirs:
+  # Scratch directory for intermediate files (searches, alignments)
+  # Fast I/O, 90-day purge policy
+  scratch: "/scratch/alpine/${USER}/2a-peptide-search"
+
+  # Permanent storage for final results (models, reports)
+  # Use /projects for long-term storage
+  results: "/projects/${USER}/2a-peptide-search/results"
+
+  # Downloaded databases (recommend scratch for large files)
+  data: "/scratch/alpine/${USER}/2a-peptide-search/data"
+
+# Import other settings from base config
+# (Use with: snakemake --configfile workflow/config-alpine.yaml)
+
+# Note: To override, run with:
+# snakemake --configfile workflow/config-alpine.yaml \
+#           --config output_dirs.scratch=/path/to/scratch
