@@ -4,6 +4,8 @@ Snakemake workflow for identifying 2A peptides in protein databases using profil
 
 ## Quick Start
 
+### Local/Workstation
+
 ```bash
 # Install Snakemake (if not already installed)
 conda install -n base -c conda-forge -c bioconda snakemake
@@ -17,6 +19,19 @@ snakemake --use-conda --cores 12
 # Or test with UniProt only
 snakemake test --use-conda --cores 12
 ```
+
+### SLURM Cluster (Alpine)
+
+```bash
+# Configure your SLURM account in cluster/slurm/config.yaml
+# Then submit the orchestrator job:
+sbatch submit-slurm.sh
+
+# Or test first:
+sbatch submit-test.sh
+```
+
+See [cluster/slurm/README.md](../cluster/slurm/README.md) for detailed SLURM setup instructions.
 
 ## Pipeline Overview
 
@@ -190,36 +205,25 @@ snakemake --use-conda --cores 12
 
 ## Advanced Usage
 
-### Run on HPC Cluster
+### Run on SLURM Cluster
 
-For LSF clusters:
+The pipeline includes a complete SLURM profile for the CU Boulder Alpine cluster:
+
 ```bash
-snakemake --cluster "bsub -n {threads} -o logs/{rule}.out -e logs/{rule}.err" \
-          --jobs 100 \
-          --use-conda
+# Using the provided SLURM profile
+snakemake --profile cluster/slurm
+
+# Or use the orchestrator script (recommended)
+sbatch submit-slurm.sh [target]
 ```
 
-For SLURM clusters:
-```bash
-snakemake --cluster "sbatch --cpus-per-task={threads} --output=logs/{rule}.out" \
-          --jobs 100 \
-          --use-conda
-```
+The SLURM profile:
+- Automatically submits each rule as a separate SLURM job
+- Applies appropriate resource allocations (CPU, memory, time)
+- Manages job dependencies through the Snakemake DAG
+- Supports up to 100 concurrent jobs
 
-### Profile Creation
-
-Create a Snakemake profile for your cluster in `~/.config/snakemake/`:
-```yaml
-# Example: ~/.config/snakemake/lsf/config.yaml
-cluster: "bsub -n {threads} -o logs/{rule}.out"
-jobs: 100
-use-conda: true
-```
-
-Then run:
-```bash
-snakemake --profile lsf
-```
+See [cluster/slurm/README.md](../cluster/slurm/README.md) for complete setup and usage instructions.
 
 ### Custom Rule Execution
 

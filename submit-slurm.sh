@@ -1,0 +1,138 @@
+#!/bin/bash
+#SBATCH --job-name=2a-orchestrator
+#SBATCH --partition=amilan
+#SBATCH --account=amc-general
+#SBATCH --time=48:00:00
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=1
+#SBATCH --mem=4G
+#SBATCH --output=logs/orchestrator_%j.out
+#SBATCH --error=logs/orchestrator_%j.err
+
+# 2A Peptide Search Pipeline - SLURM Orchestrator
+# ================================================
+# This script submits a lightweight orchestrator job that manages the Snakemake
+# workflow. The orchestrator submits individual rules as separate SLURM jobs.
+#
+# Usage:
+#   sbatch submit-slurm.sh [target]
+#
+# Examples:
+#   sbatch submit-slurm.sh                    # Run full pipeline
+#   sbatch submit-slurm.sh test               # Test with UniProt only
+#   sbatch submit-slurm.sh iter1              # Run iteration 1
+#   sbatch submit-slurm.sh download_all       # Download all databases
+#
+# Configuration:
+#   - Edit cluster/slurm/config.yaml to set your SLURM account
+#   - Edit workflow/config.yaml to select databases and set parameters
+
+set -euo pipefail
+
+# ============================================================================
+# Configuration
+# ============================================================================
+
+# Target to run (default: all)
+TARGET="${1:-all}"
+
+# Snakemake profile
+PROFILE="cluster/slurm"
+
+# Create logs directory if it doesn't exist
+mkdir -p logs
+
+# ============================================================================
+# Environment Setup
+# ============================================================================
+
+echo "=========================================="
+echo "2A Peptide Search Pipeline Orchestrator"
+echo "=========================================="
+echo "Started: $(date)"
+echo "Target: $TARGET"
+echo "Profile: $PROFILE"
+echo "Job ID: $SLURM_JOB_ID"
+echo "Node: $SLURMD_NODENAME"
+echo ""
+
+# Activate conda environment (modify path as needed)
+# Option 1: If you have a specific conda environment
+# source ~/miniconda3/etc/profile.d/conda.sh
+# conda activate snakemake
+
+# Option 2: If snakemake is in base or already activated
+# (no action needed)
+
+# Load any required modules (uncomment if needed)
+# module load anaconda
+# module load gcc
+
+# ============================================================================
+# Dry Run
+# ============================================================================
+
+echo "Running dry-run to check workflow..."
+echo ""
+
+if snakemake --profile "$PROFILE" -n "$TARGET"; then
+    echo ""
+    echo "Dry-run successful. Proceeding with execution..."
+    echo ""
+else
+    echo ""
+    echo "ERROR: Dry-run failed. Check workflow configuration."
+    echo ""
+    exit 1
+fi
+
+# ============================================================================
+# Execute Pipeline
+# ============================================================================
+
+echo "=========================================="
+echo "Starting pipeline execution"
+echo "=========================================="
+echo ""
+
+snakemake \
+    --profile "$PROFILE" \
+    "$TARGET"
+
+EXIT_CODE=$?
+
+# ============================================================================
+# Summary
+# ============================================================================
+
+echo ""
+echo "=========================================="
+echo "Pipeline Completed"
+echo "=========================================="
+echo "Finished: $(date)"
+echo "Exit code: $EXIT_CODE"
+echo ""
+
+if [ $EXIT_CODE -eq 0 ]; then
+    echo "SUCCESS: Pipeline completed successfully"
+    echo ""
+    echo "Next steps:"
+    echo "  - Check results in results/ directory"
+    echo "  - Review logs in logs/ directory"
+    echo "  - For manual curation checkpoint:"
+    echo "    1. Review alignments in results/alignments/iter2/"
+    echo "    2. Curate and save to results/alignments/final/"
+    echo "    3. Touch checkpoint: touch results/checkpoints/iter2.curated"
+    echo "    4. Resubmit: sbatch submit-slurm.sh"
+else
+    echo "ERROR: Pipeline failed with exit code $EXIT_CODE"
+    echo ""
+    echo "Troubleshooting:"
+    echo "  - Check logs/orchestrator_${SLURM_JOB_ID}.err for errors"
+    echo "  - Check .snakemake/log/ for detailed Snakemake logs"
+    echo "  - Check individual rule logs in logs/"
+    echo "  - View SLURM job status: squeue -u \$USER"
+    echo "  - View failed job details: sacct -j <JOBID> --format=JobID,State,ExitCode,Reason"
+fi
+
+exit $EXIT_CODE

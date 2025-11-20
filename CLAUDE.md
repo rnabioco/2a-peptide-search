@@ -23,6 +23,7 @@ The repository is organized as a Snakemake pipeline for reproducible analysis fr
 workflow/
 ├── Snakefile                    # Main pipeline orchestration
 ├── config.yaml                  # Configuration (databases, thresholds)
+├── README.md                    # Detailed workflow documentation
 ├── envs/                        # Conda environment specifications
 ├── scripts/                     # Python scripts for data processing
 └── rules/                       # Modular Snakemake rules
@@ -31,16 +32,24 @@ workflow/
     ├── refine.smk              # Model building
     └── report.smk              # Report generation
 
+cluster/slurm/                   # SLURM cluster configuration
+├── config.yaml                  # SLURM resource specifications
+└── README.md                    # SLURM setup and usage guide
+
 resources/seed-alignments/       # Curated starting alignments (version controlled)
 results/                         # All pipeline outputs (gitignored)
 data/                           # Downloaded databases (gitignored)
 legacy/                         # Archived historical results and scripts
+
+submit-slurm.sh                  # SLURM orchestrator submission script
+submit-test.sh                   # Quick test submission script
 ```
 
 ## Common Commands
 
 ### Running the full pipeline
 
+**Local/Workstation:**
 ```bash
 # Dry run to see what will be executed
 snakemake -n
@@ -52,11 +61,29 @@ snakemake --use-conda --cores 12
 snakemake --dag | dot -Tpng > workflow.png
 ```
 
+**SLURM Cluster (Alpine):**
+```bash
+# Configure account in cluster/slurm/config.yaml first
+# Then submit orchestrator job:
+sbatch submit-slurm.sh
+
+# Or test first:
+sbatch submit-test.sh
+
+# Using profile directly:
+snakemake --profile cluster/slurm
+```
+
 ### Testing with UniProt only
 
 ```bash
-# Quick test with just UniProt database
+# Local
 snakemake test --use-conda --cores 12
+
+# SLURM
+sbatch submit-test.sh
+# or
+snakemake --profile cluster/slurm test
 ```
 
 ### Specific pipeline stages
@@ -147,9 +174,48 @@ Major protein databases searched:
 - Legacy code is archived in `legacy/` for reference
 - The models can identify partial cross-matches between classes due to the conserved C-terminal PGP motif
 
+## SLURM Cluster Usage
+
+The pipeline is configured for the CU Boulder Alpine cluster with comprehensive SLURM support:
+
+### Setup
+1. Edit `cluster/slurm/config.yaml` and set your account:
+   ```yaml
+   slurm_account: amc-general  # Change to your allocation
+   ```
+
+2. Submit orchestrator job:
+   ```bash
+   sbatch submit-slurm.sh [target]
+   ```
+
+### Resource Specifications
+- Small jobs (downloads, model building): 1-2 CPUs, 2-4GB, 10-60 min
+- Medium jobs (alignment processing): 2-4 CPUs, 8-16GB, 30-60 min
+- Large jobs (HMM searches): 12 CPUs, 16GB, up to 24 hours
+
+### Monitoring
+```bash
+# Check your jobs
+squeue -u $USER
+
+# View orchestrator log
+tail -f logs/orchestrator_*.out
+
+# Check individual rule logs
+ls logs/
+
+# Cancel jobs
+scancel -u $USER
+```
+
+See `cluster/slurm/README.md` for complete SLURM documentation.
+
 ## Troubleshooting
 
-- **Out of memory**: Reduce `--cores` or disable large databases (uniparc, mgnify) in config
+- **Out of memory**: Increase `mem_mb` in `cluster/slurm/config.yaml` or reduce `--cores` for local runs
 - **Download fails**: Check URLs in `workflow/config.yaml` are current
 - **Conda issues**: Use `--conda-frontend mamba` for faster environment resolution
 - **Missing checkpoint**: Manually create the checkpoint file to continue pipeline
+- **SLURM job fails**: Check `.snakemake/slurm_logs/` and increase resources in cluster config
+- **Timeout on cluster**: Increase `runtime` in `cluster/slurm/config.yaml` for specific rules

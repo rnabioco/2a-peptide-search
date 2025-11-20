@@ -16,6 +16,9 @@ rule hmmsearch:
     conda:
         "../envs/hmmer.yaml"
     threads: 12
+    resources:
+        runtime=1440,  # 24 hours max
+        mem_mb=16000   # 16GB memory
     shell:
         """
         hmmsearch --cpu {threads} \
@@ -39,6 +42,9 @@ rule filter_alignment:
         "logs/filter/{database}_{iteration}_{peptide_class}.log"
     conda:
         "../envs/python.yaml"
+    resources:
+        runtime=30,
+        mem_mb=8000
     shell:
         """
         python workflow/scripts/filter_alignment.py \
@@ -62,6 +68,9 @@ rule merge_database_alignments:
         "logs/merge/{iteration}_{peptide_class}.log"
     conda:
         "../envs/python.yaml"
+    resources:
+        runtime=60,
+        mem_mb=16000
     shell:
         """
         python workflow/scripts/merge_alignments.py \
