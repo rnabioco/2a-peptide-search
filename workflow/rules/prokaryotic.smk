@@ -128,10 +128,8 @@ rule search_with_comprehensive_hmm:
     output:
         hmmsearch=RESULTS_DIR
         + "/prokaryotic/comprehensive_searches/{database}.hmmsearch.gz",
-        tblout=RESULTS_DIR
-        + "/prokaryotic/comprehensive_searches/{database}.tblout.gz",
-        alignment=RESULTS_DIR
-        + "/prokaryotic/comprehensive_searches/{database}.sto.gz",
+        tblout=RESULTS_DIR + "/prokaryotic/comprehensive_searches/{database}.tblout.gz",
+        alignment=RESULTS_DIR + "/prokaryotic/comprehensive_searches/{database}.sto.gz",
     log:
         LOGS_DIR + "/prokaryotic/search_comprehensive_{database}.log",
     threads: 12
