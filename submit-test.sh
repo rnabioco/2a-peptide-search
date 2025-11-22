@@ -18,8 +18,6 @@
 # Usage:
 #   sbatch submit-test.sh
 
-pixi shell
-
 set -euo pipefail
 
 mkdir -p logs
@@ -31,22 +29,26 @@ echo "Started: $(date)"
 echo "Job ID: $SLURM_JOB_ID"
 echo ""
 
-# Activate conda environment (modify path as needed)
-# source ~/miniconda3/etc/profile.d/conda.sh
-# conda activate snakemake
-
 echo "Running test with UniProt only..."
 echo ""
 
 # Dry run first
 echo "Dry run:"
-snakemake --profile pipeline/cluster/slurm -n test
+pixi run -e default snakemake \
+    --snakefile pipeline/workflow/Snakefile \
+    --configfile pipeline/workflow/config/config.yaml \
+    --profile pipeline/cluster/slurm \
+    -n test
 
 echo ""
 echo "Executing test target..."
 echo ""
 
-snakemake --profile pipeline/cluster/slurm test
+pixi run -e default snakemake \
+    --snakefile pipeline/workflow/Snakefile \
+    --configfile pipeline/workflow/config/config.yaml \
+    --profile pipeline/cluster/slurm \
+    test
 
 EXIT_CODE=$?
 

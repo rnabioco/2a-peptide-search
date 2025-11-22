@@ -36,8 +36,10 @@ set -euo pipefail
 # Target to run (default: all)
 TARGET="${1:-all}"
 
-# Snakemake profile
-PROFILE="cluster/slurm"
+# Snakemake configuration
+SNAKEFILE="pipeline/workflow/Snakefile"
+CONFIGFILE="pipeline/workflow/config/config.yaml"
+PROFILE="pipeline/cluster/slurm"
 
 # Create logs directory if it doesn't exist
 mkdir -p logs
@@ -51,22 +53,12 @@ echo "2A Peptide Search Pipeline Orchestrator"
 echo "=========================================="
 echo "Started: $(date)"
 echo "Target: $TARGET"
+echo "Snakefile: $SNAKEFILE"
+echo "Config: $CONFIGFILE"
 echo "Profile: $PROFILE"
 echo "Job ID: $SLURM_JOB_ID"
 echo "Node: $SLURMD_NODENAME"
 echo ""
-
-# Activate conda environment (modify path as needed)
-# Option 1: If you have a specific conda environment
-# source ~/miniconda3/etc/profile.d/conda.sh
-# conda activate snakemake
-
-# Option 2: If snakemake is in base or already activated
-# (no action needed)
-
-# Load any required modules (uncomment if needed)
-# module load anaconda
-# module load gcc
 
 # ============================================================================
 # Dry Run
@@ -75,7 +67,11 @@ echo ""
 echo "Running dry-run to check workflow..."
 echo ""
 
-if snakemake --profile "$PROFILE" -n "$TARGET"; then
+if pixi run -e default snakemake \
+    --snakefile "$SNAKEFILE" \
+    --configfile "$CONFIGFILE" \
+    --profile "$PROFILE" \
+    -n "$TARGET"; then
     echo ""
     echo "Dry-run successful. Proceeding with execution..."
     echo ""
@@ -95,7 +91,9 @@ echo "Starting pipeline execution"
 echo "=========================================="
 echo ""
 
-snakemake \
+pixi run -e default snakemake \
+    --snakefile "$SNAKEFILE" \
+    --configfile "$CONFIGFILE" \
     --profile "$PROFILE" \
     "$TARGET"
 
