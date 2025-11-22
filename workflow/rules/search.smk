@@ -14,11 +14,34 @@ def get_database_file(wildcards):
     return DATA_DIR + f"/{wildcards.database}/{db_map[wildcards.database]}"
 
 
+def get_model_path(wildcards):
+    """Map search iteration to model path.
+
+    Iteration naming:
+    - seed: initial search with seed models
+    - iter1: search with models refined from seed results
+    - iter2: search with models refined from iter1 results
+    """
+    if wildcards.iteration == "seed":
+        model_dir = "seed"
+    elif wildcards.iteration == "iter1":
+        # iter1 searches use models built from seed results
+        model_dir = "seed_refined"
+    elif wildcards.iteration == "iter2":
+        # iter2 searches use models built from iter1 results
+        model_dir = "iter1_refined"
+    else:
+        # Default to iteration name
+        model_dir = wildcards.iteration
+
+    return RESULTS_DIR + f"/models/{model_dir}/2A-{wildcards.peptide_class}.hmm"
+
+
 rule hmmsearch:
     """Search protein database with HMM model."""
     input:
-        hmm=RESULTS_DIR + "/models/{iteration}/2A-{peptide_class}.hmm",
-        db=get_database_file,
+        hmm=get_model_path,
+        db=get_database_file
     output:
         hmmsearch=SCRATCH_DIR
         + "/searches/{database}/{iteration}/2A-{peptide_class}.hmmsearch.gz",
