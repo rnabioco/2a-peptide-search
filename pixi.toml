@@ -21,35 +21,32 @@ dag = "snakemake --dag | dot -Tpng > workflow.png"
 
 [dependencies]
 # Core Snakemake and workflow management
-snakemake = ">=9.0"
-python = "3.12.*"
-snakemake-executor-plugin-slurm = "*"
-
+snakemake = ">=9.13.7,<10"
+python = ">=3.13.9,<3.14"
+snakemake-executor-plugin-slurm = ">=1.9.2,<2"
 # Bioinformatics tools
-hmmer = "3.4.*"
-muscle = ">=5.1"
-
+hmmer = ">=3.4,<4"
+muscle = ">=5.3,<6"
 # Python packages for sequence processing
-biopython = ">=1.83"
-pyfaidx = ">=0.8"
-click = ">=8.1"
-pandas = ">=2.2"
-numpy = ">=1.26"
-plotnine = ">=0.13"
-pillow = ">=10.0"
-requests = ">=2.31"
-
+biopython = ">=1.86,<2"
+pyfaidx = ">=0.9.0.3,<0.10"
+click = ">=8.3.1,<9"
+pandas = ">=2.3.3,<3"
+numpy = ">=2.3.5,<3"
+plotnine = ">=0.15.1,<0.16"
+pillow = ">=12.0.0,<13"
+requests = ">=2.32.5,<3"
 # R and packages for reporting
-r-base = "4.3.*"
-r-tidyverse = ">=2.0"
-r-cowplot = ">=1.1"
-r-glue = ">=1.7"
-r-here = ">=1.0"
-quarto = ">=1.4"
+r-base = ">=4.5.2,<4.6"
+r-tidyverse = ">=2.0.0,<3"
+r-cowplot = ">=1.2.0,<2"
+r-glue = ">=1.8.0,<2"
+r-here = ">=1.0.2,<2"
+quarto = ">=1.8.26,<2"
 
 [feature.dev.dependencies]
 # Development tools for linting, formatting, etc.
-ruff = "*"
+ruff = ">=0.14.6,<0.15"
 snakefmt = ">=0.11.2,<0.12"
 
 [environments]
