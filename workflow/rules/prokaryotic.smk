@@ -40,7 +40,7 @@ rule download_prokaryotic_proteomes:
     shell:
         """
         mkdir -p $(dirname {output.fasta})
-        wget -c -o {log} {params.url} -O {output.fasta}
+        wget -c -o {log} "{params.url}" -O {output.fasta}
         """
 
 
