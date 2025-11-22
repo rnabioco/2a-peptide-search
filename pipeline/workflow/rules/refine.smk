@@ -5,7 +5,7 @@ Rules for building and refining HMM models.
 rule build_seed_models:
     """Build initial HMM models from seed alignments."""
     input:
-        alignment="resources/seed-alignments/2A-{peptide_class}.sto.gz"
+        alignment="pipeline/resources/seed-alignments/2A-{peptide_class}.sto.gz"
     output:
         hmm=RESULTS_DIR + "/models/seed/2A-{peptide_class}.hmm"
     params:
