@@ -62,6 +62,7 @@ include: "rules/refine.smk"
 include: "rules/search.smk"
 include: "rules/report.smk"
 include: "rules/prokaryotic.smk"
+include: "rules/logos.smk"
 
 
 # Default target: generate full report

@@ -11,11 +11,13 @@ The repository is organized as a Snakemake pipeline for reproducible analysis fr
 ## Key Software Dependencies
 
 - **Snakemake** - Workflow management system
-- **Conda/Mamba** - Environment management (environments defined in `workflow/envs/`)
+- **Pixi** - Package and environment management (all dependencies defined in `pixi.toml`)
 - **HMMER suite** (`hmmsearch`, `hmmbuild`, `hmmalign`) - Core tool for HMM-based sequence searches
 - **Easel tools** (`esl-alimerge`) - For merging multiple sequence alignments
 - **Python 3** with Biopython (`Bio.AlignIO`, `Bio.SeqIO`) - For sequence processing
 - **R/Quarto** - For analysis and reporting
+
+**Note:** This project uses **Pixi only** for dependency management, not conda/mamba.
 
 ## Repository Structure
 
@@ -24,12 +26,12 @@ workflow/
 ├── Snakefile                    # Main pipeline orchestration
 ├── config.yaml                  # Configuration (databases, thresholds)
 ├── README.md                    # Detailed workflow documentation
-├── envs/                        # Conda environment specifications
 ├── scripts/                     # Python scripts for data processing
 └── rules/                       # Modular Snakemake rules
     ├── download.smk            # Database download
     ├── search.smk              # HMM searches
     ├── refine.smk              # Model building
+    ├── logos.smk               # Sequence logo generation
     └── report.smk              # Report generation
 
 cluster/slurm/                   # SLURM cluster configuration
@@ -41,6 +43,7 @@ results/                         # All pipeline outputs (gitignored)
 data/                           # Downloaded databases (gitignored)
 legacy/                         # Archived historical results and scripts
 
+pixi.toml                        # Pixi environment and dependency specification
 submit-slurm.sh                  # SLURM orchestrator submission script
 submit-test.sh                   # Quick test submission script
 ```
@@ -52,13 +55,16 @@ submit-test.sh                   # Quick test submission script
 **Local/Workstation:**
 ```bash
 # Dry run to see what will be executed
-snakemake -n
+pixi run dry-run
 
-# Run with conda environments and 12 cores
-snakemake --use-conda --cores 12
+# Run full pipeline with 12 cores
+pixi run run
 
 # Generate workflow visualization
-snakemake --dag | dot -Tpng > workflow.png
+pixi run dag
+
+# Or run snakemake directly within pixi environment
+pixi run snakemake --cores 12
 ```
 
 **SLURM Cluster (Alpine):**
@@ -71,35 +77,35 @@ sbatch submit-slurm.sh
 sbatch submit-test.sh
 
 # Using profile directly:
-snakemake --profile cluster/slurm
+pixi run snakemake --profile cluster/slurm
 ```
 
 ### Testing with UniProt only
 
 ```bash
 # Local
-snakemake test --use-conda --cores 12
+pixi run test
 
 # SLURM
 sbatch submit-test.sh
 # or
-snakemake --profile cluster/slurm test
+pixi run snakemake --profile cluster/slurm test
 ```
 
 ### Specific pipeline stages
 
 ```bash
 # Download all configured databases
-snakemake download_all --use-conda --cores 4
+pixi run download
 
 # Build seed models from curated alignments
-snakemake build_seeds --use-conda
+pixi run build-seeds
 
 # Run iteration 1 (automated)
-snakemake iter1 --use-conda --cores 12
+pixi run snakemake iter1 --cores 12
 
 # Run iteration 2 (requires manual curation checkpoint)
-snakemake iter2 --use-conda --cores 12
+pixi run snakemake iter2 --cores 12
 ```
 
 ### Configuration
@@ -154,7 +160,7 @@ Alignments use Stockholm format (`.sto` files), which includes both the alignmen
 ### Snakemake Best Practices
 
 - Rules are modular and in separate files under `workflow/rules/`
-- Each rule specifies its conda environment
+- All dependencies are managed via Pixi (defined in `pixi.toml`)
 - Wildcards enable parallel execution across databases and peptide classes
 - Checkpoints allow for manual intervention in automated workflows
 
@@ -170,7 +176,7 @@ Major protein databases searched:
 
 - Scripts in `workflow/scripts/` are called by Snakemake rules
 - Each script should be standalone and use click for CLI
-- Test rules individually: `snakemake <target> --use-conda --cores 1`
+- Test rules individually: `pixi run snakemake <target> --cores 1`
 - Legacy code is archived in `legacy/` for reference
 - The models can identify partial cross-matches between classes due to the conserved C-terminal PGP motif
 
@@ -215,7 +221,7 @@ See `cluster/slurm/README.md` for complete SLURM documentation.
 
 - **Out of memory**: Increase `mem_mb` in `cluster/slurm/config.yaml` or reduce `--cores` for local runs
 - **Download fails**: Check URLs in `workflow/config.yaml` are current
-- **Conda issues**: Use `--conda-frontend mamba` for faster environment resolution
+- **Dependency issues**: Run `pixi install` to update environment, or `pixi update` to upgrade packages
 - **Missing checkpoint**: Manually create the checkpoint file to continue pipeline
 - **SLURM job fails**: Check `.snakemake/slurm_logs/` and increase resources in cluster config
 - **Timeout on cluster**: Increase `runtime` in `cluster/slurm/config.yaml` for specific rules

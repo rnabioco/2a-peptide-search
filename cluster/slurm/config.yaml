@@ -108,3 +108,26 @@ set-resources:
     runtime: 60
     mem_mb: 8000
     cpus_per_task: 4
+
+  # ============================================================================
+  # Sequence Logo Generation Rules
+  # ============================================================================
+  generate_logo_seed:
+    runtime: 10  # API calls with retries
+    mem_mb: 2000
+    cpus_per_task: 1
+
+  generate_logo_iter1:
+    runtime: 10
+    mem_mb: 2000
+    cpus_per_task: 1
+
+  generate_logo_iter2:
+    runtime: 10
+    mem_mb: 2000
+    cpus_per_task: 1
+
+  generate_logo_final:
+    runtime: 10
+    mem_mb: 2000
+    cpus_per_task: 1
