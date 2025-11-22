@@ -12,7 +12,7 @@ Handles downloading:
 rule download_prokaryotic_proteomes:
     """Download prokaryotic reference proteomes."""
     output:
-        fasta=DATA_DIR + "/prokaryotic/{database}.fasta.gz",
+        fasta=DATA_DIR + "/prokaryotic/downloads/{database}.fasta.gz",
     params:
         url=lambda w: config["prokaryotic_databases"][w.database]["url"],
     log:

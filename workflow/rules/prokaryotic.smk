@@ -52,10 +52,10 @@ def get_prokaryotic_database_file(wildcards):
         if wildcards.database == "mgnify":
             return db_map[wildcards.database]  # Already has full path
         else:
-            return DATA_DIR + f"/prokaryotic/{db_map[wildcards.database]}"
+            return DATA_DIR + f"/prokaryotic/downloads/{db_map[wildcards.database]}"
 
     # Fallback
-    return DATA_DIR + f"/prokaryotic/{wildcards.database}.fasta.gz"
+    return DATA_DIR + f"/prokaryotic/downloads/{wildcards.database}.fasta.gz"
 
 
 # ============================================================================
