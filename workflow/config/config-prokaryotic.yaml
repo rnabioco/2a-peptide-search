@@ -25,7 +25,7 @@ phage_databases:
     # IMG/VR requires web login - download manually and specify local path
     # Download from: https://img.jgi.doe.gov/vr/
     # Set local_path to your downloaded file location
-    local_path: null  # e.g., "/path/to/IMGVR_all_nucleotides.fna.gz"
+    local_path: /scratch/alpine/jhesselberth@xsede.org/db/IMGVR_all_proteins-high_confidence.faa.gz # e.g., "/path/to/IMGVR_all_nucleotides.fna.gz"
     url: "https://img.jgi.doe.gov/vr/IMGVR_all_nucleotides.fna.gz"  # Fallback (requires login)
     description: "IMG/VR phage and virus database (requires manual download)"
 
@@ -36,8 +36,8 @@ phage_databases:
 # Which databases to use
 phage_databases_to_use:
   - inphared
-  # - imgvr  # Very large, enable for comprehensive search
-  # - millardlab
+  - imgvr  # Very large, enable for comprehensive search
+  - millardlab
 
 # Prokaryotic analysis parameters
 prokaryotic:
