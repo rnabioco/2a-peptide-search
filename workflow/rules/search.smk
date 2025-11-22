@@ -120,7 +120,15 @@ rule merge_database_alignments:
         mem_mb=16000,
     shell:
         """
-        python workflow/scripts/merge_alignments.py \
-            {input.alignments} \
-            {output.merged} 2> {log}
+        # Create temp file with alignment list
+        tmp_list=$(mktemp)
+        trap "rm -f $tmp_list" EXIT
+
+        # Write alignment paths to temp file
+        for aln in {input.alignments}; do
+            echo "$aln" >> $tmp_list
+        done
+
+        # Merge alignments
+        esl-alimerge --list $tmp_list > {output.merged} 2> {log}
         """

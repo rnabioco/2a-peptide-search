@@ -224,24 +224,46 @@ rule extract_gp_motifs:
         """
 
 
-rule annotate_domains:
-    """Run InterProScan or Pfam scan on GP-containing sequences."""
+rule run_hmmscan:
+    """Run hmmscan to annotate domains in GP-containing sequences."""
     input:
         sequences=RESULTS_DIR + "/prokaryotic/gp_motifs/all_gp_sequences.fasta.gz",
+        pfam_db=DATA_DIR + "/pfam/Pfam-A.hmm",
     output:
-        annotations=RESULTS_DIR + "/prokaryotic/gp_motifs/domain_annotations.tsv.gz",
+        domtblout=RESULTS_DIR + "/prokaryotic/gp_motifs/domains.domtblout",
     log:
-        LOGS_DIR + "/prokaryotic/annotate_domains.log",
-    conda:
-        "../envs/python.yaml"
+        LOGS_DIR + "/prokaryotic/hmmscan.log",
     threads: 8
     resources:
         runtime=480,
         mem_mb=16000,
     shell:
         """
-        python workflow/scripts/annotate_gp_domains.py \
-            --sequences {input.sequences} \
+        # Decompress sequences and run hmmscan
+        zcat {input.sequences} | hmmscan \
+            --cpu {threads} \
+            --domtblout {output.domtblout} \
+            --cut_ga \
+            {input.pfam_db} \
+            - \
+            > {log} 2>&1
+        """
+
+
+rule parse_domain_annotations:
+    """Parse hmmscan output into domain annotations table."""
+    input:
+        domtblout=RESULTS_DIR + "/prokaryotic/gp_motifs/domains.domtblout",
+        motifs=RESULTS_DIR + "/prokaryotic/gp_motifs/all_gp_motifs.tsv.gz",
+    output:
+        annotations=RESULTS_DIR + "/prokaryotic/gp_motifs/domain_annotations.tsv.gz",
+    log:
+        LOGS_DIR + "/prokaryotic/parse_annotations.log",
+    shell:
+        """
+        python workflow/scripts/parse_domain_annotations.py \
+            --domtblout {input.domtblout} \
+            --motifs {input.motifs} \
             --annotations {output.annotations} \
             > {log} 2>&1
         """
@@ -277,34 +299,85 @@ rule filter_interdomain_gp:
 # ============================================================================
 
 
-rule cluster_gp_motifs:
-    """Cluster GP motifs by sequence context using CD-HIT or MMseqs2."""
+rule prepare_clustering_fasta:
+    """Extract GP context sequences for clustering."""
     input:
         interdomain=RESULTS_DIR + "/prokaryotic/gp_motifs/interdomain_gp_motifs.tsv.gz",
     output:
-        clusters=RESULTS_DIR + "/prokaryotic/clusters/gp_clusters.tsv.gz",
-        representatives=RESULTS_DIR
-        + "/prokaryotic/clusters/cluster_representatives.fasta",
+        fasta=RESULTS_DIR + "/prokaryotic/clusters/gp_motifs.fasta",
+    shell:
+        """
+        # Extract context sequences to FASTA
+        zcat {input.interdomain} | awk -F'\t' 'NR>1 {{
+            printf ">%s_GP%s_pos%s\\n%s\\n", $1, $4, $5, $6
+        }}' > {output.fasta}
+        """
+
+
+rule run_mmseqs_clustering:
+    """Cluster GP motifs using MMseqs2."""
+    input:
+        fasta=RESULTS_DIR + "/prokaryotic/clusters/gp_motifs.fasta",
+    output:
+        cluster_tsv=RESULTS_DIR + "/prokaryotic/clusters/mmseqs_clusters.tsv",
     params:
         identity=config["prokaryotic"]["clustering_identity"],
         coverage=config["prokaryotic"]["clustering_coverage"],
+        prefix=RESULTS_DIR + "/prokaryotic/clusters/mmseqs",
+        tmpdir=RESULTS_DIR + "/prokaryotic/clusters/tmp",
     log:
-        LOGS_DIR + "/prokaryotic/cluster_gp_motifs.log",
-    conda:
-        "../envs/python.yaml"
+        LOGS_DIR + "/prokaryotic/mmseqs_cluster.log",
     threads: 8
     resources:
         runtime=120,
         mem_mb=16000,
     shell:
         """
-        python workflow/scripts/cluster_gp_motifs.py \
+        mkdir -p {params.tmpdir}
+
+        # Create MMseqs2 database
+        mmseqs createdb {input.fasta} {params.prefix}_db 2>> {log}
+
+        # Cluster
+        mmseqs cluster \
+            {params.prefix}_db \
+            {params.prefix}_cluster \
+            {params.tmpdir} \
+            --min-seq-id {params.identity} \
+            -c {params.coverage} \
+            --threads {threads} \
+            2>> {log}
+
+        # Create TSV output
+        mmseqs createtsv \
+            {params.prefix}_db \
+            {params.prefix}_db \
+            {params.prefix}_cluster \
+            {output.cluster_tsv} \
+            2>> {log}
+
+        # Cleanup temp files
+        rm -rf {params.tmpdir} {params.prefix}_db* {params.prefix}_cluster*
+        """
+
+
+rule parse_gp_clusters:
+    """Parse MMseqs2 clustering results."""
+    input:
+        cluster_tsv=RESULTS_DIR + "/prokaryotic/clusters/mmseqs_clusters.tsv",
+        interdomain=RESULTS_DIR + "/prokaryotic/gp_motifs/interdomain_gp_motifs.tsv.gz",
+    output:
+        clusters=RESULTS_DIR + "/prokaryotic/clusters/gp_clusters.tsv.gz",
+        representatives=RESULTS_DIR + "/prokaryotic/clusters/cluster_representatives.fasta",
+    log:
+        LOGS_DIR + "/prokaryotic/parse_clusters.log",
+    shell:
+        """
+        python workflow/scripts/parse_gp_clusters.py \
+            --cluster-tsv {input.cluster_tsv} \
             --interdomain {input.interdomain} \
             --clusters-out {output.clusters} \
             --representatives-out {output.representatives} \
-            --identity {params.identity} \
-            --coverage {params.coverage} \
-            --threads {threads} \
             > {log} 2>&1
         """
 
