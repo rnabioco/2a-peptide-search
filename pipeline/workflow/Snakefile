@@ -61,7 +61,7 @@ rule all:
 rule test:
     input:
         expand(
-            "results/searches/uniprot/seed/2A-{peptide_class}.hmmsearch.gz",
+            SCRATCH_DIR + "/searches/uniprot/seed/2A-{peptide_class}.hmmsearch.gz",
             peptide_class=["class-1", "class-2"]
         )
 

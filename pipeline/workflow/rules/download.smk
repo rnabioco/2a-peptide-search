@@ -41,7 +41,7 @@ rule extract_reference_proteomes:
     log:
         "logs/download/extract_reference_proteomes.log"
     shell:
-        """
+        r"""
         tar -xzf {input.tarball} -C $(dirname {input.tarball})/ 2> {log}
         find $(dirname {output.fasta}) -name "*.fasta.gz" -exec zcat {{}} \; | gzip > {output.fasta}
         """

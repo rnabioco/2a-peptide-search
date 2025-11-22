@@ -2,11 +2,22 @@
 Rules for searching protein databases with HMM models.
 """
 
+def get_database_file(wildcards):
+    """Map database name to its file path."""
+    db_map = {
+        "uniprot": "uniprot_sprot.fasta.gz",
+        "reference_proteomes": "reference_proteomes.fasta.gz",
+        "uniparc": "uniparc_active.fasta.gz",
+        "mgnify": "mgnify_proteins.fasta.gz"
+    }
+    return DATA_DIR + f"/{wildcards.database}/{db_map[wildcards.database]}"
+
+
 rule hmmsearch:
     """Search protein database with HMM model."""
     input:
         hmm=RESULTS_DIR + "/models/{iteration}/2A-{peptide_class}.hmm",
-        db=DATA_DIR + "/{database}/{database_file}"
+        db=get_database_file
     output:
         hmmsearch=SCRATCH_DIR + "/searches/{database}/{iteration}/2A-{peptide_class}.hmmsearch.gz",
         tblout=SCRATCH_DIR + "/searches/{database}/{iteration}/2A-{peptide_class}.tblout.gz",
