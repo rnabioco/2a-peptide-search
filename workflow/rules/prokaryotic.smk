@@ -48,6 +48,10 @@ rule download_pfam_database:
     """Download and decompress Pfam-A HMM database."""
     output:
         hmm=DATA_DIR + "/pfam/Pfam-A.hmm",
+        h3f=DATA_DIR + "/pfam/Pfam-A.hmm.h3f",
+        h3i=DATA_DIR + "/pfam/Pfam-A.hmm.h3i",
+        h3m=DATA_DIR + "/pfam/Pfam-A.hmm.h3m",
+        h3p=DATA_DIR + "/pfam/Pfam-A.hmm.h3p",
     params:
         url=config["prokaryotic_databases"]["pfam"]["url"],
     log:
@@ -57,6 +61,9 @@ rule download_pfam_database:
         mkdir -p $(dirname "{output.hmm}")
         wget -c -o "{log}" "{params.url}" -O "{output.hmm}.gz"
         gunzip -f "{output.hmm}.gz"
+
+        # Press HMM database to create binary auxfiles
+        hmmpress "{output.hmm}" 2>> "{log}"
         """
 
 
@@ -238,6 +245,11 @@ rule run_hmmscan:
     input:
         sequences=RESULTS_DIR + "/prokaryotic/gp_motifs/all_gp_sequences.fasta.gz",
         pfam_db=DATA_DIR + "/pfam/Pfam-A.hmm",
+        # Ensure pressed files exist
+        h3f=DATA_DIR + "/pfam/Pfam-A.hmm.h3f",
+        h3i=DATA_DIR + "/pfam/Pfam-A.hmm.h3i",
+        h3m=DATA_DIR + "/pfam/Pfam-A.hmm.h3m",
+        h3p=DATA_DIR + "/pfam/Pfam-A.hmm.h3p",
     output:
         domtblout=RESULTS_DIR + "/prokaryotic/gp_motifs/domains.domtblout",
     log:
