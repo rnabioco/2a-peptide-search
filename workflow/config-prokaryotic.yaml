@@ -22,8 +22,12 @@ phage_databases:
     description: "INPHARED curated phage database"
 
   imgvr:
-    url: "https://img.jgi.doe.gov/vr/IMGVR_all_nucleotides.fna.gz"
-    description: "IMG/VR phage and virus database"
+    # IMG/VR requires web login - download manually and specify local path
+    # Download from: https://img.jgi.doe.gov/vr/
+    # Set local_path to your downloaded file location
+    local_path: null  # e.g., "/path/to/IMGVR_all_nucleotides.fna.gz"
+    url: "https://img.jgi.doe.gov/vr/IMGVR_all_nucleotides.fna.gz"  # Fallback (requires login)
+    description: "IMG/VR phage and virus database (requires manual download)"
 
   millardlab:
     url: "https://millardlab.org/phage-genomes/phage_genomes.fasta.gz"

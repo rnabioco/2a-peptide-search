@@ -172,6 +172,26 @@ Major protein databases searched:
 - **UniParc** - Non-redundant uncurated proteins (millions of sequences)
 - **MGnify** - Environmental/metagenomic sequences (very large)
 
+### Databases Requiring Manual Download
+
+Some databases require authentication or manual download:
+
+**IMG/VR (Phage Database)**
+
+IMG/VR requires web login and cannot be downloaded directly via wget. To use IMG/VR:
+
+1. Download manually from https://img.jgi.doe.gov/vr/
+2. Save the file locally (e.g., `IMGVR_all_nucleotides.fna.gz`)
+3. Edit `workflow/config-prokaryotic.yaml` and set the local path:
+   ```yaml
+   phage_databases:
+     imgvr:
+       local_path: "/path/to/IMGVR_all_nucleotides.fna.gz"
+   ```
+4. The pipeline will create a symlink to your local file instead of attempting download
+
+If `local_path` is not configured, the pipeline will attempt to download and provide clear error messages about authentication requirements.
+
 ## Development Notes
 
 - Scripts in `workflow/scripts/` are called by Snakemake rules
@@ -228,3 +248,4 @@ See `cluster/slurm/README.md` for complete SLURM documentation.
 - **Missing checkpoint**: Manually create the checkpoint file to continue pipeline
 - **SLURM job fails**: Check `.snakemake/slurm_logs/` and increase resources in cluster config
 - **Timeout on cluster**: Increase `runtime` in `cluster/slurm/config.yaml` for specific rules
+- **IMG/VR authentication error**: Download manually from https://img.jgi.doe.gov/vr/ and set `local_path` in `workflow/config-prokaryotic.yaml`
