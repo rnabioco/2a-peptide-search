@@ -44,18 +44,19 @@ rule download_prokaryotic_proteomes:
         """
 
 
-rule download_domain_annotations:
-    """Download Pfam or pre-computed domain annotations."""
+rule download_pfam_database:
+    """Download and decompress Pfam-A HMM database."""
     output:
-        annotations=DATA_DIR + "/prokaryotic/domain_annotations.tsv.gz",
+        hmm=DATA_DIR + "/pfam/Pfam-A.hmm",
     params:
         url=config["prokaryotic_databases"]["pfam"]["url"],
     log:
-        LOGS_DIR + "/download/domain_annotations.log",
+        LOGS_DIR + "/download/pfam.log",
     shell:
         """
-        mkdir -p $(dirname {output.annotations})
-        wget -c -o {log} {params.url} -O {output.annotations}
+        mkdir -p $(dirname {output.hmm})
+        wget -c -o {log} "{params.url}" -O {output.hmm}.gz
+        gunzip -f {output.hmm}.gz
         """
 
 
