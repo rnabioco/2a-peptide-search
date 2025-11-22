@@ -55,7 +55,8 @@ PROFILE="cluster/slurm"
 # Use Alpine's fast scratch filesystem for all outputs
 # Format: /scratch/alpine/<username>/<project-name>
 # Note: Scratch has 90-day purge policy - move important results to /projects after completion
-export SCRATCH_DIR="/scratch/alpine/${USER}/2a-peptide-search"
+# Use whoami instead of $USER to avoid @ character issues
+export SCRATCH_DIR="/scratch/alpine/$(whoami)/2a-peptide-search"
 export RESULTS_DIR="${SCRATCH_DIR}/results"
 export DATA_DIR="${SCRATCH_DIR}/data"
 export LOGS_DIR="${SCRATCH_DIR}/logs"
