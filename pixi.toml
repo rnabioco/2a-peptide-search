@@ -34,6 +34,9 @@ biopython = ">=1.83"
 pyfaidx = ">=0.8"
 click = ">=8.1"
 pandas = ">=2.2"
+numpy = ">=1.26"
+plotnine = ">=0.13"
+pillow = ">=10.0"
 
 # R and packages for reporting
 r-base = "4.3.*"
@@ -42,11 +45,11 @@ r-cowplot = ">=1.1"
 r-glue = ">=1.7"
 r-here = ">=1.0"
 quarto = ">=1.4"
-snakefmt = ">=0.11.2,<0.12"
 
 [feature.dev.dependencies]
 # Development tools for linting, formatting, etc.
 ruff = "*"
+snakefmt = ">=0.11.2,<0.12"
 
 [environments]
 # Default environment with just Snakemake

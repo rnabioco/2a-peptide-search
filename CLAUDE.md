@@ -170,6 +170,9 @@ Major protein databases searched:
 
 - Scripts in `workflow/scripts/` are called by Snakemake rules
 - Each script should be standalone and use click for CLI
+- **Plotting**: Use `plotnine` (NOT matplotlib or seaborn) for all data visualization
+- **Image manipulation**: Use `pillow` (PIL) for creating images
+- **Code formatting**: Use `ruff` for Python formatting (available in dev environment)
 - Test rules individually: `snakemake <target> --use-conda --cores 1`
 - Legacy code is archived in `legacy/` for reference
 - The models can identify partial cross-matches between classes due to the conserved C-terminal PGP motif
