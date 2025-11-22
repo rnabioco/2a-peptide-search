@@ -23,7 +23,7 @@ rule hmmsearch:
         tblout=SCRATCH_DIR + "/searches/{database}/{iteration}/2A-{peptide_class}.tblout.gz",
         alignment=SCRATCH_DIR + "/searches/{database}/{iteration}/2A-{peptide_class}.sto.gz"
     log:
-        "logs/hmmsearch/{database}_{iteration}_{peptide_class}.log"
+        LOGS_DIR + "/hmmsearch/{database}_{iteration}_{peptide_class}.log"
     conda:
         "../envs/hmmer.yaml"
     threads: 12
@@ -50,7 +50,7 @@ rule filter_alignment:
     params:
         evalue=config["thresholds"]["evalue"]
     log:
-        "logs/filter/{database}_{iteration}_{peptide_class}.log"
+        LOGS_DIR + "/filter/{database}_{iteration}_{peptide_class}.log"
     conda:
         "../envs/python.yaml"
     resources:
@@ -76,7 +76,7 @@ rule merge_database_alignments:
     output:
         merged=SCRATCH_DIR + "/alignments/{iteration}/2A-{peptide_class}.merged.sto"
     log:
-        "logs/merge/{iteration}_{peptide_class}.log"
+        LOGS_DIR + "/merge/{iteration}_{peptide_class}.log"
     conda:
         "../envs/python.yaml"
     resources:

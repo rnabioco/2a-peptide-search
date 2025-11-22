@@ -9,7 +9,7 @@ rule download_uniprot:
     params:
         url=config["databases"]["uniprot"]["url"]
     log:
-        "logs/download/uniprot.log"
+        LOGS_DIR + "/download/uniprot.log"
     shell:
         """
         mkdir -p $(dirname {output.fasta})
@@ -24,7 +24,7 @@ rule download_reference_proteomes:
     params:
         url=config["databases"]["reference_proteomes"]["url"]
     log:
-        "logs/download/reference_proteomes.log"
+        LOGS_DIR + "/download/reference_proteomes.log"
     shell:
         """
         mkdir -p $(dirname {output.tarball})
@@ -39,7 +39,7 @@ rule extract_reference_proteomes:
     output:
         fasta=DATA_DIR + "/reference_proteomes/reference_proteomes.fasta.gz"
     log:
-        "logs/download/extract_reference_proteomes.log"
+        LOGS_DIR + "/download/extract_reference_proteomes.log"
     shell:
         r"""
         tar -xzf {input.tarball} -C $(dirname {input.tarball})/ 2> {log}
@@ -54,7 +54,7 @@ rule download_uniparc:
     params:
         url=config["databases"]["uniparc"]["url"]
     log:
-        "logs/download/uniparc.log"
+        LOGS_DIR + "/download/uniparc.log"
     threads: 1
     shell:
         """
@@ -70,7 +70,7 @@ rule download_mgnify:
     params:
         url=config["databases"]["mgnify"]["url"]
     log:
-        "logs/download/mgnify.log"
+        LOGS_DIR + "/download/mgnify.log"
     shell:
         """
         mkdir -p $(dirname {output.fasta})

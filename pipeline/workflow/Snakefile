@@ -23,16 +23,19 @@ configfile: "workflow/config.yaml"
 SCRATCH_DIR = os.environ.get('SCRATCH_DIR', config.get('output_dirs', {}).get('scratch', 'scratch'))
 RESULTS_DIR = os.environ.get('RESULTS_DIR', config.get('output_dirs', {}).get('results', 'scratch/results'))
 DATA_DIR = os.environ.get('DATA_DIR', config.get('output_dirs', {}).get('data', 'scratch/data'))
+LOGS_DIR = os.environ.get('LOGS_DIR', config.get('output_dirs', {}).get('logs', 'scratch/logs'))
 
 # Expand environment variables (e.g., ${USER})
 SCRATCH_DIR = os.path.expandvars(SCRATCH_DIR)
 RESULTS_DIR = os.path.expandvars(RESULTS_DIR)
 DATA_DIR = os.path.expandvars(DATA_DIR)
+LOGS_DIR = os.path.expandvars(LOGS_DIR)
 
 # Create directories
 Path(SCRATCH_DIR).mkdir(parents=True, exist_ok=True)
 Path(RESULTS_DIR).mkdir(parents=True, exist_ok=True)
 Path(DATA_DIR).mkdir(parents=True, exist_ok=True)
+Path(LOGS_DIR).mkdir(parents=True, exist_ok=True)
 
 # Database file mapping
 DB_FILES = {

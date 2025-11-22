@@ -11,7 +11,7 @@ rule build_seed_models:
     params:
         name=lambda w: f"2A-{w.peptide_class}"
     log:
-        "logs/hmmbuild/seed_{peptide_class}.log"
+        LOGS_DIR + "/hmmbuild/seed_{peptide_class}.log"
     conda:
         "../envs/hmmer.yaml"
     shell:
@@ -29,7 +29,7 @@ rule build_refined_model:
     params:
         name=lambda w: f"2A-{w.peptide_class}"
     log:
-        "logs/hmmbuild/{iteration}_refined_{peptide_class}.log"
+        LOGS_DIR + "/hmmbuild/{iteration}_refined_{peptide_class}.log"
     conda:
         "../envs/hmmer.yaml"
     shell:
@@ -63,7 +63,7 @@ rule build_final_models:
     params:
         name=lambda w: f"2A-{w.peptide_class}"
     log:
-        "logs/hmmbuild/final_{peptide_class}.log"
+        LOGS_DIR + "/hmmbuild/final_{peptide_class}.log"
     conda:
         "../envs/hmmer.yaml"
     shell:

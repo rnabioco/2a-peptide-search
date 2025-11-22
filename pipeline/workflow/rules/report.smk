@@ -13,7 +13,7 @@ rule collect_statistics:
     output:
         stats=RESULTS_DIR + "/reports/search_statistics.tsv"
     log:
-        "logs/report/collect_stats.log"
+        LOGS_DIR + "/report/collect_stats.log"
     conda:
         "../envs/python.yaml"
     script:
@@ -35,7 +35,7 @@ rule generate_report:
     output:
         report=RESULTS_DIR + "/reports/2A-peptide-analysis.html"
     log:
-        "logs/report/generate_report.log"
+        LOGS_DIR + "/report/generate_report.log"
     conda:
         "../envs/r-quarto.yaml"
     shell:

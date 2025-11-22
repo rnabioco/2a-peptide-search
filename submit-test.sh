@@ -7,8 +7,8 @@
 #SBATCH --qos=normal
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=4G
-#SBATCH --output=logs/test_%j.out
-#SBATCH --error=logs/test_%j.err
+#SBATCH --output=/scratch/alpine/%u/2a-peptide-search/logs/test_%j.out
+#SBATCH --error=/scratch/alpine/%u/2a-peptide-search/logs/test_%j.err
 
 # 2A Peptide Search Pipeline - Quick Test
 # ========================================
@@ -29,10 +29,11 @@ set -euo pipefail
 export SCRATCH_DIR="/scratch/alpine/${USER}/2a-peptide-search"
 export RESULTS_DIR="${SCRATCH_DIR}/results"
 export DATA_DIR="${SCRATCH_DIR}/data"
+export LOGS_DIR="${SCRATCH_DIR}/logs"
 
 # Create base directories
-mkdir -p logs
 mkdir -p "$SCRATCH_DIR"
+mkdir -p "$LOGS_DIR"
 
 echo "=========================================="
 echo "2A Peptide Search Pipeline - Test Run"
