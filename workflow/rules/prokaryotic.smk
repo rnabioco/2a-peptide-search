@@ -73,8 +73,14 @@ rule split_known_peptides_by_motif:
         fastas=directory(RESULTS_DIR + "/prokaryotic/seeds/by_motif/"),
     log:
         LOGS_DIR + "/prokaryotic/split_peptides_by_motif.log",
-    script:
-        "../scripts/split_peptides_by_motif.py"
+    shell:
+        """
+        python workflow/scripts/split_peptides_by_motif.py \
+            --fasta {input.fasta} \
+            --output-dir {output.fastas} \
+            --motif-list {output.motif_list} \
+            > {log} 2>&1
+        """
 
 
 rule align_all_seed_peptides:
@@ -206,8 +212,16 @@ rule extract_gp_motifs:
         LOGS_DIR + "/prokaryotic/extract_gp_motifs.log",
     conda:
         "../envs/python.yaml"
-    script:
-        "../scripts/extract_gp_motifs.py"
+    shell:
+        """
+        python workflow/scripts/extract_gp_motifs.py \
+            --fasta {input.fasta} \
+            --motifs-out {output.motifs} \
+            --sequences-out {output.sequences} \
+            --upstream {params.upstream} \
+            --downstream {params.downstream} \
+            > {log} 2>&1
+        """
 
 
 rule annotate_domains:
@@ -224,8 +238,13 @@ rule annotate_domains:
     resources:
         runtime=480,
         mem_mb=16000,
-    script:
-        "../scripts/annotate_gp_domains.py"
+    shell:
+        """
+        python workflow/scripts/annotate_gp_domains.py \
+            --sequences {input.sequences} \
+            --annotations {output.annotations} \
+            > {log} 2>&1
+        """
 
 
 rule filter_interdomain_gp:
@@ -241,8 +260,16 @@ rule filter_interdomain_gp:
         LOGS_DIR + "/prokaryotic/filter_interdomain_gp.log",
     conda:
         "../envs/python.yaml"
-    script:
-        "../scripts/filter_interdomain_gp.py"
+    shell:
+        """
+        python workflow/scripts/filter_interdomain_gp.py \
+            --motifs {input.motifs} \
+            --annotations {input.annotations} \
+            --interdomain-out {output.interdomain} \
+            --intradomain-out {output.intradomain} \
+            --stats-out {output.statistics} \
+            > {log} 2>&1
+        """
 
 
 # ============================================================================
@@ -269,8 +296,17 @@ rule cluster_gp_motifs:
     resources:
         runtime=120,
         mem_mb=16000,
-    script:
-        "../scripts/cluster_gp_motifs.py"
+    shell:
+        """
+        python workflow/scripts/cluster_gp_motifs.py \
+            --interdomain {input.interdomain} \
+            --clusters-out {output.clusters} \
+            --representatives-out {output.representatives} \
+            --identity {params.identity} \
+            --coverage {params.coverage} \
+            --threads {threads} \
+            > {log} 2>&1
+        """
 
 
 rule analyze_cluster_conservation:
@@ -286,12 +322,22 @@ rule analyze_cluster_conservation:
         ),
     params:
         min_cluster_size=config["prokaryotic"]["min_cluster_size"],
+        logos_dir=RESULTS_DIR + "/prokaryotic/clusters/logos",
     log:
         LOGS_DIR + "/prokaryotic/analyze_conservation.log",
     conda:
         "../envs/python.yaml"
-    script:
-        "../scripts/analyze_gp_conservation.py"
+    shell:
+        """
+        python workflow/scripts/analyze_gp_conservation.py \
+            --clusters {input.clusters} \
+            --motifs {input.motifs} \
+            --conservation {output.conservation} \
+            --logos-dir {params.logos_dir} \
+            --min-cluster-size {params.min_cluster_size} \
+            --top-n 20 \
+            > {log} 2>&1
+        """
 
 
 rule identify_consensus_patterns:
@@ -299,6 +345,7 @@ rule identify_consensus_patterns:
     input:
         conservation=RESULTS_DIR + "/prokaryotic/clusters/cluster_conservation.tsv.gz",
         clusters=RESULTS_DIR + "/prokaryotic/clusters/gp_clusters.tsv.gz",
+        motifs=RESULTS_DIR + "/prokaryotic/gp_motifs/interdomain_gp_motifs.tsv.gz",
     output:
         consensus=RESULTS_DIR + "/prokaryotic/consensus/consensus_patterns.tsv",
         alignments=expand(
@@ -307,12 +354,25 @@ rule identify_consensus_patterns:
         ),
     params:
         min_conservation=config["prokaryotic"]["min_conservation"],
+        min_cluster_size=config["prokaryotic"]["min_cluster_size"],
+        alignments_dir=RESULTS_DIR + "/prokaryotic/consensus",
     log:
         LOGS_DIR + "/prokaryotic/identify_consensus.log",
     conda:
         "../envs/python.yaml"
-    script:
-        "../scripts/identify_consensus_patterns.py"
+    shell:
+        """
+        python workflow/scripts/identify_consensus_patterns.py \
+            --conservation {input.conservation} \
+            --clusters {input.clusters} \
+            --motifs {input.motifs} \
+            --consensus {output.consensus} \
+            --alignments-dir {params.alignments_dir} \
+            --min-conservation {params.min_conservation} \
+            --min-cluster-size {params.min_cluster_size} \
+            --top-n 20 \
+            > {log} 2>&1
+        """
 
 
 # ============================================================================
@@ -382,13 +442,23 @@ rule validate_against_known_peptides:
     output:
         validation=RESULTS_DIR + "/prokaryotic/validation/known_peptide_hits.tsv",
         summary=RESULTS_DIR + "/prokaryotic/validation/validation_summary.txt",
+    params:
+        hmms_pattern=RESULTS_DIR + "/prokaryotic/models/initial/cluster_*.hmm",
     log:
         LOGS_DIR + "/prokaryotic/validate_known_peptides.log",
     conda:
         "../envs/hmmer.yaml"
     threads: 4
-    script:
-        "../scripts/validate_stalling_peptides.py"
+    shell:
+        """
+        python workflow/scripts/validate_stalling_peptides.py \
+            --hmms '{params.hmms_pattern}' \
+            --known-peptides {input.known_peptides} \
+            --validation {output.validation} \
+            --summary {output.summary} \
+            --threads {threads} \
+            > {log} 2>&1
+        """
 
 
 # ============================================================================
@@ -411,8 +481,17 @@ rule compare_approaches:
         LOGS_DIR + "/prokaryotic/compare_approaches.log",
     conda:
         "../envs/python.yaml"
-    script:
-        "../scripts/compare_gp_approaches.py"
+    shell:
+        """
+        python workflow/scripts/compare_gp_approaches.py \
+            --all-gp-motifs {input.all_gp_motifs} \
+            --interdomain-motifs {input.interdomain_motifs} \
+            --clusters {input.clusters} \
+            --validation {input.validation} \
+            --comparison {output.comparison} \
+            --plots {output.plots} \
+            > {log} 2>&1
+        """
 
 
 # ============================================================================
