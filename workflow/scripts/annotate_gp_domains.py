@@ -42,11 +42,14 @@ def run_hmmscan(fasta_file, pfam_db, evalue=1e-3, cpus=8):
     click.echo(f"Command: {' '.join(cmd)}")
 
     try:
-        result = subprocess.run(cmd, check=True, capture_output=True, text=True)
+        # Don't use text=True to avoid UTF-8 decode errors with binary output
+        result = subprocess.run(cmd, check=True, capture_output=True)
         click.echo("hmmscan completed successfully")
     except subprocess.CalledProcessError as e:
         click.echo(f"Error running hmmscan: {e}", err=True)
-        click.echo(f"stderr: {e.stderr}", err=True)
+        # Decode stderr with error handling
+        stderr = e.stderr.decode('utf-8', errors='replace') if e.stderr else ''
+        click.echo(f"stderr: {stderr}", err=True)
         raise
 
     return tmp_output
