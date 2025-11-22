@@ -4,6 +4,7 @@
 #SBATCH --account=amc-general
 #SBATCH --time=4:00:00
 #SBATCH --ntasks=1
+#SBATCH --qos=normal
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=4G
 #SBATCH --output=logs/test_%j.out
@@ -16,6 +17,8 @@
 #
 # Usage:
 #   sbatch submit-test.sh
+
+pixi shell
 
 set -euo pipefail
 
@@ -37,13 +40,13 @@ echo ""
 
 # Dry run first
 echo "Dry run:"
-snakemake --profile cluster/slurm -n test
+snakemake --profile pipeline/cluster/slurm -n test
 
 echo ""
 echo "Executing test target..."
 echo ""
 
-snakemake --profile cluster/slurm test
+snakemake --profile pipeline/cluster/slurm test
 
 EXIT_CODE=$?
 

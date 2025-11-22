@@ -2,8 +2,8 @@
 name = "2a-peptide-search"
 version = "0.1.0"
 description = "Bioinformatics pipeline for identifying 2A peptides using profile HMMs"
-channels = ["bioconda", "conda-forge"]
-platforms = ["osx-arm64", "osx-64", "linux-64"]
+channels = ["conda-forge", "bioconda"]
+platforms = ["linux-64"]
 
 [tasks]
 # Run full pipeline
@@ -22,14 +22,13 @@ dag = "snakemake --dag | dot -Tpng > workflow.png"
 [dependencies]
 # Core Snakemake and workflow management
 # Snakemake will manage tool-specific conda envs with --use-conda
-snakemake-minimal = "*"
-python = "*"
-graphviz = "*"
+snakemake = ">=9.0"
+python = "3.12.*"
+snakemake-executor-plugin-slurm = "*"
 
 [feature.dev.dependencies]
 # Development tools for linting, formatting, etc.
 ruff = "*"
-ipython = "*"
 
 [environments]
 # Default environment with just Snakemake
