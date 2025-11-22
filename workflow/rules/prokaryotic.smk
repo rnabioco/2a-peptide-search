@@ -25,15 +25,6 @@ Known prokaryotic stalling peptides:
 """
 
 # ============================================================================
-# Include modular rule files
-# ============================================================================
-
-
-include: "prokaryotic_download.smk"
-include: "prokaryotic_orf.smk"
-
-
-# ============================================================================
 # Helper Functions
 # ============================================================================
 
@@ -233,7 +224,7 @@ rule merge_comprehensive_searches:
             database=config["prokaryotic_databases_to_search"],
         ),
     output:
-        merged=RESULTS_DIR + "/prokaryotic/comprehensive_searches/merged_all.sto.gz",
+        merged=RESULTS_DIR + "/prokaryotic/comprehensive_searches_merged.sto.gz",
     log:
         LOGS_DIR + "/prokaryotic/merge_comprehensive_searches.log",
     shell:
@@ -264,8 +255,6 @@ rule extract_gp_motifs:
         downstream=15,  # residues downstream of GP
     log:
         LOGS_DIR + "/prokaryotic/extract_gp_motifs.log",
-    conda:
-        "../envs/python.yaml"
     shell:
         """
         python workflow/scripts/extract_gp_motifs.py \
@@ -339,8 +328,6 @@ rule filter_interdomain_gp:
         statistics=RESULTS_DIR + "/prokaryotic/gp_motifs/gp_motif_stats.tsv",
     log:
         LOGS_DIR + "/prokaryotic/filter_interdomain_gp.log",
-    conda:
-        "../envs/python.yaml"
     shell:
         """
         python workflow/scripts/filter_interdomain_gp.py \
@@ -458,8 +445,6 @@ rule analyze_cluster_conservation:
         logos_dir=RESULTS_DIR + "/prokaryotic/clusters/logos",
     log:
         LOGS_DIR + "/prokaryotic/analyze_conservation.log",
-    conda:
-        "../envs/python.yaml"
     shell:
         """
         python workflow/scripts/analyze_gp_conservation.py \
@@ -491,8 +476,6 @@ rule identify_consensus_patterns:
         alignments_dir=RESULTS_DIR + "/prokaryotic/consensus",
     log:
         LOGS_DIR + "/prokaryotic/identify_consensus.log",
-    conda:
-        "../envs/python.yaml"
     shell:
         """
         python workflow/scripts/identify_consensus_patterns.py \
@@ -523,8 +506,6 @@ rule build_prokaryotic_hmms:
         name=lambda w: f"prok-2A-cluster-{w.cluster_id}",
     log:
         LOGS_DIR + "/prokaryotic/build_hmm_cluster_{cluster_id}.log",
-    conda:
-        "../envs/hmmer.yaml"
     shell:
         """
         hmmbuild -n {params.name} "{output.hmm}" "{input.alignment}" 2> "{log}"
@@ -543,8 +524,6 @@ rule search_prokaryotic_proteomes:
         alignment=RESULTS_DIR + "/prokaryotic/searches/cluster_{cluster_id}.sto.gz",
     log:
         LOGS_DIR + "/prokaryotic/search_cluster_{cluster_id}.log",
-    conda:
-        "../envs/hmmer.yaml"
     threads: 12
     resources:
         runtime=480,
@@ -579,8 +558,6 @@ rule validate_against_known_peptides:
         hmms_pattern=RESULTS_DIR + "/prokaryotic/models/initial/cluster_*.hmm",
     log:
         LOGS_DIR + "/prokaryotic/validate_known_peptides.log",
-    conda:
-        "../envs/hmmer.yaml"
     threads: 4
     shell:
         """
@@ -609,14 +586,12 @@ rule compare_approaches:
         validation=RESULTS_DIR + "/prokaryotic/validation/known_peptide_hits.tsv",
         # APPROACH 1: Seed-based searches (merged from all databases)
         seed_comprehensive=RESULTS_DIR
-        + "/prokaryotic/comprehensive_searches/merged_all.sto.gz",
+        + "/prokaryotic/comprehensive_searches_merged.sto.gz",
     output:
         comparison=RESULTS_DIR + "/prokaryotic/analysis/approach_comparison.tsv",
         plots=directory(RESULTS_DIR + "/prokaryotic/analysis/comparison_plots/"),
     log:
         LOGS_DIR + "/prokaryotic/compare_approaches.log",
-    conda:
-        "../envs/python.yaml"
     shell:
         """
         python workflow/scripts/compare_gp_approaches.py \
@@ -646,7 +621,5 @@ rule prokaryotic_discovery_report:
         report=RESULTS_DIR + "/prokaryotic/reports/prokaryotic_discovery.html",
     log:
         LOGS_DIR + "/prokaryotic/generate_report.log",
-    conda:
-        "../envs/r-quarto.yaml"
     script:
         "../scripts/prokaryotic_discovery_report.qmd"
