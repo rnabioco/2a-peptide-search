@@ -33,8 +33,8 @@
 
 set -euo pipefail
 
-# Change to project root directory (parent of scripts/)
-cd "$(dirname "$0")/.."
+# Change to submission directory (project root)
+cd "$SLURM_SUBMIT_DIR"
 
 # ============================================================================
 # Configuration
