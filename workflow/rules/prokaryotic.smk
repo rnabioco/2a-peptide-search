@@ -280,11 +280,14 @@ rule analyze_cluster_conservation:
         motifs=RESULTS_DIR + "/prokaryotic/gp_motifs/interdomain_gp_motifs.tsv.gz",
     output:
         conservation=RESULTS_DIR + "/prokaryotic/clusters/cluster_conservation.tsv.gz",
-        logos=RESULTS_DIR + "/prokaryotic/clusters/logos/cluster_{cluster_id}.png",
+        logos=expand(
+            RESULTS_DIR + "/prokaryotic/clusters/logos/cluster_{cluster_id}.png",
+            cluster_id=range(1, 21),  # Top 20 clusters
+        ),
     params:
         min_cluster_size=config["prokaryotic"]["min_cluster_size"],
     log:
-        LOGS_DIR + "/prokaryotic/analyze_conservation_{cluster_id}.log",
+        LOGS_DIR + "/prokaryotic/analyze_conservation.log",
     conda:
         "../envs/python.yaml"
     script:
