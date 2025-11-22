@@ -37,11 +37,15 @@ def get_prokaryotic_database_file(wildcards):
     if "local_path" in db_config and db_config["local_path"]:
         return db_config["local_path"]
 
-    # Standard databases with URLs - use standard naming
+    # Standard databases with URLs or ORF-predicted - use standard naming
     db_map = {
         "bacteria": "bacteria.fasta.gz",
         "archaea": "archaea.fasta.gz",
         "mgnify": f"{DATA_DIR}/mgnify/mgnify_proteins.fasta.gz",  # Use main pipeline download
+        "ncbi_viral_refseq": "ncbi_viral_refseq.fasta.gz",  # Merged from splits
+        "uniprot_viruses": "uniprot_viruses.fasta.gz",
+        "inphared_proteins": "inphared_proteins.fasta.gz",  # ORF-predicted
+        "millardlab_proteins": "millardlab_proteins.fasta.gz",  # ORF-predicted
     }
 
     if wildcards.database in db_map:
@@ -66,6 +70,152 @@ rule download_prokaryotic_proteomes:
         """
         mkdir -p $(dirname "{output.fasta}")
         wget -c -o "{log}" "{params.url}" -O "{output.fasta}"
+        """
+
+
+rule download_ncbi_viral_split:
+    """Download one NCBI Viral RefSeq protein file."""
+    output:
+        fasta=DATA_DIR + "/prokaryotic/ncbi_viral/splits/viral.{file_num}.protein.faa.gz",
+    params:
+        base_url=lambda w: config["prokaryotic_databases"]["ncbi_viral_refseq"]["base_url"],
+    log:
+        LOGS_DIR + "/download/ncbi_viral_{file_num}.log",
+    shell:
+        """
+        mkdir -p $(dirname "{output.fasta}")
+        wget -c -o "{log}" "{params.base_url}/viral.{wildcards.file_num}.protein.faa.gz" -O "{output.fasta}"
+        """
+
+
+rule download_ncbi_viral_refseq:
+    """Download all NCBI Viral RefSeq protein files."""
+    input:
+        splits=expand(
+            DATA_DIR + "/prokaryotic/ncbi_viral/splits/viral.{file_num}.protein.faa.gz",
+            file_num=range(1, config["prokaryotic_databases"]["ncbi_viral_refseq"]["num_files"] + 1),
+        ),
+    output:
+        flag=DATA_DIR + "/prokaryotic/ncbi_viral/download_complete.flag",
+    shell:
+        """
+        touch "{output.flag}"
+        """
+
+
+rule merge_ncbi_viral_splits:
+    """Merge NCBI Viral RefSeq splits into single database."""
+    input:
+        splits=expand(
+            DATA_DIR + "/prokaryotic/ncbi_viral/splits/viral.{file_num}.protein.faa.gz",
+            file_num=range(1, config["prokaryotic_databases"]["ncbi_viral_refseq"]["num_files"] + 1),
+        ),
+        flag=DATA_DIR + "/prokaryotic/ncbi_viral/download_complete.flag",
+    output:
+        fasta=DATA_DIR + "/prokaryotic/ncbi_viral_refseq.fasta.gz",
+    log:
+        LOGS_DIR + "/download/merge_ncbi_viral.log",
+    shell:
+        """
+        cat {input.splits} > "{output.fasta}" 2> "{log}"
+        """
+
+
+rule download_uniprot_viruses:
+    """Download UniProt viral proteins via REST API."""
+    output:
+        fasta=DATA_DIR + "/prokaryotic/uniprot_viruses.fasta.gz",
+    params:
+        url=config["prokaryotic_databases"]["uniprot_viruses"]["url"],
+    log:
+        LOGS_DIR + "/download/uniprot_viruses.log",
+    shell:
+        """
+        mkdir -p $(dirname "{output.fasta}")
+        wget -c -o "{log}" "{params.url}" -O "{output.fasta}"
+        """
+
+
+rule download_inphared_genomes:
+    """Download INPHARED phage genomes."""
+    output:
+        genomes=DATA_DIR + "/prokaryotic/phage_genomes/inphared_genomes.fasta",
+    params:
+        url=config["phage_databases"]["inphared"]["genomes_url"],
+    log:
+        LOGS_DIR + "/download/inphared_genomes.log",
+    shell:
+        """
+        mkdir -p $(dirname "{output.genomes}")
+        wget -c -o "{log}" "{params.url}" -O "{output.genomes}"
+        """
+
+
+rule download_millardlab_genomes:
+    """Download Millard Lab phage genomes."""
+    output:
+        genomes=DATA_DIR + "/prokaryotic/phage_genomes/millardlab_genomes.fasta.gz",
+    params:
+        url=config["phage_databases"]["millardlab"]["url"],
+    log:
+        LOGS_DIR + "/download/millardlab_genomes.log",
+    shell:
+        """
+        mkdir -p $(dirname "{output.genomes}")
+        wget -c -o "{log}" "{params.url}" -O "{output.genomes}"
+        """
+
+
+rule run_prodigal_inphared:
+    """Run Prodigal to predict ORFs from INPHARED phage genomes."""
+    input:
+        genomes=DATA_DIR + "/prokaryotic/phage_genomes/inphared_genomes.fasta",
+    output:
+        proteins=DATA_DIR + "/prokaryotic/inphared_proteins.fasta.gz",
+        genes=DATA_DIR + "/prokaryotic/inphared_genes.gff",
+    log:
+        LOGS_DIR + "/prodigal/inphared.log",
+    params:
+        mode=config["orf_prediction"]["mode"],
+        table=config["orf_prediction"]["translation_table"],
+    threads: 1
+    shell:
+        """
+        # Run Prodigal in metagenomic mode for diverse phages
+        prodigal -i "{input.genomes}" \
+            -a >(gzip > "{output.proteins}") \
+            -f gff \
+            -o "{output.genes}" \
+            -p {params.mode} \
+            -g {params.table} \
+            2> "{log}"
+        """
+
+
+rule run_prodigal_millardlab:
+    """Run Prodigal to predict ORFs from Millard Lab phage genomes."""
+    input:
+        genomes=DATA_DIR + "/prokaryotic/phage_genomes/millardlab_genomes.fasta.gz",
+    output:
+        proteins=DATA_DIR + "/prokaryotic/millardlab_proteins.fasta.gz",
+        genes=DATA_DIR + "/prokaryotic/millardlab_genes.gff",
+    log:
+        LOGS_DIR + "/prodigal/millardlab.log",
+    params:
+        mode=config["orf_prediction"]["mode"],
+        table=config["orf_prediction"]["translation_table"],
+    threads: 1
+    shell:
+        """
+        # Decompress genomes, run Prodigal, compress output
+        zcat "{input.genomes}" | \
+        prodigal -a /dev/stdout \
+            -f gff \
+            -o "{output.genes}" \
+            -p {params.mode} \
+            -g {params.table} \
+            2> "{log}" | \
+        gzip > "{output.proteins}"
         """
 
 

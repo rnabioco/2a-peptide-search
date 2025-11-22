@@ -28,6 +28,7 @@ snakemake-executor-plugin-slurm = ">=1.9.2,<2"
 hmmer = ">=3.4,<4"
 mafft = ">=7.5,<8"
 mmseqs2 = "*"
+prodigal = ">=2.6.3,<3"
 # Python packages for sequence processing
 biopython = ">=1.86,<2"
 pyfaidx = ">=0.9.0.3,<0.10"
