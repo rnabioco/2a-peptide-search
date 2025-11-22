@@ -19,14 +19,15 @@ Known prokaryotic stalling peptides:
 # Data Preparation
 # ============================================================================
 
+
 rule download_prokaryotic_proteomes:
     """Download prokaryotic reference proteomes."""
     output:
-        fasta=DATA_DIR + "/prokaryotic/uniprot_bacteria.fasta.gz"
+        fasta=DATA_DIR + "/prokaryotic/uniprot_bacteria.fasta.gz",
     params:
-        url=config["prokaryotic_databases"]["bacteria"]["url"]
+        url=config["prokaryotic_databases"]["bacteria"]["url"],
     log:
-        LOGS_DIR + "/download/prokaryotic_proteomes.log"
+        LOGS_DIR + "/download/prokaryotic_proteomes.log",
     shell:
         """
         mkdir -p data/prokaryotic
@@ -37,11 +38,11 @@ rule download_prokaryotic_proteomes:
 rule download_domain_annotations:
     """Download Pfam or pre-computed domain annotations."""
     output:
-        annotations=DATA_DIR + "/prokaryotic/domain_annotations.tsv.gz"
+        annotations=DATA_DIR + "/prokaryotic/domain_annotations.tsv.gz",
     params:
-        url=config["prokaryotic_databases"]["pfam"]["url"]
+        url=config["prokaryotic_databases"]["pfam"]["url"],
     log:
-        LOGS_DIR + "/download/domain_annotations.log"
+        LOGS_DIR + "/download/domain_annotations.log",
     shell:
         """
         mkdir -p data/prokaryotic
@@ -53,18 +54,19 @@ rule download_domain_annotations:
 # GP Motif Extraction
 # ============================================================================
 
+
 rule extract_gp_motifs:
     """Extract all sequences containing GP motifs with context."""
     input:
-        fasta=DATA_DIR + "/prokaryotic/uniprot_bacteria.fasta.gz"
+        fasta=DATA_DIR + "/prokaryotic/uniprot_bacteria.fasta.gz",
     output:
         motifs=RESULTS_DIR + "/prokaryotic/gp_motifs/all_gp_motifs.tsv.gz",
-        sequences=RESULTS_DIR + "/prokaryotic/gp_motifs/all_gp_sequences.fasta.gz"
+        sequences=RESULTS_DIR + "/prokaryotic/gp_motifs/all_gp_sequences.fasta.gz",
     params:
         upstream=30,  # residues upstream of GP
-        downstream=15  # residues downstream of GP
+        downstream=15,  # residues downstream of GP
     log:
-        LOGS_DIR + "/prokaryotic/extract_gp_motifs.log"
+        LOGS_DIR + "/prokaryotic/extract_gp_motifs.log",
     conda:
         "../envs/python.yaml"
     script:
@@ -74,17 +76,17 @@ rule extract_gp_motifs:
 rule annotate_domains:
     """Run InterProScan or Pfam scan on GP-containing sequences."""
     input:
-        sequences=RESULTS_DIR + "/prokaryotic/gp_motifs/all_gp_sequences.fasta.gz"
+        sequences=RESULTS_DIR + "/prokaryotic/gp_motifs/all_gp_sequences.fasta.gz",
     output:
-        annotations=RESULTS_DIR + "/prokaryotic/gp_motifs/domain_annotations.tsv.gz"
+        annotations=RESULTS_DIR + "/prokaryotic/gp_motifs/domain_annotations.tsv.gz",
     log:
-        LOGS_DIR + "/prokaryotic/annotate_domains.log"
+        LOGS_DIR + "/prokaryotic/annotate_domains.log",
     conda:
         "../envs/python.yaml"
     threads: 8
     resources:
         runtime=480,
-        mem_mb=16000
+        mem_mb=16000,
     script:
         "../scripts/annotate_gp_domains.py"
 
@@ -93,13 +95,13 @@ rule filter_interdomain_gp:
     """Filter GP motifs that occur between protein domains."""
     input:
         motifs=RESULTS_DIR + "/prokaryotic/gp_motifs/all_gp_motifs.tsv.gz",
-        annotations=RESULTS_DIR + "/prokaryotic/gp_motifs/domain_annotations.tsv.gz"
+        annotations=RESULTS_DIR + "/prokaryotic/gp_motifs/domain_annotations.tsv.gz",
     output:
         interdomain=RESULTS_DIR + "/prokaryotic/gp_motifs/interdomain_gp_motifs.tsv.gz",
         intradomain=RESULTS_DIR + "/prokaryotic/gp_motifs/intradomain_gp_motifs.tsv.gz",
-        statistics=RESULTS_DIR + "/prokaryotic/gp_motifs/gp_motif_stats.tsv"
+        statistics=RESULTS_DIR + "/prokaryotic/gp_motifs/gp_motif_stats.tsv",
     log:
-        LOGS_DIR + "/prokaryotic/filter_interdomain_gp.log"
+        LOGS_DIR + "/prokaryotic/filter_interdomain_gp.log",
     conda:
         "../envs/python.yaml"
     script:
@@ -110,24 +112,26 @@ rule filter_interdomain_gp:
 # Pattern Discovery and Clustering
 # ============================================================================
 
+
 rule cluster_gp_motifs:
     """Cluster GP motifs by sequence context using CD-HIT or MMseqs2."""
     input:
-        interdomain=RESULTS_DIR + "/prokaryotic/gp_motifs/interdomain_gp_motifs.tsv.gz"
+        interdomain=RESULTS_DIR + "/prokaryotic/gp_motifs/interdomain_gp_motifs.tsv.gz",
     output:
         clusters=RESULTS_DIR + "/prokaryotic/clusters/gp_clusters.tsv.gz",
-        representatives=RESULTS_DIR + "/prokaryotic/clusters/cluster_representatives.fasta"
+        representatives=RESULTS_DIR
+        + "/prokaryotic/clusters/cluster_representatives.fasta",
     params:
         identity=config["prokaryotic"]["clustering_identity"],
-        coverage=config["prokaryotic"]["clustering_coverage"]
+        coverage=config["prokaryotic"]["clustering_coverage"],
     log:
-        LOGS_DIR + "/prokaryotic/cluster_gp_motifs.log"
+        LOGS_DIR + "/prokaryotic/cluster_gp_motifs.log",
     conda:
         "../envs/python.yaml"
     threads: 8
     resources:
         runtime=120,
-        mem_mb=16000
+        mem_mb=16000,
     script:
         "../scripts/cluster_gp_motifs.py"
 
@@ -136,14 +140,14 @@ rule analyze_cluster_conservation:
     """Analyze conservation patterns within each cluster."""
     input:
         clusters=RESULTS_DIR + "/prokaryotic/clusters/gp_clusters.tsv.gz",
-        motifs=RESULTS_DIR + "/prokaryotic/gp_motifs/interdomain_gp_motifs.tsv.gz"
+        motifs=RESULTS_DIR + "/prokaryotic/gp_motifs/interdomain_gp_motifs.tsv.gz",
     output:
         conservation=RESULTS_DIR + "/prokaryotic/clusters/cluster_conservation.tsv.gz",
-        logos=RESULTS_DIR + "/prokaryotic/clusters/logos/cluster_{cluster_id}.png"
+        logos=RESULTS_DIR + "/prokaryotic/clusters/logos/cluster_{cluster_id}.png",
     params:
-        min_cluster_size=config["prokaryotic"]["min_cluster_size"]
+        min_cluster_size=config["prokaryotic"]["min_cluster_size"],
     log:
-        LOGS_DIR + "/prokaryotic/analyze_conservation_{cluster_id}.log"
+        LOGS_DIR + "/prokaryotic/analyze_conservation_{cluster_id}.log",
     conda:
         "../envs/python.yaml"
     script:
@@ -154,17 +158,17 @@ rule identify_consensus_patterns:
     """Identify consensus patterns for major clusters."""
     input:
         conservation=RESULTS_DIR + "/prokaryotic/clusters/cluster_conservation.tsv.gz",
-        clusters=RESULTS_DIR + "/prokaryotic/clusters/gp_clusters.tsv.gz"
+        clusters=RESULTS_DIR + "/prokaryotic/clusters/gp_clusters.tsv.gz",
     output:
         consensus=RESULTS_DIR + "/prokaryotic/consensus/consensus_patterns.tsv",
         alignments=expand(
             RESULTS_DIR + "/prokaryotic/consensus/cluster_{cluster_id}.sto",
-            cluster_id=range(1, 21)  # Top 20 clusters
-        )
+            cluster_id=range(1, 21),  # Top 20 clusters
+        ),
     params:
-        min_conservation=config["prokaryotic"]["min_conservation"]
+        min_conservation=config["prokaryotic"]["min_conservation"],
     log:
-        LOGS_DIR + "/prokaryotic/identify_consensus.log"
+        LOGS_DIR + "/prokaryotic/identify_consensus.log",
     conda:
         "../envs/python.yaml"
     script:
@@ -175,16 +179,17 @@ rule identify_consensus_patterns:
 # HMM Building for Prokaryotic Motifs
 # ============================================================================
 
+
 rule build_prokaryotic_hmms:
     """Build HMMs from consensus patterns."""
     input:
-        alignment=RESULTS_DIR + "/prokaryotic/consensus/cluster_{cluster_id}.sto"
+        alignment=RESULTS_DIR + "/prokaryotic/consensus/cluster_{cluster_id}.sto",
     output:
-        hmm=RESULTS_DIR + "/prokaryotic/models/initial/cluster_{cluster_id}.hmm"
+        hmm=RESULTS_DIR + "/prokaryotic/models/initial/cluster_{cluster_id}.hmm",
     params:
-        name=lambda w: f"prok-2A-cluster-{w.cluster_id}"
+        name=lambda w: f"prok-2A-cluster-{w.cluster_id}",
     log:
-        LOGS_DIR + "/prokaryotic/build_hmm_cluster_{cluster_id}.log"
+        LOGS_DIR + "/prokaryotic/build_hmm_cluster_{cluster_id}.log",
     conda:
         "../envs/hmmer.yaml"
     shell:
@@ -197,19 +202,20 @@ rule search_prokaryotic_proteomes:
     """Search prokaryotic proteomes with discovered HMMs."""
     input:
         hmm=RESULTS_DIR + "/prokaryotic/models/initial/cluster_{cluster_id}.hmm",
-        db=DATA_DIR + "/prokaryotic/uniprot_bacteria.fasta.gz"
+        db=DATA_DIR + "/prokaryotic/uniprot_bacteria.fasta.gz",
     output:
-        hmmsearch=RESULTS_DIR + "/prokaryotic/searches/cluster_{cluster_id}.hmmsearch.gz",
+        hmmsearch=RESULTS_DIR
+        + "/prokaryotic/searches/cluster_{cluster_id}.hmmsearch.gz",
         tblout=RESULTS_DIR + "/prokaryotic/searches/cluster_{cluster_id}.tblout.gz",
-        alignment=RESULTS_DIR + "/prokaryotic/searches/cluster_{cluster_id}.sto.gz"
+        alignment=RESULTS_DIR + "/prokaryotic/searches/cluster_{cluster_id}.sto.gz",
     log:
-        LOGS_DIR + "/prokaryotic/search_cluster_{cluster_id}.log"
+        LOGS_DIR + "/prokaryotic/search_cluster_{cluster_id}.log",
     conda:
         "../envs/hmmer.yaml"
     threads: 12
     resources:
         runtime=480,
-        mem_mb=16000
+        mem_mb=16000,
     shell:
         """
         hmmsearch --cpu {threads} \
@@ -224,19 +230,20 @@ rule search_prokaryotic_proteomes:
 # Validation Against Known Stalling Peptides
 # ============================================================================
 
+
 rule validate_against_known_peptides:
     """Compare discovered motifs to known stalling peptides (SecM, TnaC, etc.)."""
     input:
         hmms=expand(
             RESULTS_DIR + "/prokaryotic/models/initial/cluster_{cluster_id}.hmm",
-            cluster_id=range(1, 21)
+            cluster_id=range(1, 21),
         ),
-        known_peptides="resources/known_stalling_peptides.fasta"
+        known_peptides="resources/known_stalling_peptides.fasta",
     output:
         validation=RESULTS_DIR + "/prokaryotic/validation/known_peptide_hits.tsv",
-        summary=RESULTS_DIR + "/prokaryotic/validation/validation_summary.txt"
+        summary=RESULTS_DIR + "/prokaryotic/validation/validation_summary.txt",
     log:
-        LOGS_DIR + "/prokaryotic/validate_known_peptides.log"
+        LOGS_DIR + "/prokaryotic/validate_known_peptides.log",
     conda:
         "../envs/hmmer.yaml"
     threads: 4
@@ -248,18 +255,20 @@ rule validate_against_known_peptides:
 # Comparative Analysis: All GP vs Inter-domain GP
 # ============================================================================
 
+
 rule compare_approaches:
     """Compare results from all-GP vs inter-domain-GP approaches."""
     input:
         all_gp_motifs=RESULTS_DIR + "/prokaryotic/gp_motifs/all_gp_motifs.tsv.gz",
-        interdomain_motifs=RESULTS_DIR + "/prokaryotic/gp_motifs/interdomain_gp_motifs.tsv.gz",
+        interdomain_motifs=RESULTS_DIR
+        + "/prokaryotic/gp_motifs/interdomain_gp_motifs.tsv.gz",
         clusters=RESULTS_DIR + "/prokaryotic/clusters/gp_clusters.tsv.gz",
-        validation=RESULTS_DIR + "/prokaryotic/validation/known_peptide_hits.tsv"
+        validation=RESULTS_DIR + "/prokaryotic/validation/known_peptide_hits.tsv",
     output:
         comparison=RESULTS_DIR + "/prokaryotic/analysis/approach_comparison.tsv",
-        plots=directory(RESULTS_DIR + "/prokaryotic/analysis/comparison_plots/")
+        plots=directory(RESULTS_DIR + "/prokaryotic/analysis/comparison_plots/"),
     log:
-        LOGS_DIR + "/prokaryotic/compare_approaches.log"
+        LOGS_DIR + "/prokaryotic/compare_approaches.log",
     conda:
         "../envs/python.yaml"
     script:
@@ -270,17 +279,18 @@ rule compare_approaches:
 # Final Report
 # ============================================================================
 
+
 rule prokaryotic_discovery_report:
     """Generate comprehensive report on prokaryotic 2A-like discovery."""
     input:
         comparison=RESULTS_DIR + "/prokaryotic/analysis/approach_comparison.tsv",
         validation=RESULTS_DIR + "/prokaryotic/validation/validation_summary.txt",
         conservation=RESULTS_DIR + "/prokaryotic/clusters/cluster_conservation.tsv.gz",
-        consensus=RESULTS_DIR + "/prokaryotic/consensus/consensus_patterns.tsv"
+        consensus=RESULTS_DIR + "/prokaryotic/consensus/consensus_patterns.tsv",
     output:
-        report=RESULTS_DIR + "/prokaryotic/reports/prokaryotic_discovery.html"
+        report=RESULTS_DIR + "/prokaryotic/reports/prokaryotic_discovery.html",
     log:
-        LOGS_DIR + "/prokaryotic/generate_report.log"
+        LOGS_DIR + "/prokaryotic/generate_report.log",
     conda:
         "../envs/r-quarto.yaml"
     script:

@@ -2,14 +2,15 @@
 Rules for downloading protein databases.
 """
 
+
 rule download_uniprot:
     """Download UniProt database."""
     output:
-        fasta=DATA_DIR + "/uniprot/uniprot_sprot.fasta.gz"
+        fasta=DATA_DIR + "/uniprot/uniprot_sprot.fasta.gz",
     params:
-        url=config["databases"]["uniprot"]["url"]
+        url=config["databases"]["uniprot"]["url"],
     log:
-        LOGS_DIR + "/download/uniprot.log"
+        LOGS_DIR + "/download/uniprot.log",
     shell:
         """
         mkdir -p $(dirname {output.fasta})
@@ -20,11 +21,11 @@ rule download_uniprot:
 rule download_reference_proteomes:
     """Download Reference Proteomes database."""
     output:
-        tarball=DATA_DIR + "/reference_proteomes/Reference_Proteomes.tar.gz"
+        tarball=DATA_DIR + "/reference_proteomes/Reference_Proteomes.tar.gz",
     params:
-        url=config["databases"]["reference_proteomes"]["url"]
+        url=config["databases"]["reference_proteomes"]["url"],
     log:
-        LOGS_DIR + "/download/reference_proteomes.log"
+        LOGS_DIR + "/download/reference_proteomes.log",
     shell:
         """
         mkdir -p $(dirname {output.tarball})
@@ -35,11 +36,11 @@ rule download_reference_proteomes:
 rule extract_reference_proteomes:
     """Extract and concatenate reference proteomes."""
     input:
-        tarball=DATA_DIR + "/reference_proteomes/Reference_Proteomes.tar.gz"
+        tarball=DATA_DIR + "/reference_proteomes/Reference_Proteomes.tar.gz",
     output:
-        fasta=DATA_DIR + "/reference_proteomes/reference_proteomes.fasta.gz"
+        fasta=DATA_DIR + "/reference_proteomes/reference_proteomes.fasta.gz",
     log:
-        LOGS_DIR + "/download/extract_reference_proteomes.log"
+        LOGS_DIR + "/download/extract_reference_proteomes.log",
     shell:
         r"""
         tar -xzf {input.tarball} -C $(dirname {input.tarball})/ 2> {log}
@@ -50,11 +51,11 @@ rule extract_reference_proteomes:
 rule download_uniparc:
     """Download UniParc database (warning: very large)."""
     output:
-        fasta=DATA_DIR + "/uniparc/uniparc_active.fasta.gz"
+        fasta=DATA_DIR + "/uniparc/uniparc_active.fasta.gz",
     params:
-        url=config["databases"]["uniparc"]["url"]
+        url=config["databases"]["uniparc"]["url"],
     log:
-        LOGS_DIR + "/download/uniparc.log"
+        LOGS_DIR + "/download/uniparc.log",
     threads: 1
     shell:
         """
@@ -66,11 +67,11 @@ rule download_uniparc:
 rule download_mgnify:
     """Download MGnify protein database."""
     output:
-        fasta=DATA_DIR + "/mgnify/mgnify_proteins.fasta.gz"
+        fasta=DATA_DIR + "/mgnify/mgnify_proteins.fasta.gz",
     params:
-        url=config["databases"]["mgnify"]["url"]
+        url=config["databases"]["mgnify"]["url"],
     log:
-        LOGS_DIR + "/download/mgnify.log"
+        LOGS_DIR + "/download/mgnify.log",
     shell:
         """
         mkdir -p $(dirname {output.fasta})

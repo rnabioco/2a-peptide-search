@@ -2,13 +2,14 @@
 Rules for searching protein databases with HMM models.
 """
 
+
 def get_database_file(wildcards):
     """Map database name to its file path."""
     db_map = {
         "uniprot": "uniprot_sprot.fasta.gz",
         "reference_proteomes": "reference_proteomes.fasta.gz",
         "uniparc": "uniparc_active.fasta.gz",
-        "mgnify": "mgnify_proteins.fasta.gz"
+        "mgnify": "mgnify_proteins.fasta.gz",
     }
     return DATA_DIR + f"/{wildcards.database}/{db_map[wildcards.database]}"
 
@@ -17,17 +18,20 @@ rule hmmsearch:
     """Search protein database with HMM model."""
     input:
         hmm=RESULTS_DIR + "/models/{iteration}/2A-{peptide_class}.hmm",
-        db=get_database_file
+        db=get_database_file,
     output:
-        hmmsearch=SCRATCH_DIR + "/searches/{database}/{iteration}/2A-{peptide_class}.hmmsearch.gz",
-        tblout=SCRATCH_DIR + "/searches/{database}/{iteration}/2A-{peptide_class}.tblout.gz",
-        alignment=SCRATCH_DIR + "/searches/{database}/{iteration}/2A-{peptide_class}.sto.gz"
+        hmmsearch=SCRATCH_DIR
+        + "/searches/{database}/{iteration}/2A-{peptide_class}.hmmsearch.gz",
+        tblout=SCRATCH_DIR
+        + "/searches/{database}/{iteration}/2A-{peptide_class}.tblout.gz",
+        alignment=SCRATCH_DIR
+        + "/searches/{database}/{iteration}/2A-{peptide_class}.sto.gz",
     log:
-        LOGS_DIR + "/hmmsearch/{database}_{iteration}_{peptide_class}.log"
+        LOGS_DIR + "/hmmsearch/{database}_{iteration}_{peptide_class}.log",
     threads: 12
     resources:
         runtime=1440,  # 24 hours max
-        mem_mb=16000   # 16GB memory
+        mem_mb=16000,  # 16GB memory
     shell:
         """
         hmmsearch --cpu {threads} \
@@ -41,17 +45,20 @@ rule hmmsearch:
 rule filter_alignment:
     """Filter alignment by E-value threshold."""
     input:
-        alignment=SCRATCH_DIR + "/searches/{database}/{iteration}/2A-{peptide_class}.sto.gz",
-        tblout=SCRATCH_DIR + "/searches/{database}/{iteration}/2A-{peptide_class}.tblout.gz"
+        alignment=SCRATCH_DIR
+        + "/searches/{database}/{iteration}/2A-{peptide_class}.sto.gz",
+        tblout=SCRATCH_DIR
+        + "/searches/{database}/{iteration}/2A-{peptide_class}.tblout.gz",
     output:
-        filtered=SCRATCH_DIR + "/alignments/{database}/{iteration}/2A-{peptide_class}.filtered.sto"
+        filtered=SCRATCH_DIR
+        + "/alignments/{database}/{iteration}/2A-{peptide_class}.filtered.sto",
     params:
-        evalue=config["thresholds"]["evalue"]
+        evalue=config["thresholds"]["evalue"],
     log:
-        LOGS_DIR + "/filter/{database}_{iteration}_{peptide_class}.log"
+        LOGS_DIR + "/filter/{database}_{iteration}_{peptide_class}.log",
     resources:
         runtime=30,
-        mem_mb=8000
+        mem_mb=8000,
     shell:
         """
         python workflow/scripts/filter_alignment.py \
@@ -66,16 +73,17 @@ rule merge_database_alignments:
     """Merge alignments from all databases for a given iteration."""
     input:
         alignments=expand(
-            SCRATCH_DIR + "/alignments/{database}/{{iteration}}/2A-{{peptide_class}}.filtered.sto",
-            database=config["databases_to_search"]
-        )
+            SCRATCH_DIR
+            + "/alignments/{database}/{{iteration}}/2A-{{peptide_class}}.filtered.sto",
+            database=config["databases_to_search"],
+        ),
     output:
-        merged=SCRATCH_DIR + "/alignments/{iteration}/2A-{peptide_class}.merged.sto"
+        merged=SCRATCH_DIR + "/alignments/{iteration}/2A-{peptide_class}.merged.sto",
     log:
-        LOGS_DIR + "/merge/{iteration}_{peptide_class}.log"
+        LOGS_DIR + "/merge/{iteration}_{peptide_class}.log",
     resources:
         runtime=60,
-        mem_mb=16000
+        mem_mb=16000,
     shell:
         """
         python workflow/scripts/merge_alignments.py \
