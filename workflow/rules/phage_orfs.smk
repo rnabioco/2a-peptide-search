@@ -15,11 +15,11 @@ Workflow:
 rule download_phage_genomes:
     """Download phage genome databases."""
     output:
-        genomes="data/phage/{db}/genomes.fasta.gz"
+        genomes=DATA_DIR + "/phage/{db}/genomes.fasta.gz"
     params:
         url=lambda w: config["phage_databases"][w.db]["url"]
     log:
-        "logs/download/phage_{db}.log"
+        LOGS_DIR + "/download/phage_{db}.log"
     shell:
         """
         mkdir -p data/phage/{wildcards.db}
@@ -30,11 +30,11 @@ rule download_phage_genomes:
 rule download_imgvr_phages:
     """Download IMG/VR phage database."""
     output:
-        genomes="data/phage/imgvr/IMGVR_all_nucleotides.fna.gz"
+        genomes=DATA_DIR + "/phage/imgvr/IMGVR_all_nucleotides.fna.gz"
     params:
         url=config["phage_databases"]["imgvr"]["url"]
     log:
-        "logs/download/phage_imgvr.log"
+        LOGS_DIR + "/download/phage_imgvr.log"
     shell:
         """
         mkdir -p data/phage/imgvr
@@ -45,13 +45,13 @@ rule download_imgvr_phages:
 rule download_inphared:
     """Download INPHARED phage database (curated phage genomes)."""
     output:
-        genomes="data/phage/inphared/genomes.fasta.gz",
-        metadata="data/phage/inphared/metadata.tsv"
+        genomes=DATA_DIR + "/phage/inphared/genomes.fasta.gz",
+        metadata=DATA_DIR + "/phage/inphared/metadata.tsv"
     params:
         genomes_url=config["phage_databases"]["inphared"]["genomes_url"],
         metadata_url=config["phage_databases"]["inphared"]["metadata_url"]
     log:
-        "logs/download/phage_inphared.log"
+        LOGS_DIR + "/download/phage_inphared.log"
     shell:
         """
         mkdir -p data/phage/inphared
@@ -67,16 +67,16 @@ rule download_inphared:
 rule split_phage_genomes:
     """Split large phage genome files into chunks for parallel ORF prediction."""
     input:
-        genomes="data/phage/{db}/genomes.fasta.gz"
+        genomes=DATA_DIR + "/phage/{db}/genomes.fasta.gz"
     output:
         chunks=expand(
-            "data/phage/{{db}}/chunks/chunk_{chunk}.fasta",
+            DATA_DIR + "/phage/{{db}}/chunks/chunk_{chunk}.fasta",
             chunk=range(1, 101)  # 100 chunks
         )
     params:
         seqs_per_chunk=1000
     log:
-        "logs/phage/split_{db}.log"
+        LOGS_DIR + "/phage/split_{db}.log"
     conda:
         "../envs/python.yaml"
     script:
@@ -86,13 +86,13 @@ rule split_phage_genomes:
 rule predict_orfs_prodigal:
     """Predict ORFs from phage genomes using Prodigal (metagenomics mode)."""
     input:
-        chunk="data/phage/{db}/chunks/chunk_{chunk}.fasta"
+        chunk=DATA_DIR + "/phage/{db}/chunks/chunk_{chunk}.fasta"
     output:
-        proteins="results/phage/{db}/orfs/chunk_{chunk}.faa",
-        genes="results/phage/{db}/orfs/chunk_{chunk}.fna",
-        gff="results/phage/{db}/orfs/chunk_{chunk}.gff"
+        proteins=RESULTS_DIR + "/phage/{db}/orfs/chunk_{chunk}.faa",
+        genes=RESULTS_DIR + "/phage/{db}/orfs/chunk_{chunk}.fna",
+        gff=RESULTS_DIR + "/phage/{db}/orfs/chunk_{chunk}.gff"
     log:
-        "logs/phage/prodigal_{db}_chunk_{chunk}.log"
+        LOGS_DIR + "/phage/prodigal_{db}_chunk_{chunk}.log"
     conda:
         "../envs/orfs.yaml"
     threads: 1
@@ -115,13 +115,13 @@ rule merge_predicted_orfs:
     """Merge predicted ORFs from all chunks."""
     input:
         proteins=expand(
-            "results/phage/{{db}}/orfs/chunk_{chunk}.faa",
+            RESULTS_DIR + "/phage/{{db}}/orfs/chunk_{chunk}.faa",
             chunk=range(1, 101)
         )
     output:
-        merged="results/phage/{db}/predicted_orfs.faa.gz"
+        merged=RESULTS_DIR + "/phage/{db}/predicted_orfs.faa.gz"
     log:
-        "logs/phage/merge_orfs_{db}.log"
+        LOGS_DIR + "/phage/merge_orfs_{db}.log"
     shell:
         """
         cat {input.proteins} | gzip > {output.merged}
@@ -136,15 +136,15 @@ rule merge_predicted_orfs:
 rule extract_phage_gp_motifs:
     """Extract GP motifs from predicted phage ORFs."""
     input:
-        fasta="results/phage/{db}/predicted_orfs.faa.gz"
+        fasta=RESULTS_DIR + "/phage/{db}/predicted_orfs.faa.gz"
     output:
-        motifs="results/phage/{db}/gp_motifs/all_gp_motifs.tsv.gz",
-        sequences="results/phage/{db}/gp_motifs/all_gp_sequences.fasta.gz"
+        motifs=RESULTS_DIR + "/phage/{db}/gp_motifs/all_gp_motifs.tsv.gz",
+        sequences=RESULTS_DIR + "/phage/{db}/gp_motifs/all_gp_sequences.fasta.gz"
     params:
         upstream=30,
         downstream=15
     log:
-        "logs/phage/extract_gp_{db}.log"
+        LOGS_DIR + "/phage/extract_gp_{db}.log"
     conda:
         "../envs/python.yaml"
     script:
@@ -154,11 +154,11 @@ rule extract_phage_gp_motifs:
 rule annotate_phage_domains:
     """Run domain annotation on phage ORFs with GP motifs."""
     input:
-        sequences="results/phage/{db}/gp_motifs/all_gp_sequences.fasta.gz"
+        sequences=RESULTS_DIR + "/phage/{db}/gp_motifs/all_gp_sequences.fasta.gz"
     output:
-        annotations="results/phage/{db}/gp_motifs/domain_annotations.tsv.gz"
+        annotations=RESULTS_DIR + "/phage/{db}/gp_motifs/domain_annotations.tsv.gz"
     log:
-        "logs/phage/annotate_domains_{db}.log"
+        LOGS_DIR + "/phage/annotate_domains_{db}.log"
     conda:
         "../envs/python.yaml"
     threads: 8
@@ -172,14 +172,14 @@ rule annotate_phage_domains:
 rule filter_phage_interdomain_gp:
     """Filter phage GP motifs by domain boundaries."""
     input:
-        motifs="results/phage/{db}/gp_motifs/all_gp_motifs.tsv.gz",
-        annotations="results/phage/{db}/gp_motifs/domain_annotations.tsv.gz"
+        motifs=RESULTS_DIR + "/phage/{db}/gp_motifs/all_gp_motifs.tsv.gz",
+        annotations=RESULTS_DIR + "/phage/{db}/gp_motifs/domain_annotations.tsv.gz"
     output:
-        interdomain="results/phage/{db}/gp_motifs/interdomain_gp_motifs.tsv.gz",
-        intradomain="results/phage/{db}/gp_motifs/intradomain_gp_motifs.tsv.gz",
-        statistics="results/phage/{db}/gp_motifs/gp_motif_stats.tsv"
+        interdomain=RESULTS_DIR + "/phage/{db}/gp_motifs/interdomain_gp_motifs.tsv.gz",
+        intradomain=RESULTS_DIR + "/phage/{db}/gp_motifs/intradomain_gp_motifs.tsv.gz",
+        statistics=RESULTS_DIR + "/phage/{db}/gp_motifs/gp_motif_stats.tsv"
     log:
-        "logs/phage/filter_interdomain_{db}.log"
+        LOGS_DIR + "/phage/filter_interdomain_{db}.log"
     conda:
         "../envs/python.yaml"
     script:
@@ -193,16 +193,16 @@ rule filter_phage_interdomain_gp:
 rule merge_prokaryotic_and_phage_motifs:
     """Combine GP motifs from prokaryotic proteomes and phage ORFs."""
     input:
-        prok_interdomain="results/prokaryotic/gp_motifs/interdomain_gp_motifs.tsv.gz",
+        prok_interdomain=RESULTS_DIR + "/prokaryotic/gp_motifs/interdomain_gp_motifs.tsv.gz",
         phage_interdomain=expand(
-            "results/phage/{db}/gp_motifs/interdomain_gp_motifs.tsv.gz",
+            RESULTS_DIR + "/phage/{db}/gp_motifs/interdomain_gp_motifs.tsv.gz",
             db=config["phage_databases_to_use"]
         )
     output:
-        merged="results/combined/interdomain_gp_motifs_all.tsv.gz",
-        summary="results/combined/source_summary.tsv"
+        merged=RESULTS_DIR + "/combined/interdomain_gp_motifs_all.tsv.gz",
+        summary=RESULTS_DIR + "/combined/source_summary.tsv"
     log:
-        "logs/combined/merge_motifs.log"
+        LOGS_DIR + "/combined/merge_motifs.log"
     conda:
         "../envs/python.yaml"
     script:
@@ -212,15 +212,15 @@ rule merge_prokaryotic_and_phage_motifs:
 rule cluster_combined_motifs:
     """Cluster combined prokaryotic and phage GP motifs."""
     input:
-        interdomain="results/combined/interdomain_gp_motifs_all.tsv.gz"
+        interdomain=RESULTS_DIR + "/combined/interdomain_gp_motifs_all.tsv.gz"
     output:
-        clusters="results/combined/clusters/gp_clusters.tsv.gz",
-        representatives="results/combined/clusters/cluster_representatives.fasta"
+        clusters=RESULTS_DIR + "/combined/clusters/gp_clusters.tsv.gz",
+        representatives=RESULTS_DIR + "/combined/clusters/cluster_representatives.fasta"
     params:
         identity=config["prokaryotic"]["clustering_identity"],
         coverage=config["prokaryotic"]["clustering_coverage"]
     log:
-        "logs/combined/cluster_motifs.log"
+        LOGS_DIR + "/combined/cluster_motifs.log"
     conda:
         "../envs/python.yaml"
     threads: 12
@@ -239,15 +239,15 @@ rule analyze_phage_gp_distribution:
     """Analyze distribution of GP motifs in phage genomes."""
     input:
         motifs=expand(
-            "results/phage/{db}/gp_motifs/all_gp_motifs.tsv.gz",
+            RESULTS_DIR + "/phage/{db}/gp_motifs/all_gp_motifs.tsv.gz",
             db=config["phage_databases_to_use"]
         ),
-        metadata="data/phage/inphared/metadata.tsv"
+        metadata=DATA_DIR + "/phage/inphared/metadata.tsv"
     output:
-        distribution="results/phage/analysis/gp_distribution.tsv",
-        plots=directory("results/phage/analysis/distribution_plots/")
+        distribution=RESULTS_DIR + "/phage/analysis/gp_distribution.tsv",
+        plots=directory(RESULTS_DIR + "/phage/analysis/distribution_plots/")
     log:
-        "logs/phage/analyze_distribution.log"
+        LOGS_DIR + "/phage/analyze_distribution.log"
     conda:
         "../envs/python.yaml"
     script:
@@ -257,13 +257,13 @@ rule analyze_phage_gp_distribution:
 rule compare_phage_vs_bacterial:
     """Compare GP motif characteristics between phages and bacteria."""
     input:
-        phage_motifs="results/combined/interdomain_gp_motifs_all.tsv.gz",
-        clusters="results/combined/clusters/gp_clusters.tsv.gz"
+        phage_motifs=RESULTS_DIR + "/combined/interdomain_gp_motifs_all.tsv.gz",
+        clusters=RESULTS_DIR + "/combined/clusters/gp_clusters.tsv.gz"
     output:
-        comparison="results/combined/analysis/phage_vs_bacterial.tsv",
-        plots=directory("results/combined/analysis/comparison_plots/")
+        comparison=RESULTS_DIR + "/combined/analysis/phage_vs_bacterial.tsv",
+        plots=directory(RESULTS_DIR + "/combined/analysis/comparison_plots/")
     log:
-        "logs/combined/compare_phage_bacterial.log"
+        LOGS_DIR + "/combined/compare_phage_bacterial.log"
     conda:
         "../envs/python.yaml"
     script:
