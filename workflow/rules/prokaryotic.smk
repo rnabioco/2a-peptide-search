@@ -96,8 +96,8 @@ rule align_all_seed_peptides:
         """
         mkdir -p $(dirname "{output.alignment}")
 
-        # Use MUSCLE for alignment, convert to Stockholm format
-        muscle -align "{input.fasta}" -output "{output.alignment}.afa" 2> "{log}"
+        # Use MAFFT for alignment, convert to Stockholm format
+        mafft --auto "{input.fasta}" > "{output.alignment}.afa" 2> "{log}"
 
         # Convert to Stockholm format
         esl-reformat stockholm "{output.alignment}.afa" > "{output.alignment}" 2>> "{log}"
@@ -155,8 +155,8 @@ rule align_seed_peptides:
         """
         mkdir -p $(dirname "{output.alignment}")
 
-        # Use MUSCLE for alignment, convert to Stockholm format
-        muscle -align "{input.fasta}" -output "{output.alignment}.afa" 2> "{log}"
+        # Use MAFFT for alignment, convert to Stockholm format
+        mafft --auto "{input.fasta}" > "{output.alignment}.afa" 2> "{log}"
 
         # Convert to Stockholm format (hmmer accepts various formats)
         esl-reformat stockholm "{output.alignment}.afa" > "{output.alignment}" 2>> "{log}"

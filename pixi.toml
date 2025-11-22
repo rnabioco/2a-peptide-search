@@ -26,7 +26,7 @@ python = ">=3.13.9,<3.14"
 snakemake-executor-plugin-slurm = ">=1.9.2,<2"
 # Bioinformatics tools
 hmmer = ">=3.4,<4"
-muscle = ">=5.3,<6"
+mafft = ">=7.5,<8"
 mmseqs2 = "*"
 # Python packages for sequence processing
 biopython = ">=1.86,<2"
