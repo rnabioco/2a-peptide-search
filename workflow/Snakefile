@@ -56,7 +56,7 @@ include: "rules/report.smk"
 # Default target: generate full report
 rule all:
     input:
-        "results/reports/2A-peptide-analysis.html"
+        RESULTS_DIR + "/reports/2A-peptide-analysis.html"
     default_target: True
 
 
@@ -72,7 +72,7 @@ rule test:
 # Download all databases
 rule download_all:
     input:
-        expand("data/{db}/{file}",
+        expand(DATA_DIR + "/{db}/{file}",
             zip,
             db=config["databases_to_search"],
             file=[DB_FILES[db] for db in config["databases_to_search"]]
@@ -83,7 +83,7 @@ rule download_all:
 rule build_seeds:
     input:
         expand(
-            "results/models/seed/2A-{peptide_class}.hmm",
+            RESULTS_DIR + "/models/seed/2A-{peptide_class}.hmm",
             peptide_class=["class-1", "class-2"]
         )
 
@@ -92,7 +92,7 @@ rule build_seeds:
 rule iter1:
     input:
         expand(
-            "results/models/iter1_refined/2A-{peptide_class}.hmm",
+            RESULTS_DIR + "/models/iter1_refined/2A-{peptide_class}.hmm",
             peptide_class=["class-1", "class-2"]
         )
 
@@ -100,7 +100,7 @@ rule iter1:
 # Complete iteration 2 (requires checkpoint)
 rule iter2:
     input:
-        "results/checkpoints/iter2.curated"
+        RESULTS_DIR + "/checkpoints/iter2.curated"
 
 
 # Workflow for each iteration
@@ -109,20 +109,20 @@ def get_iteration_outputs(iteration):
     if iteration == "seed":
         return {
             "models": expand(
-                "results/models/seed/2A-{peptide_class}.hmm",
+                RESULTS_DIR + "/models/seed/2A-{peptide_class}.hmm",
                 peptide_class=["class-1", "class-2"]
             )
         }
     else:
         return {
             "searches": expand(
-                "results/searches/{database}/{iteration}/2A-{peptide_class}.hmmsearch.gz",
+                SCRATCH_DIR + "/searches/{database}/{iteration}/2A-{peptide_class}.hmmsearch.gz",
                 database=config["databases_to_search"],
                 iteration=iteration,
                 peptide_class=["class-1", "class-2"]
             ),
             "merged": expand(
-                "results/alignments/{iteration}/2A-{peptide_class}.merged.sto",
+                SCRATCH_DIR + "/alignments/{iteration}/2A-{peptide_class}.merged.sto",
                 iteration=iteration,
                 peptide_class=["class-1", "class-2"]
             )
