@@ -25,7 +25,16 @@ Known prokaryotic stalling peptides:
 """
 
 # ============================================================================
-# Data Preparation
+# Include modular rule files
+# ============================================================================
+
+
+include: "prokaryotic_download.smk"
+include: "prokaryotic_orf.smk"
+
+
+# ============================================================================
+# Helper Functions
 # ============================================================================
 
 
@@ -58,193 +67,12 @@ def get_prokaryotic_database_file(wildcards):
     return DATA_DIR + f"/prokaryotic/{wildcards.database}.fasta.gz"
 
 
-rule download_prokaryotic_proteomes:
-    """Download prokaryotic reference proteomes."""
-    output:
-        fasta=DATA_DIR + "/prokaryotic/{database}.fasta.gz",
-    params:
-        url=lambda w: config["prokaryotic_databases"][w.database]["url"],
-    log:
-        LOGS_DIR + "/download/prokaryotic_{database}.log",
-    shell:
-        """
-        mkdir -p $(dirname "{output.fasta}")
-        wget -c -o "{log}" "{params.url}" -O "{output.fasta}"
-        """
-
-
-rule download_ncbi_viral_split:
-    """Download one NCBI Viral RefSeq protein file."""
-    output:
-        fasta=DATA_DIR + "/prokaryotic/ncbi_viral/splits/viral.{file_num}.protein.faa.gz",
-    params:
-        base_url=lambda w: config["prokaryotic_databases"]["ncbi_viral_refseq"]["base_url"],
-    log:
-        LOGS_DIR + "/download/ncbi_viral_{file_num}.log",
-    shell:
-        """
-        mkdir -p $(dirname "{output.fasta}")
-        wget -c -o "{log}" "{params.base_url}/viral.{wildcards.file_num}.protein.faa.gz" -O "{output.fasta}"
-        """
-
-
-rule download_ncbi_viral_refseq:
-    """Download all NCBI Viral RefSeq protein files."""
-    input:
-        splits=expand(
-            DATA_DIR + "/prokaryotic/ncbi_viral/splits/viral.{file_num}.protein.faa.gz",
-            file_num=range(1, config["prokaryotic_databases"]["ncbi_viral_refseq"]["num_files"] + 1),
-        ),
-    output:
-        flag=DATA_DIR + "/prokaryotic/ncbi_viral/download_complete.flag",
-    shell:
-        """
-        touch "{output.flag}"
-        """
-
-
-rule merge_ncbi_viral_splits:
-    """Merge NCBI Viral RefSeq splits into single database."""
-    input:
-        splits=expand(
-            DATA_DIR + "/prokaryotic/ncbi_viral/splits/viral.{file_num}.protein.faa.gz",
-            file_num=range(1, config["prokaryotic_databases"]["ncbi_viral_refseq"]["num_files"] + 1),
-        ),
-        flag=DATA_DIR + "/prokaryotic/ncbi_viral/download_complete.flag",
-    output:
-        fasta=DATA_DIR + "/prokaryotic/ncbi_viral_refseq.fasta.gz",
-    log:
-        LOGS_DIR + "/download/merge_ncbi_viral.log",
-    shell:
-        """
-        cat {input.splits} > "{output.fasta}" 2> "{log}"
-        """
-
-
-rule download_uniprot_viruses:
-    """Download UniProt viral proteins via REST API."""
-    output:
-        fasta=DATA_DIR + "/prokaryotic/uniprot_viruses.fasta.gz",
-    params:
-        url=config["prokaryotic_databases"]["uniprot_viruses"]["url"],
-    log:
-        LOGS_DIR + "/download/uniprot_viruses.log",
-    shell:
-        """
-        mkdir -p $(dirname "{output.fasta}")
-        wget -c -o "{log}" "{params.url}" -O "{output.fasta}"
-        """
-
-
-rule download_inphared_genomes:
-    """Download INPHARED phage genomes."""
-    output:
-        genomes=DATA_DIR + "/prokaryotic/phage_genomes/inphared_genomes.fasta",
-    params:
-        url=config["phage_databases"]["inphared"]["genomes_url"],
-    log:
-        LOGS_DIR + "/download/inphared_genomes.log",
-    shell:
-        """
-        mkdir -p $(dirname "{output.genomes}")
-        wget -c -o "{log}" "{params.url}" -O "{output.genomes}"
-        """
-
-
-rule download_millardlab_genomes:
-    """Download Millard Lab phage genomes."""
-    output:
-        genomes=DATA_DIR + "/prokaryotic/phage_genomes/millardlab_genomes.fasta.gz",
-    params:
-        url=config["phage_databases"]["millardlab"]["url"],
-    log:
-        LOGS_DIR + "/download/millardlab_genomes.log",
-    shell:
-        """
-        mkdir -p $(dirname "{output.genomes}")
-        wget -c -o "{log}" "{params.url}" -O "{output.genomes}"
-        """
-
-
-rule run_prodigal_inphared:
-    """Run Prodigal to predict ORFs from INPHARED phage genomes."""
-    input:
-        genomes=DATA_DIR + "/prokaryotic/phage_genomes/inphared_genomes.fasta",
-    output:
-        proteins=DATA_DIR + "/prokaryotic/inphared_proteins.fasta.gz",
-        genes=DATA_DIR + "/prokaryotic/inphared_genes.gff",
-    log:
-        LOGS_DIR + "/prodigal/inphared.log",
-    params:
-        mode=config["orf_prediction"]["mode"],
-        table=config["orf_prediction"]["translation_table"],
-    threads: 1
-    shell:
-        """
-        # Run Prodigal in metagenomic mode for diverse phages
-        prodigal -i "{input.genomes}" \
-            -a >(gzip > "{output.proteins}") \
-            -f gff \
-            -o "{output.genes}" \
-            -p {params.mode} \
-            -g {params.table} \
-            2> "{log}"
-        """
-
-
-rule run_prodigal_millardlab:
-    """Run Prodigal to predict ORFs from Millard Lab phage genomes."""
-    input:
-        genomes=DATA_DIR + "/prokaryotic/phage_genomes/millardlab_genomes.fasta.gz",
-    output:
-        proteins=DATA_DIR + "/prokaryotic/millardlab_proteins.fasta.gz",
-        genes=DATA_DIR + "/prokaryotic/millardlab_genes.gff",
-    log:
-        LOGS_DIR + "/prodigal/millardlab.log",
-    params:
-        mode=config["orf_prediction"]["mode"],
-        table=config["orf_prediction"]["translation_table"],
-    threads: 1
-    shell:
-        """
-        # Decompress genomes, run Prodigal, compress output
-        zcat "{input.genomes}" | \
-        prodigal -a /dev/stdout \
-            -f gff \
-            -o "{output.genes}" \
-            -p {params.mode} \
-            -g {params.table} \
-            2> "{log}" | \
-        gzip > "{output.proteins}"
-        """
-
-
-rule download_pfam_database:
-    """Download and decompress Pfam-A HMM database."""
-    output:
-        hmm=DATA_DIR + "/pfam/Pfam-A.hmm",
-        h3f=DATA_DIR + "/pfam/Pfam-A.hmm.h3f",
-        h3i=DATA_DIR + "/pfam/Pfam-A.hmm.h3i",
-        h3m=DATA_DIR + "/pfam/Pfam-A.hmm.h3m",
-        h3p=DATA_DIR + "/pfam/Pfam-A.hmm.h3p",
-    params:
-        url=config["prokaryotic_databases"]["pfam"]["url"],
-    log:
-        LOGS_DIR + "/download/pfam.log",
-    shell:
-        """
-        mkdir -p $(dirname "{output.hmm}")
-        wget -c -o "{log}" "{params.url}" -O "{output.hmm}.gz"
-        gunzip -f "{output.hmm}.gz"
-
-        # Press HMM database to create binary auxfiles
-        hmmpress "{output.hmm}" 2>> "{log}"
-        """
-
-
 # ============================================================================
 # APPROACH 1: Seed-based Discovery with Known Stalling Peptides
 # ============================================================================
+
+# Resolve ambiguity between comprehensive and motif-specific searches
+ruleorder: search_with_comprehensive_hmm > search_with_seed_hmms
 
 
 rule split_known_peptides_by_motif:
@@ -310,9 +138,12 @@ rule search_with_comprehensive_hmm:
         hmm=RESULTS_DIR + "/prokaryotic/models/seed/comprehensive.hmm",
         db=get_prokaryotic_database_file,
     output:
-        hmmsearch=RESULTS_DIR + "/prokaryotic/seed_searches/{database}/comprehensive.hmmsearch.gz",
-        tblout=RESULTS_DIR + "/prokaryotic/seed_searches/{database}/comprehensive.tblout.gz",
-        alignment=RESULTS_DIR + "/prokaryotic/seed_searches/{database}/comprehensive.sto.gz",
+        hmmsearch=RESULTS_DIR
+        + "/prokaryotic/seed_searches/{database}/comprehensive.hmmsearch.gz",
+        tblout=RESULTS_DIR
+        + "/prokaryotic/seed_searches/{database}/comprehensive.tblout.gz",
+        alignment=RESULTS_DIR
+        + "/prokaryotic/seed_searches/{database}/comprehensive.sto.gz",
     log:
         LOGS_DIR + "/prokaryotic/search_comprehensive_{database}.log",
     threads: 12
@@ -373,7 +204,8 @@ rule search_with_seed_hmms:
         hmm=RESULTS_DIR + "/prokaryotic/models/seed/{motif}.hmm",
         db=get_prokaryotic_database_file,
     output:
-        hmmsearch=RESULTS_DIR + "/prokaryotic/seed_searches/{database}/{motif}.hmmsearch.gz",
+        hmmsearch=RESULTS_DIR
+        + "/prokaryotic/seed_searches/{database}/{motif}.hmmsearch.gz",
         tblout=RESULTS_DIR + "/prokaryotic/seed_searches/{database}/{motif}.tblout.gz",
         alignment=RESULTS_DIR + "/prokaryotic/seed_searches/{database}/{motif}.sto.gz",
     log:
@@ -594,7 +426,8 @@ rule parse_gp_clusters:
         interdomain=RESULTS_DIR + "/prokaryotic/gp_motifs/interdomain_gp_motifs.tsv.gz",
     output:
         clusters=RESULTS_DIR + "/prokaryotic/clusters/gp_clusters.tsv.gz",
-        representatives=RESULTS_DIR + "/prokaryotic/clusters/cluster_representatives.fasta",
+        representatives=RESULTS_DIR
+        + "/prokaryotic/clusters/cluster_representatives.fasta",
     log:
         LOGS_DIR + "/prokaryotic/parse_clusters.log",
     shell:
@@ -774,7 +607,8 @@ rule compare_approaches:
         clusters=RESULTS_DIR + "/prokaryotic/clusters/gp_clusters.tsv.gz",
         validation=RESULTS_DIR + "/prokaryotic/validation/known_peptide_hits.tsv",
         # APPROACH 1: Seed-based searches (merged from all databases)
-        seed_comprehensive=RESULTS_DIR + "/prokaryotic/seed_searches/comprehensive_merged.sto.gz",
+        seed_comprehensive=RESULTS_DIR
+        + "/prokaryotic/seed_searches/comprehensive_merged.sto.gz",
     output:
         comparison=RESULTS_DIR + "/prokaryotic/analysis/approach_comparison.tsv",
         plots=directory(RESULTS_DIR + "/prokaryotic/analysis/comparison_plots/"),
