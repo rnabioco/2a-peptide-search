@@ -2,6 +2,7 @@
 #SBATCH --job-name=2a-prokaryotic
 #SBATCH --comment="2a-prokaryotic"
 #SBATCH --partition=amilan
+#SBATCH --qos=normal
 #SBATCH --account=amc-general
 #SBATCH --time=72:00:00
 #SBATCH --ntasks=1

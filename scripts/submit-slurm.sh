@@ -2,6 +2,7 @@
 #SBATCH --job-name=2a-orchestrator
 #SBATCH --comment="2a-orchestrator"
 #SBATCH --partition=amilan
+#SBATCH --qos=normal
 #SBATCH --account=amc-general
 #SBATCH --time=48:00:00
 #SBATCH --ntasks=1
