@@ -14,8 +14,6 @@ rule collect_statistics:
         stats=RESULTS_DIR + "/reports/search_statistics.tsv"
     log:
         LOGS_DIR + "/report/collect_stats.log"
-    conda:
-        "../envs/python.yaml"
     script:
         "../scripts/collect_statistics.py"
 
@@ -36,8 +34,6 @@ rule generate_report:
         report=RESULTS_DIR + "/reports/2A-peptide-analysis.html"
     log:
         LOGS_DIR + "/report/generate_report.log"
-    conda:
-        "../envs/r-quarto.yaml"
     shell:
         """
         quarto render workflow/report.qmd -o {output.report} 2> {log}

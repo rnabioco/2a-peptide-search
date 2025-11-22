@@ -24,8 +24,6 @@ rule hmmsearch:
         alignment=SCRATCH_DIR + "/searches/{database}/{iteration}/2A-{peptide_class}.sto.gz"
     log:
         LOGS_DIR + "/hmmsearch/{database}_{iteration}_{peptide_class}.log"
-    conda:
-        "../envs/hmmer.yaml"
     threads: 12
     resources:
         runtime=1440,  # 24 hours max
@@ -51,8 +49,6 @@ rule filter_alignment:
         evalue=config["thresholds"]["evalue"]
     log:
         LOGS_DIR + "/filter/{database}_{iteration}_{peptide_class}.log"
-    conda:
-        "../envs/python.yaml"
     resources:
         runtime=30,
         mem_mb=8000
@@ -77,8 +73,6 @@ rule merge_database_alignments:
         merged=SCRATCH_DIR + "/alignments/{iteration}/2A-{peptide_class}.merged.sto"
     log:
         LOGS_DIR + "/merge/{iteration}_{peptide_class}.log"
-    conda:
-        "../envs/python.yaml"
     resources:
         runtime=60,
         mem_mb=16000
