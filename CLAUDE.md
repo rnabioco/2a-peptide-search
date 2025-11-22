@@ -182,7 +182,7 @@ IMG/VR requires web login and cannot be downloaded directly via wget. To use IMG
 
 1. Download manually from https://img.jgi.doe.gov/vr/
 2. Save the file locally (e.g., `IMGVR_all_nucleotides.fna.gz`)
-3. Edit `workflow/config-prokaryotic.yaml` and set the local path:
+3. Edit `workflow/config/config-prokaryotic.yaml` and set the local path:
    ```yaml
    phage_databases:
      imgvr:
@@ -248,4 +248,4 @@ See `cluster/slurm/README.md` for complete SLURM documentation.
 - **Missing checkpoint**: Manually create the checkpoint file to continue pipeline
 - **SLURM job fails**: Check `.snakemake/slurm_logs/` and increase resources in cluster config
 - **Timeout on cluster**: Increase `runtime` in `cluster/slurm/config.yaml` for specific rules
-- **IMG/VR authentication error**: Download manually from https://img.jgi.doe.gov/vr/ and set `local_path` in `workflow/config-prokaryotic.yaml`
+- **IMG/VR authentication error**: Download manually from https://img.jgi.doe.gov/vr/ and set `local_path` in `workflow/config/config-prokaryotic.yaml`

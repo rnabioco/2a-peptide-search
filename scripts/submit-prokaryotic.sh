@@ -27,7 +27,7 @@
 #
 # Configuration:
 #   - Edit cluster/slurm/config.yaml to set your SLURM account
-#   - Edit workflow/config-prokaryotic.yaml to configure phage databases and parameters
+#   - Edit workflow/config/config-prokaryotic.yaml to configure phage databases and parameters
 #
 # See workflow/PROKARYOTIC-DISCOVERY.md for detailed documentation
 
@@ -45,7 +45,7 @@ TARGET="${1:-prokaryotic_discovery}"
 
 # Snakemake configuration
 SNAKEFILE="workflow/Snakefile"
-CONFIGFILE="workflow/config-prokaryotic.yaml"
+CONFIGFILE="workflow/config/config-prokaryotic.yaml"
 PROFILE="cluster/slurm"
 
 # ============================================================================
