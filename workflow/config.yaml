@@ -42,6 +42,14 @@ databases:
     #       merge_mgnify_splits creates single file (for existing search rules)
     #       For best performance on cluster, search splits separately in parallel
 
+  imgvr:
+    # IMG/VR requires web login - download manually and specify local path
+    # Download from: https://img.jgi.doe.gov/vr/
+    # Set local_path to your downloaded file location
+    local_path: null  # e.g., "/path/to/IMGVR_all_proteins.faa.gz"
+    description: "IMG/VR viral genomes database (requires manual download)"
+    size: "very_large"
+
 # Which databases to search (comment out to skip)
 databases_to_search:
   - uniprot
