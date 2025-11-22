@@ -30,31 +30,30 @@ Known prokaryotic stalling peptides:
 
 
 def get_prokaryotic_database_file(wildcards):
-    """Map database name to its file path, handling local_path for IMG/VR and MGnify."""
+    """Map database name to its file path, handling different download mechanisms."""
     db_config = config["prokaryotic_databases"][wildcards.database]
 
-    # Check if database has a local_path configured (e.g., IMG/VR, MGnify)
+    # Check if database has a local_path configured (e.g., IMG/VR)
     if "local_path" in db_config and db_config["local_path"]:
         return db_config["local_path"]
 
-    # Standard databases with URLs or ORF-predicted - use standard naming
-    db_map = {
-        "bacteria": "bacteria.fasta.gz",
-        "archaea": "archaea.fasta.gz",
-        "mgnify": f"{DATA_DIR}/mgnify/mgnify_proteins.fasta.gz",  # Use main pipeline download
-        "ncbi_viral_refseq": "ncbi_viral_refseq.fasta.gz",  # Merged from splits
-        "uniprot_viruses": "uniprot_viruses.fasta.gz",
-        "inphared_proteins": "inphared_proteins.fasta.gz",  # ORF-predicted
-        "millardlab_proteins": "millardlab_proteins.fasta.gz",  # ORF-predicted
-    }
+    # Databases with direct URL downloads (go to downloads/ subdirectory)
+    if wildcards.database in ["bacteria", "archaea", "uniprot_viruses"]:
+        return DATA_DIR + f"/prokaryotic/downloads/{wildcards.database}.fasta.gz"
 
-    if wildcards.database in db_map:
-        if wildcards.database == "mgnify":
-            return db_map[wildcards.database]  # Already has full path
-        else:
-            return DATA_DIR + f"/prokaryotic/downloads/{db_map[wildcards.database]}"
+    # Databases from merged splits (go to prokaryotic/ directly)
+    if wildcards.database == "ncbi_viral_refseq":
+        return DATA_DIR + "/prokaryotic/ncbi_viral_refseq.fasta.gz"
 
-    # Fallback
+    # Databases from ORF prediction (go to prokaryotic/ directly)
+    if wildcards.database in ["inphared_proteins", "millardlab_proteins"]:
+        return DATA_DIR + f"/prokaryotic/{wildcards.database}.fasta.gz"
+
+    # MGnify uses main pipeline download
+    if wildcards.database == "mgnify":
+        return f"{DATA_DIR}/mgnify/mgnify_proteins.fasta.gz"
+
+    # Fallback to downloads subdirectory
     return DATA_DIR + f"/prokaryotic/downloads/{wildcards.database}.fasta.gz"
 
 
