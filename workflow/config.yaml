@@ -85,3 +85,24 @@ peptide_classes:
 resources:
   hmmsearch_threads: 12
   download_retries: 3
+
+# Skylign sequence logo generation
+skylign:
+  api_url: "http://skylign.org"
+  processing: "hmm"  # hmm or obs
+  retry_attempts: 3
+  retry_delay: 5  # seconds between retries
+
+# Prokaryotic databases (for prokaryotic 2A-like peptide discovery)
+prokaryotic_databases:
+  bacteria:
+    url: "https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/taxonomic_divisions/uniprot_sprot_bacteria.dat.gz"
+  pfam:
+    url: "http://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/Pfam-A.hmm.gz"
+
+# Prokaryotic analysis parameters
+prokaryotic:
+  clustering_identity: 0.7
+  clustering_coverage: 0.8
+  min_cluster_size: 5
+  min_conservation: 0.5
