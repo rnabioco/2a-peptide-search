@@ -3,7 +3,7 @@ name = "2a-peptide-search"
 version = "0.1.0"
 description = "Bioinformatics pipeline for identifying 2A peptides using profile HMMs"
 channels = ["conda-forge", "bioconda"]
-platforms = ["linux-64"]
+platforms = ["linux-64", "osx-arm64"]
 
 [tasks]
 # Run full pipeline
@@ -37,6 +37,7 @@ pandas = ">=2.2"
 numpy = ">=1.26"
 plotnine = ">=0.13"
 pillow = ">=10.0"
+requests = ">=2.31"
 
 # R and packages for reporting
 r-base = "4.3.*"
