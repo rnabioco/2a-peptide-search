@@ -1,5 +1,6 @@
 #!/bin/bash
 #SBATCH --job-name=2a-test
+#SBATCH --comment="2a-test"
 #SBATCH --partition=amilan
 #SBATCH --account=amc-general
 #SBATCH --time=4:00:00
@@ -49,9 +50,9 @@ echo ""
 # Dry run first
 echo "Dry run:"
 pixi run -e default snakemake \
-    --snakefile pipeline/workflow/Snakefile \
-    --configfile pipeline/workflow/config/config.yaml \
-    --profile pipeline/cluster/slurm \
+    --snakefile workflow/Snakefile \
+    --configfile workflow/config/config.yaml \
+    --profile cluster/slurm \
     -n test
 
 echo ""
@@ -59,9 +60,9 @@ echo "Executing test target..."
 echo ""
 
 pixi run -e default snakemake \
-    --snakefile pipeline/workflow/Snakefile \
-    --configfile pipeline/workflow/config/config.yaml \
-    --profile pipeline/cluster/slurm \
+    --snakefile workflow/Snakefile \
+    --configfile workflow/config/config.yaml \
+    --profile cluster/slurm \
     test
 
 EXIT_CODE=$?

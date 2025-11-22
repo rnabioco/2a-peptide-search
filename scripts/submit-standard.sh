@@ -1,32 +1,32 @@
 #!/bin/bash
-#SBATCH --job-name=2a-orchestrator
-#SBATCH --comment="2a-orchestrator"
+#SBATCH --job-name=2a-standard
+#SBATCH --comment="2a-standard"
 #SBATCH --partition=amilan
 #SBATCH --account=amc-general
 #SBATCH --time=48:00:00
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=4G
-#SBATCH --output=/scratch/alpine/%u/2a-peptide-search/logs/orchestrator_%j.out
-#SBATCH --error=/scratch/alpine/%u/2a-peptide-search/logs/orchestrator_%j.err
+#SBATCH --output=/scratch/alpine/%u/2a-peptide-search/logs/standard_%j.out
+#SBATCH --error=/scratch/alpine/%u/2a-peptide-search/logs/standard_%j.err
 
-# 2A Peptide Search Pipeline - SLURM Orchestrator
-# ================================================
-# This script submits a lightweight orchestrator job that manages the Snakemake
-# workflow. The orchestrator submits individual rules as separate SLURM jobs.
+# Standard 2A Peptide Search Pipeline
+# ====================================
+# Identifies eukaryotic/viral 2A peptides using curated seed alignments
+# for class-1 and class-2 2A peptides.
 #
 # Usage:
-#   sbatch submit-slurm.sh [target]
+#   sbatch scripts/submit-standard.sh [target]
 #
 # Examples:
-#   sbatch submit-slurm.sh                    # Run full pipeline
-#   sbatch submit-slurm.sh test               # Test with UniProt only
-#   sbatch submit-slurm.sh iter1              # Run iteration 1
-#   sbatch submit-slurm.sh download_all       # Download all databases
+#   sbatch scripts/submit-standard.sh                 # Run full pipeline
+#   sbatch scripts/submit-standard.sh test            # Test with UniProt only
+#   sbatch scripts/submit-standard.sh iter1           # Run iteration 1
+#   sbatch scripts/submit-standard.sh download_all    # Download all databases
 #
 # Configuration:
 #   - Edit cluster/slurm/config.yaml to set your SLURM account
-#   - Edit workflow/config.yaml to select databases and set parameters
+#   - Edit workflow/config/config.yaml to select databases and set parameters
 
 set -euo pipefail
 
@@ -63,7 +63,7 @@ mkdir -p "$LOGS_DIR"
 # ============================================================================
 
 echo "=========================================="
-echo "2A Peptide Search Pipeline Orchestrator"
+echo "Standard 2A Peptide Search Pipeline"
 echo "=========================================="
 echo "Started: $(date)"
 echo "Target: $TARGET"

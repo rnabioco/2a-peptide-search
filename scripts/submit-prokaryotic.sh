@@ -1,32 +1,34 @@
 #!/bin/bash
-#SBATCH --job-name=2a-orchestrator
-#SBATCH --comment="2a-orchestrator"
+#SBATCH --job-name=2a-prokaryotic
+#SBATCH --comment="2a-prokaryotic"
 #SBATCH --partition=amilan
 #SBATCH --account=amc-general
-#SBATCH --time=48:00:00
+#SBATCH --time=72:00:00
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=1
 #SBATCH --mem=4G
-#SBATCH --output=/scratch/alpine/%u/2a-peptide-search/logs/orchestrator_%j.out
-#SBATCH --error=/scratch/alpine/%u/2a-peptide-search/logs/orchestrator_%j.err
+#SBATCH --output=/scratch/alpine/%u/2a-peptide-search/logs/prokaryotic_%j.out
+#SBATCH --error=/scratch/alpine/%u/2a-peptide-search/logs/prokaryotic_%j.err
 
-# 2A Peptide Search Pipeline - SLURM Orchestrator
-# ================================================
-# This script submits a lightweight orchestrator job that manages the Snakemake
-# workflow. The orchestrator submits individual rules as separate SLURM jobs.
+# Prokaryotic 2A-like Peptide Discovery Pipeline
+# ===============================================
+# Discovers prokaryotic ribosomal stalling peptides using GP-motif
+# extraction, domain annotation, and pattern clustering.
 #
 # Usage:
-#   sbatch submit-slurm.sh [target]
+#   sbatch scripts/submit-prokaryotic.sh [target]
 #
 # Examples:
-#   sbatch submit-slurm.sh                    # Run full pipeline
-#   sbatch submit-slurm.sh test               # Test with UniProt only
-#   sbatch submit-slurm.sh iter1              # Run iteration 1
-#   sbatch submit-slurm.sh download_all       # Download all databases
+#   sbatch scripts/submit-prokaryotic.sh                      # Run full prokaryotic discovery
+#   sbatch scripts/submit-prokaryotic.sh extract_gp_motifs    # Extract GP motifs
+#   sbatch scripts/submit-prokaryotic.sh cluster_gp_motifs    # Cluster motifs
+#   sbatch scripts/submit-prokaryotic.sh prokaryotic_report   # Generate report
 #
 # Configuration:
 #   - Edit cluster/slurm/config.yaml to set your SLURM account
-#   - Edit workflow/config.yaml to select databases and set parameters
+#   - Edit workflow/config-prokaryotic.yaml to configure phage databases and parameters
+#
+# See workflow/PROKARYOTIC-DISCOVERY.md for detailed documentation
 
 set -euo pipefail
 
@@ -34,12 +36,12 @@ set -euo pipefail
 # Configuration
 # ============================================================================
 
-# Target to run (default: all)
-TARGET="${1:-all}"
+# Target to run (default: prokaryotic_discovery)
+TARGET="${1:-prokaryotic_discovery}"
 
 # Snakemake configuration
 SNAKEFILE="workflow/Snakefile"
-CONFIGFILE="workflow/config/config.yaml"
+CONFIGFILE="workflow/config-prokaryotic.yaml"
 PROFILE="cluster/slurm"
 
 # ============================================================================
@@ -63,7 +65,7 @@ mkdir -p "$LOGS_DIR"
 # ============================================================================
 
 echo "=========================================="
-echo "2A Peptide Search Pipeline Orchestrator"
+echo "Prokaryotic 2A-like Discovery Pipeline"
 echo "=========================================="
 echo "Started: $(date)"
 echo "Target: $TARGET"
