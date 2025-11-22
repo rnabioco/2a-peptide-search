@@ -20,10 +20,11 @@
 #   sbatch scripts/submit-standard.sh [target]
 #
 # Examples:
-#   sbatch scripts/submit-standard.sh                 # Run full pipeline
+#   sbatch scripts/submit-standard.sh                 # Run iter1 (automated)
 #   sbatch scripts/submit-standard.sh test            # Test with UniProt only
-#   sbatch scripts/submit-standard.sh iter1           # Run iteration 1
+#   sbatch scripts/submit-standard.sh build_seeds     # Just build seed models
 #   sbatch scripts/submit-standard.sh download_all    # Download all databases
+#   sbatch scripts/submit-standard.sh all             # Full pipeline (requires manual curation)
 #
 # Configuration:
 #   - Edit cluster/slurm/config.yaml to set your SLURM account
@@ -38,8 +39,9 @@ cd "$SLURM_SUBMIT_DIR"
 # Configuration
 # ============================================================================
 
-# Target to run (default: all)
-TARGET="${1:-all}"
+# Target to run (default: iter1 - automated first iteration)
+# Use 'all' only after manual curation of iter2 alignments
+TARGET="${1:-iter1}"
 
 # Snakemake configuration
 SNAKEFILE="workflow/Snakefile"
