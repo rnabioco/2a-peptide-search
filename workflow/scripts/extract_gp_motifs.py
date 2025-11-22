@@ -121,9 +121,18 @@ def main(fasta, motifs_out, sequences_out, upstream, downstream):
     click.echo("GP Motif Extraction Summary")
     click.echo("="*60)
     click.echo(f"Total proteins: {total_proteins:,}")
+
+    if total_proteins == 0:
+        click.echo("ERROR: No proteins found in input file!", err=True)
+        click.echo("Please check that the FASTA file exists and contains sequences.", err=True)
+        raise ValueError("No proteins found in input file")
+
     click.echo(f"Proteins with GP: {proteins_with_gp:,} ({proteins_with_gp/total_proteins*100:.2f}%)")
     click.echo(f"Total GP motifs: {total_gp_motifs:,}")
-    click.echo(f"Average GP per protein with GP: {total_gp_motifs/proteins_with_gp:.2f}")
+
+    if proteins_with_gp > 0:
+        click.echo(f"Average GP per protein with GP: {total_gp_motifs/proteins_with_gp:.2f}")
+
     click.echo(f"\nOutput files:")
     click.echo(f"  Motifs: {motifs_out}")
     click.echo(f"  Sequences: {sequences_out}")
