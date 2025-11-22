@@ -7,20 +7,25 @@ For each cluster:
 2. Calculate per-position conservation (Shannon entropy)
 3. Identify conserved positions
 4. Generate consensus sequences
-5. Create sequence logos (placeholder for issue #12)
+5. Create sequence logos using Skylign API
 """
 
 import gzip
 import subprocess
+import sys
 import tempfile
 from collections import Counter
 from pathlib import Path
 
 import click
+import numpy as np
 import pandas as pd
 from Bio import AlignIO, SeqIO
 from Bio.Align import AlignInfo
-import numpy as np
+
+# Import Skylign functions
+sys.path.insert(0, str(Path(__file__).parent))
+from generate_skylign_logos import download_logo, submit_to_skylign
 
 
 def calculate_shannon_entropy(alignment_column):
@@ -102,15 +107,19 @@ def align_sequences(sequences, method="muscle"):
 
 
 def analyze_cluster(cluster_id, sequences, min_size=5):
-    """Analyze conservation for a single cluster."""
+    """Analyze conservation for a single cluster.
+
+    Returns:
+        tuple: (results_dict, alignment) or (None, None) if cluster too small
+    """
     if len(sequences) < min_size:
-        return None
+        return None, None
 
     # Align sequences
     alignment = align_sequences(sequences)
 
     if alignment is None or len(alignment) == 0:
-        return None
+        return None, None
 
     # Calculate per-position conservation
     alignment_length = alignment.get_alignment_length()
@@ -148,7 +157,7 @@ def analyze_cluster(cluster_id, sequences, min_size=5):
         i for i, score in enumerate(conservation_scores) if score > 0.8
     ]
 
-    return {
+    results = {
         "cluster_id": cluster_id,
         "cluster_size": len(sequences),
         "alignment_length": alignment_length,
@@ -160,40 +169,58 @@ def analyze_cluster(cluster_id, sequences, min_size=5):
         "entropy_scores": ",".join(f"{s:.3f}" for s in entropy_scores),
     }
 
+    return results, alignment
 
-def create_placeholder_logo(cluster_id, output_dir):
-    """Create placeholder PNG for sequence logo (to be implemented in issue #12)."""
-    from PIL import Image, ImageDraw, ImageFont
 
+def generate_skylign_logo(alignment, cluster_id, output_dir):
+    """Generate sequence logo using Skylign API."""
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
     output_file = output_dir / f"cluster_{cluster_id}.png"
 
-    # Create simple placeholder image
-    width, height = 800, 200
-    img = Image.new("RGB", (width, height), color="white")
-    draw = ImageDraw.Draw(img)
+    # Save alignment as Stockholm format in temp file
+    with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".sto") as tmp_sto:
+        tmp_sto_name = tmp_sto.name
+        AlignIO.write(alignment, tmp_sto, "stockholm")
 
-    # Add text
-    text = f"Sequence Logo for Cluster {cluster_id}\n(To be generated in issue #12)"
     try:
-        font = ImageFont.truetype("/System/Library/Fonts/Helvetica.ttc", 24)
-    except:
-        font = ImageFont.load_default()
+        # Submit to Skylign and get UUID
+        click.echo(f"    Submitting to Skylign API...")
+        uuid = submit_to_skylign(
+            tmp_sto_name, processing="obs", retry_attempts=2, retry_delay=3
+        )
 
-    # Draw text in center
-    bbox = draw.textbbox((0, 0), text, font=font)
-    text_width = bbox[2] - bbox[0]
-    text_height = bbox[3] - bbox[1]
-    x = (width - text_width) / 2
-    y = (height - text_height) / 2
-    draw.text((x, y), text, fill="gray", font=font)
+        # Download logo
+        click.echo(f"    Downloading logo (UUID: {uuid})...")
+        download_logo(uuid, output_file, retry_attempts=2, retry_delay=3)
 
-    # Save
-    img.save(output_file)
+        click.echo(f"    Logo saved: {output_file}")
+        return str(output_file)
 
-    return str(output_file)
+    except Exception as e:
+        click.echo(f"    Warning: Failed to generate Skylign logo: {e}", err=True)
+        click.echo(f"    Creating placeholder instead...", err=True)
+
+        # Fallback to placeholder
+        from PIL import Image, ImageDraw
+
+        img = Image.new("RGB", (800, 200), color="white")
+        draw = ImageDraw.Draw(img)
+        draw.text(
+            (50, 80),
+            f"Logo generation failed for cluster {cluster_id}",
+            fill="gray",
+        )
+        img.save(output_file)
+        return str(output_file)
+
+    finally:
+        # Cleanup temp file
+        import os
+
+        if os.path.exists(tmp_sto_name):
+            os.unlink(tmp_sto_name)
 
 
 @click.command()
@@ -254,17 +281,16 @@ def main(
         ].tolist()
 
         # Analyze conservation
-        result = analyze_cluster(cluster_id, cluster_seqs, min_cluster_size)
+        result, alignment = analyze_cluster(cluster_id, cluster_seqs, min_cluster_size)
 
         if result:
             conservation_results.append(result)
             click.echo(f"  Mean conservation: {result['mean_conservation']:.3f}")
             click.echo(f"  Consensus: {result['consensus_sequence']}")
 
-            # Create placeholder logo
-            if logos_dir:
-                logo_file = create_placeholder_logo(cluster_id, logos_dir)
-                click.echo(f"  Placeholder logo: {logo_file}")
+            # Generate Skylign logo
+            if logos_dir and alignment:
+                logo_file = generate_skylign_logo(alignment, cluster_id, logos_dir)
         else:
             click.echo(f"  Skipped (insufficient data)")
 
