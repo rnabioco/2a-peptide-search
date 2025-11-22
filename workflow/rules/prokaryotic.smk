@@ -126,9 +126,9 @@ rule search_with_comprehensive_hmm:
         hmm=RESULTS_DIR + "/prokaryotic/models/seed/comprehensive.hmm",
         db=get_prokaryotic_database_file,
     output:
-        hmmsearch=RESULTS_DIR + "/prokaryotic/seed_search_results/{database}/comprehensive.hmmsearch.gz",
-        tblout=RESULTS_DIR + "/prokaryotic/seed_search_results/{database}/comprehensive.tblout.gz",
-        alignment=RESULTS_DIR + "/prokaryotic/seed_search_results/{database}/comprehensive.sto.gz",
+        hmmsearch=RESULTS_DIR + "/prokaryotic/seed_search_results/{database}/comprehensive_hmm/results.hmmsearch.gz",
+        tblout=RESULTS_DIR + "/prokaryotic/seed_search_results/{database}/comprehensive_hmm/results.tblout.gz",
+        alignment=RESULTS_DIR + "/prokaryotic/seed_search_results/{database}/comprehensive_hmm/results.sto.gz",
     log:
         LOGS_DIR + "/prokaryotic/search_comprehensive_{database}.log",
     threads: 12
@@ -212,7 +212,7 @@ rule merge_comprehensive_searches:
     """Merge comprehensive search results from all databases."""
     input:
         alignments=expand(
-            RESULTS_DIR + "/prokaryotic/seed_search_results/{database}/comprehensive.sto.gz",
+            RESULTS_DIR + "/prokaryotic/seed_search_results/{database}/comprehensive_hmm/results.sto.gz",
             database=config["prokaryotic_databases_to_search"],
         ),
     output:
