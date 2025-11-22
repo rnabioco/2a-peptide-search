@@ -39,7 +39,7 @@ rule download_prokaryotic_proteomes:
         LOGS_DIR + "/download/prokaryotic_proteomes.log",
     shell:
         """
-        mkdir -p data/prokaryotic
+        mkdir -p $(dirname {output.fasta})
         wget -c -o {log} {params.url} -O {output.fasta}
         """
 
@@ -54,7 +54,7 @@ rule download_domain_annotations:
         LOGS_DIR + "/download/domain_annotations.log",
     shell:
         """
-        mkdir -p data/prokaryotic
+        mkdir -p $(dirname {output.annotations})
         wget -c -o {log} {params.url} -O {output.annotations}
         """
 
