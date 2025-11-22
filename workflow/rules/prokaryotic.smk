@@ -126,12 +126,9 @@ rule search_with_comprehensive_hmm:
         hmm=RESULTS_DIR + "/prokaryotic/models/seed/comprehensive.hmm",
         db=get_prokaryotic_database_file,
     output:
-        hmmsearch=RESULTS_DIR
-        + "/prokaryotic/comp_search/{database}.hmmsearch.gz",
-        tblout=RESULTS_DIR
-        + "/prokaryotic/comp_search/{database}.tblout.gz",
-        alignment=RESULTS_DIR
-        + "/prokaryotic/comp_search/{database}.sto.gz",
+        hmmsearch=RESULTS_DIR + "/prokaryotic/seed_searches/{database}/comprehensive.hmmsearch.gz",
+        tblout=RESULTS_DIR + "/prokaryotic/seed_searches/{database}/comprehensive.tblout.gz",
+        alignment=RESULTS_DIR + "/prokaryotic/seed_searches/{database}/comprehensive.sto.gz",
     log:
         LOGS_DIR + "/prokaryotic/search_comprehensive_{database}.log",
     threads: 12
@@ -187,19 +184,14 @@ rule build_seed_hmms:
 
 
 rule search_with_seed_hmms:
-    """Search prokaryotic proteomes with seed HMMs from known peptides.
-
-    Note: This rule is not connected to the DAG (motif-specific searches not used).
-    Kept for potential future use or manual execution.
-    """
+    """Search prokaryotic proteomes with seed HMMs from known peptides."""
     input:
         hmm=RESULTS_DIR + "/prokaryotic/models/seed/{motif}.hmm",
         db=get_prokaryotic_database_file,
     output:
-        hmmsearch=RESULTS_DIR
-        + "/prokaryotic/seed_motif/{database}/{motif}.hmmsearch.gz",
-        tblout=RESULTS_DIR + "/prokaryotic/seed_motif/{database}/{motif}.tblout.gz",
-        alignment=RESULTS_DIR + "/prokaryotic/seed_motif/{database}/{motif}.sto.gz",
+        hmmsearch=RESULTS_DIR + "/prokaryotic/seed_searches/{database}/{motif}.hmmsearch.gz",
+        tblout=RESULTS_DIR + "/prokaryotic/seed_searches/{database}/{motif}.tblout.gz",
+        alignment=RESULTS_DIR + "/prokaryotic/seed_searches/{database}/{motif}.sto.gz",
     log:
         LOGS_DIR + "/prokaryotic/motif_search_{database}_{motif}.log",
     threads: 12
@@ -220,11 +212,11 @@ rule merge_comprehensive_searches:
     """Merge comprehensive search results from all databases."""
     input:
         alignments=expand(
-            RESULTS_DIR + "/prokaryotic/comp_search/{database}.sto.gz",
+            RESULTS_DIR + "/prokaryotic/seed_searches/{database}/comprehensive.sto.gz",
             database=config["prokaryotic_databases_to_search"],
         ),
     output:
-        merged=RESULTS_DIR + "/prokaryotic/comp_search_merged.sto.gz",
+        merged=RESULTS_DIR + "/prokaryotic/seed_searches/comprehensive_merged.sto.gz",
     log:
         LOGS_DIR + "/prokaryotic/merge_comprehensive_searches.log",
     shell:
@@ -586,7 +578,7 @@ rule compare_approaches:
         validation=RESULTS_DIR + "/prokaryotic/validation/known_peptide_hits.tsv",
         # APPROACH 1: Seed-based searches (merged from all databases)
         seed_comprehensive=RESULTS_DIR
-        + "/prokaryotic/comp_search_merged.sto.gz",
+        + "/prokaryotic/seed_searches/comprehensive_merged.sto.gz",
     output:
         comparison=RESULTS_DIR + "/prokaryotic/analysis/approach_comparison.tsv",
         plots=directory(RESULTS_DIR + "/prokaryotic/analysis/comparison_plots/"),
