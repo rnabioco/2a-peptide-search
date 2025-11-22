@@ -41,8 +41,20 @@ SNAKEFILE="pipeline/workflow/Snakefile"
 CONFIGFILE="pipeline/workflow/config/config.yaml"
 PROFILE="pipeline/cluster/slurm"
 
-# Create logs directory if it doesn't exist
+# ============================================================================
+# Configure output directories for Alpine scratch filesystem
+# ============================================================================
+
+# Use Alpine's fast scratch filesystem for all outputs
+# Format: /scratch/alpine/<username>/<project-name>
+# Note: Scratch has 90-day purge policy - move important results to /projects after completion
+export SCRATCH_DIR="/scratch/alpine/${USER}/2a-peptide-search"
+export RESULTS_DIR="${SCRATCH_DIR}/results"
+export DATA_DIR="${SCRATCH_DIR}/data"
+
+# Create base directories
 mkdir -p logs
+mkdir -p "$SCRATCH_DIR"
 
 # ============================================================================
 # Environment Setup
@@ -58,6 +70,7 @@ echo "Config: $CONFIGFILE"
 echo "Profile: $PROFILE"
 echo "Job ID: $SLURM_JOB_ID"
 echo "Node: $SLURMD_NODENAME"
+echo "Scratch dir: $SCRATCH_DIR"
 echo ""
 
 # ============================================================================

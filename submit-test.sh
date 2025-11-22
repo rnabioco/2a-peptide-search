@@ -20,13 +20,26 @@
 
 set -euo pipefail
 
+# ============================================================================
+# Configure output directories for Alpine scratch filesystem
+# ============================================================================
+
+# Use Alpine's fast scratch filesystem for all outputs
+# Format: /scratch/alpine/<username>/<project-name>
+export SCRATCH_DIR="/scratch/alpine/${USER}/2a-peptide-search"
+export RESULTS_DIR="${SCRATCH_DIR}/results"
+export DATA_DIR="${SCRATCH_DIR}/data"
+
+# Create base directories
 mkdir -p logs
+mkdir -p "$SCRATCH_DIR"
 
 echo "=========================================="
 echo "2A Peptide Search Pipeline - Test Run"
 echo "=========================================="
 echo "Started: $(date)"
 echo "Job ID: $SLURM_JOB_ID"
+echo "Scratch dir: $SCRATCH_DIR"
 echo ""
 
 echo "Running test with UniProt only..."
