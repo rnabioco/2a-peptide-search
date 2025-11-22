@@ -16,7 +16,7 @@ import os
 
 
 # Load configuration
-configfile: "workflow/config.yaml"
+configfile: "workflow/config/config.yaml"
 
 
 # Set up output directories
