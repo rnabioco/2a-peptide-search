@@ -10,6 +10,16 @@ prokaryotic_databases:
     url: "https://rest.uniprot.org/uniprotkb/stream?compressed=true&format=fasta&query=%28taxonomy_id%3A2157%29+AND+%28reviewed%3Atrue%29"
     description: "UniProt Swiss-Prot archaeal proteins (via REST API)"
 
+  mgnify:
+    # MGnify uses the merged database from the main pipeline
+    # Download via main pipeline first: pixi run snakemake download_mgnify --cores 4
+    local_path: ""  # Will be set to DATA_DIR/mgnify/mgnify_proteins.fasta.gz if downloaded
+    description: "MGnify metagenomic protein database (use main pipeline download)"
+
+  imgvr:
+    local_path: "/scratch/alpine/jhesselberth@xsede.org/db/IMGVR_all_proteins-high_confidence.faa.gz"
+    description: "IMG/VR phage protein database (local copy)"
+
   pfam:
     url: "http://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/Pfam-A.hmm.gz"
     description: "Pfam domain database"
@@ -33,7 +43,14 @@ phage_databases:
     url: "https://millardlab.org/phage-genomes/phage_genomes.fasta.gz"
     description: "Millard Lab phage genome collection"
 
-# Which databases to use
+# Which protein databases to search
+prokaryotic_databases_to_search:
+  - bacteria   # UniProt bacteria (~500k proteins)
+  - archaea    # UniProt archaea (~50k proteins)
+  - imgvr      # IMG/VR phage proteins (millions, local file)
+  # - mgnify   # MGnify metagenomic proteins (VERY large, ~300M proteins, enable for comprehensive search)
+
+# Which phage databases to use
 phage_databases_to_use:
   - inphared
   - imgvr  # Very large, enable for comprehensive search

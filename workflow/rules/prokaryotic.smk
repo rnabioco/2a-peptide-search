@@ -29,14 +29,39 @@ Known prokaryotic stalling peptides:
 # ============================================================================
 
 
+def get_prokaryotic_database_file(wildcards):
+    """Map database name to its file path, handling local_path for IMG/VR and MGnify."""
+    db_config = config["prokaryotic_databases"][wildcards.database]
+
+    # Check if database has a local_path configured (e.g., IMG/VR, MGnify)
+    if "local_path" in db_config and db_config["local_path"]:
+        return db_config["local_path"]
+
+    # Standard databases with URLs - use standard naming
+    db_map = {
+        "bacteria": "bacteria.fasta.gz",
+        "archaea": "archaea.fasta.gz",
+        "mgnify": f"{DATA_DIR}/mgnify/mgnify_proteins.fasta.gz",  # Use main pipeline download
+    }
+
+    if wildcards.database in db_map:
+        if wildcards.database == "mgnify":
+            return db_map[wildcards.database]  # Already has full path
+        else:
+            return DATA_DIR + f"/prokaryotic/{db_map[wildcards.database]}"
+
+    # Fallback
+    return DATA_DIR + f"/prokaryotic/{wildcards.database}.fasta.gz"
+
+
 rule download_prokaryotic_proteomes:
     """Download prokaryotic reference proteomes."""
     output:
-        fasta=DATA_DIR + "/prokaryotic/uniprot_bacteria.fasta.gz",
+        fasta=DATA_DIR + "/prokaryotic/{database}.fasta.gz",
     params:
-        url=config["prokaryotic_databases"]["bacteria"]["url"],
+        url=lambda w: config["prokaryotic_databases"][w.database]["url"],
     log:
-        LOGS_DIR + "/download/prokaryotic_proteomes.log",
+        LOGS_DIR + "/download/prokaryotic_{database}.log",
     shell:
         """
         mkdir -p $(dirname "{output.fasta}")
@@ -133,13 +158,17 @@ rule search_with_comprehensive_hmm:
     """Search prokaryotic proteomes with comprehensive pan-stalling HMM."""
     input:
         hmm=RESULTS_DIR + "/prokaryotic/models/seed/comprehensive.hmm",
-        db=DATA_DIR + "/prokaryotic/uniprot_bacteria.fasta.gz",
+        db=get_prokaryotic_database_file,
     output:
-        hmmsearch=RESULTS_DIR + "/prokaryotic/seed_searches/comprehensive.hmmsearch.gz",
-        tblout=RESULTS_DIR + "/prokaryotic/seed_searches/comprehensive.tblout.gz",
-        alignment=RESULTS_DIR + "/prokaryotic/seed_searches/comprehensive.sto.gz",
+        hmmsearch=RESULTS_DIR + "/prokaryotic/seed_searches/{database}/comprehensive.hmmsearch.gz",
+        tblout=RESULTS_DIR + "/prokaryotic/seed_searches/{database}/comprehensive.tblout.gz",
+        alignment=RESULTS_DIR + "/prokaryotic/seed_searches/{database}/comprehensive.sto.gz",
     log:
-        LOGS_DIR + "/prokaryotic/search_comprehensive.log",
+        LOGS_DIR + "/prokaryotic/search_comprehensive_{database}.log",
+    threads: 12
+    resources:
+        runtime=480,
+        mem_mb=16000,
     shell:
         """
         hmmsearch --cpu {threads} \
@@ -192,13 +221,17 @@ rule search_with_seed_hmms:
     """Search prokaryotic proteomes with seed HMMs from known peptides."""
     input:
         hmm=RESULTS_DIR + "/prokaryotic/models/seed/{motif}.hmm",
-        db=DATA_DIR + "/prokaryotic/uniprot_bacteria.fasta.gz",
+        db=get_prokaryotic_database_file,
     output:
-        hmmsearch=RESULTS_DIR + "/prokaryotic/seed_searches/{motif}.hmmsearch.gz",
-        tblout=RESULTS_DIR + "/prokaryotic/seed_searches/{motif}.tblout.gz",
-        alignment=RESULTS_DIR + "/prokaryotic/seed_searches/{motif}.sto.gz",
+        hmmsearch=RESULTS_DIR + "/prokaryotic/seed_searches/{database}/{motif}.hmmsearch.gz",
+        tblout=RESULTS_DIR + "/prokaryotic/seed_searches/{database}/{motif}.tblout.gz",
+        alignment=RESULTS_DIR + "/prokaryotic/seed_searches/{database}/{motif}.sto.gz",
     log:
-        LOGS_DIR + "/prokaryotic/seed_search_{motif}.log",
+        LOGS_DIR + "/prokaryotic/seed_search_{database}_{motif}.log",
+    threads: 12
+    resources:
+        runtime=480,
+        mem_mb=16000,
     shell:
         """
         hmmsearch --cpu {threads} \
@@ -206,6 +239,28 @@ rule search_with_seed_hmms:
             -A >(gzip > "{output.alignment}") \
             --noali \
             "{input.hmm}" "{input.db}" 2> "{log}" | gzip > "{output.hmmsearch}"
+        """
+
+
+rule merge_comprehensive_searches:
+    """Merge comprehensive search results from all databases."""
+    input:
+        alignments=expand(
+            RESULTS_DIR + "/prokaryotic/seed_searches/{database}/comprehensive.sto.gz",
+            database=config["prokaryotic_databases_to_search"],
+        ),
+    output:
+        merged=RESULTS_DIR + "/prokaryotic/seed_searches/comprehensive_merged.sto.gz",
+    log:
+        LOGS_DIR + "/prokaryotic/merge_comprehensive_searches.log",
+    shell:
+        """
+        # Decompress all alignments
+        for aln in {input.alignments}; do
+            zcat "$aln"
+        done | \
+        # Merge with esl-alimerge and compress
+        esl-alimerge --list - 2> "{log}" | gzip > "{output.merged}"
         """
 
 
@@ -568,8 +623,8 @@ rule compare_approaches:
         + "/prokaryotic/gp_motifs/interdomain_gp_motifs.tsv.gz",
         clusters=RESULTS_DIR + "/prokaryotic/clusters/gp_clusters.tsv.gz",
         validation=RESULTS_DIR + "/prokaryotic/validation/known_peptide_hits.tsv",
-        # APPROACH 1: Seed-based searches
-        seed_comprehensive=RESULTS_DIR + "/prokaryotic/seed_searches/comprehensive.sto.gz",
+        # APPROACH 1: Seed-based searches (merged from all databases)
+        seed_comprehensive=RESULTS_DIR + "/prokaryotic/seed_searches/comprehensive_merged.sto.gz",
     output:
         comparison=RESULTS_DIR + "/prokaryotic/analysis/approach_comparison.tsv",
         plots=directory(RESULTS_DIR + "/prokaryotic/analysis/comparison_plots/"),
