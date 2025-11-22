@@ -10,13 +10,15 @@ Handles downloading:
 
 
 rule download_prokaryotic_proteomes:
-    """Download prokaryotic reference proteomes."""
+    """Download prokaryotic reference proteomes (bacteria, archaea, uniprot_viruses only)."""
     output:
         fasta=DATA_DIR + "/prokaryotic/downloads/{database}.fasta.gz",
     params:
         url=lambda w: config["prokaryotic_databases"][w.database]["url"],
     log:
         LOGS_DIR + "/download/prokaryotic_{database}.log",
+    wildcard_constraints:
+        database="bacteria|archaea|uniprot_viruses",
     shell:
         """
         mkdir -p $(dirname "{output.fasta}")

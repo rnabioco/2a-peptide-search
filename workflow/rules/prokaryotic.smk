@@ -131,6 +131,8 @@ rule search_with_comprehensive_hmm:
         alignment=RESULTS_DIR + "/prokaryotic/seed_search_results/{database}/comprehensive_hmm/results.sto.gz",
     log:
         LOGS_DIR + "/prokaryotic/search_comprehensive_{database}.log",
+    wildcard_constraints:
+        database="[^/]+",
     threads: 12
     resources:
         runtime=480,
@@ -194,6 +196,9 @@ rule search_with_seed_hmms:
         alignment=RESULTS_DIR + "/prokaryotic/seed_search_results/{database}/{motif}.sto.gz",
     log:
         LOGS_DIR + "/prokaryotic/seed_search_{database}_{motif}.log",
+    wildcard_constraints:
+        database="[^/]+",
+        motif="[^/]+",
     threads: 12
     resources:
         runtime=480,
