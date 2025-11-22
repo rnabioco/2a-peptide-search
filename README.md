@@ -1,36 +1,60 @@
-# 2a-peptide-search
+# 2A Peptide Search Pipeline
 
-## Introduction
+Automated discovery and characterization of 2A peptides and prokaryotic ribosomal stalling peptides using profile hidden Markov models (HMMs).
 
-The 2A peptide is a short (~15 residue) cis-acting oligopeptide that causes the
-ribosome to skip a peptide bond between a Gly-Pro dipeptide. 2A peptides are
-thought to interact with specific residues in the ribosome exit channel.
-Previous studies described 2A and 2A-like peptides that are broadly distributed
-in other RNA viruses, and typically occur between proteins with specific
-functions, including viral coat proteins and enzymes involved in viral
-replication.
+## Overview
 
-2A peptides have conserved sequence features making them amenable to
-construction of profile hidden Markov models, which capture sequence elements in
-a statistical model suitable for searching large protein sequence databases. In
-particular, the Pro-Gly-Pro residues at its C-terminus are critical for 2A
-skipping activity.
+This repository contains a Snakemake pipeline for identifying:
+- **Eukaryotic 2A peptides**: Viral peptides causing ribosomal skipping
+- **Prokaryotic stalling peptides**: Bacterial/archaeal peptides causing ribosomal stalling (SecM, TnaC, etc.)
 
-## Data availability
+The 2A peptide is a short (~15 residue) cis-acting oligopeptide that causes the ribosome to skip a peptide bond between Gly-Pro dipeptides. 2A peptides interact with specific residues in the ribosome exit channel and are broadly distributed in RNA viruses, typically occurring between proteins with specific functions (viral coat proteins, replication enzymes).
 
-Alignments and profile HMMs of class 1 and 2 2A peptides are in `curated-models/`.
+2A peptides have conserved sequence features making them amenable to profile HMM construction, which captures sequence elements in a statistical model suitable for searching large protein databases.
 
-`hmmsearch` results with the models against major protein databases are in `db-searches`.
+## Quick Start
 
-N.B. searches with the 2A models will identify e.g. partial matches between the class
-2 model and class 1 sequences and vice versa, due to similarities between the
-models (i.e., the C-terminal PGP
+### Setup
 
-### Pfam onboarding
+```bash
+# Install pixi (if not already installed)
+curl -fsSL https://pixi.sh/install.sh | bash
 
-I have tried to no avail to incorporate these models into Pfam, now hosted by Interpro.
-They claim to not be able to build HMM models that are specific (due to the sequences being short),
-despite them starting with the collection of seqeuences that are identified using the models provided here 🤦‍♂️. 
+# Install dependencies
+pixi install
+
+# Run pipeline (local)
+pixi run snakemake --cores 12
+
+# Run on SLURM cluster
+sbatch submit-slurm.sh
+```
+
+### Project Structure
+
+```
+.
+├── workflow/
+│   ├── Snakefile                 # Main pipeline
+│   ├── config.yaml               # Configuration
+│   ├── rules/                    # Modular rules
+│   │   ├── download.smk         # Database downloads
+│   │   ├── search.smk           # HMM searches
+│   │   ├── refine.smk           # Model refinement
+│   │   ├── prokaryotic.smk      # Prokaryotic discovery
+│   │   └── report.smk           # Report generation
+│   ├── scripts/                  # Analysis scripts
+│   └── envs/                     # Conda environments
+├── resources/
+│   ├── seed-alignments/          # Curated 2A seed alignments
+│   └── stalling-peptides/        # Known prokaryotic stalling peptides
+├── cluster/slurm/                # SLURM cluster config
+├── results/                      # Pipeline outputs
+└── legacy/                       # Historical results
+
+```
+
+See `workflow/README.md` for detailed pipeline documentation. 
 
 ## Results
 
@@ -69,27 +93,129 @@ Class 2 2A peptides are similar to class 1 with some key distinctions.
   <figcaption>Logo of 2A peptide Class 2 sequences</figcaption>
 </figure>
 
+## Pipeline Workflows
+
+### Eukaryotic 2A Peptide Discovery
+
+**Iterative refinement approach:**
+1. Build seed HMMs from curated alignments (`resources/seed-alignments/`)
+2. Search protein databases with seed models
+3. Filter hits by E-value threshold
+4. Build refined HMMs from high-confidence hits
+5. Iterate 2-3 times until convergence
+6. Manual curation checkpoint for final models
+
+**Databases searched:**
+- [UniProt](https://www.uniprot.org/help/about) - Curated reference proteins (~500k sequences)
+- [Reference Proteomes](https://www.uniprot.org/help/reference_proteome) - Subset used for Pfam models
+- [UniParc](https://www.uniprot.org/help/uniparc) - Non-redundant archive (millions of sequences)
+- [MGnify](https://www.ebi.ac.uk/metagenomics/about) - Environmental/metagenomic sequences (25 split files, ~270GB)
+- [IMG/VR](https://genome.jgi.doe.gov/portal/IMG_VR/IMG_VR.home.html) - Viral genomes (requires manual download)
+
+### Prokaryotic Stalling Peptide Discovery
+
+**Three complementary strategies:**
+
+1. **Seed-based discovery** (NEW)
+   - Start with 47 known stalling peptides from PMID 38565864
+   - Build comprehensive HMM from all peptides (broad search)
+   - Build motif-specific HMMs (RAGP, QAPP, etc.) for targeted search
+
+2. **Domain-guided discovery**
+   - Extract all GP-containing sequences
+   - Annotate protein domains
+   - Focus on inter-domain GP motifs (hypothesis: stalling occurs at domain boundaries)
+
+3. **Unbiased discovery**
+   - Extract all GP motifs regardless of position
+   - Validates other approaches
+
+See `workflow/PROKARYOTIC-DISCOVERY.md` for details.
+
 ## Methods
 
-### Protein databases
+### HMM Construction
 
-- [Uniprot](https://www.uniprot.org/help/about) - highly curated reference proteins, pan-organism
-- [Uniparc](https://www.uniprot.org/help/uniparc) - non-redundant, uncurated, pan-organism
-- [MGnify](https://www.ebi.ac.uk/metagenomics/about) - sequences from enrivonmental samples
-- [Reference Proteomes](https://www.uniprot.org/help/reference_proteome) — a subset of Uniprot used to build models for Pfam.
-- [IMGVR](https://genome.jgi.doe.gov/portal/IMG_VR/IMG_VR.home.html) - large database of cultivated an uncultivated viruses
+Profile HMMs are built using [HMMER](http://hmmer.org/) from curated multiple sequence alignments:
+- Alignments created with `hmmalign` or MUSCLE
+- Visualized with [Jalview](https://www.jalview.org/)
+- Sequence logos created with [Skylign](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-15-7)
 
-### Multiple sequence alignments
+### Database Handling
 
-We created multiple sequence alignments using `hmmalign` and visualized them
-with [Jalview](https://www.jalview.org/). Neighbor-joing trees were calulcated
-for sequences in the MSA and the MSA was tree-sorted to identify sequence
-similarities. Seed alignments were also calculated by eliminating redundant
-sequences from the aligment. Sequence logos in `img/` were created with
-[Skylign](https://bmcbioinformatics.biomedcentral.com/articles/10.1186/1471-2105-15-7).
+**MGnify**: Downloaded as 25 split files in parallel, optionally merged for searching
+**IMG/VR**: Requires web login - download manually and set `local_path` in config
 
-**Mutliple sequence alignments of searches with the 2A models against
-proteome databases are in `db-searches/`.**
+## Configuration
+
+Edit `workflow/config.yaml` to customize:
+
+```yaml
+# Select databases to search
+databases_to_search:
+  - uniprot
+  - reference_proteomes
+  # - uniparc      # Large, takes time
+  # - mgnify       # Very large (~270GB)
+  # - imgvr        # Requires manual download
+
+# Set IMG/VR local path (after manual download)
+databases:
+  imgvr:
+    local_path: "/path/to/IMGVR_all_proteins.faa.gz"
+
+# Adjust thresholds
+thresholds:
+  evalue: 1e-5
+  identity: 0.95
+```
+
+## Running the Pipeline
+
+**Common commands:**
+```bash
+# Full pipeline
+pixi run snakemake --cores 12
+
+# Test with UniProt only
+pixi run snakemake test --cores 12
+
+# Download databases
+pixi run snakemake download_all --cores 4
+
+# Prokaryotic discovery
+pixi run snakemake --cores 12 -s workflow/rules/prokaryotic.smk
+
+# On SLURM cluster
+sbatch submit-slurm.sh
+```
+
+**See also:**
+- `workflow/README.md` - Detailed pipeline documentation
+- `workflow/PROKARYOTIC-DISCOVERY.md` - Prokaryotic discovery guide
+- `cluster/slurm/README.md` - SLURM cluster setup
+
+## Output Structure
+
+```
+results/
+├── models/                      # HMM models
+│   ├── seed/                   # Initial models
+│   ├── iter1_refined/          # First refinement
+│   └── iter2_refined/          # Second refinement
+├── searches/                    # Search results by database
+├── alignments/                  # Filtered alignments
+└── prokaryotic/                 # Prokaryotic discovery
+    ├── seed_searches/          # Seed-based searches
+    ├── gp_motifs/              # GP motif extraction
+    └── models/                 # Prokaryotic HMMs
+```
+
+## Data Availability
+
+**Historical results** (pre-Snakemake): `legacy/` directory contains previous searches and curated models.
+
+**Current pipeline outputs**: Generated in `results/` by running the Snakemake pipeline.
 
 ## References
 
@@ -119,7 +245,19 @@ Different Virus Species and Applications in Biotechnology. Viruses. 2021
 Oct 26;13(11):2160. doi: 10.3390/v13112160. PMID: 34834965; PMCID:
 PMC8623073.
 
-- Nibert, Max L. “'2A-like' and 'shifty heptamer' motifs in penaeid
+- Nibert, Max L. "'2A-like' and 'shifty heptamer' motifs in penaeid
 shrimp infectious myonecrosis virus, a monosegmented double-stranded RNA
-virus.” The Journal of general virology vol. 88,Pt 4 (2007):
+virus." The Journal of general virology vol. 88,Pt 4 (2007):
 1315-1318. doi:10.1099/vir.0.82681-0
+
+### Prokaryotic Stalling Peptides
+
+- Ito K, Chiba S. Arrest peptides: cis-acting modulators of translation.
+Annu Rev Biochem. 2013;82:171-202. doi: 10.1146/annurev-biochem-080211-105026.
+PMID: 23746254.
+
+- Weaver J, Mohammad F, Buskirk AR, Storz G. Identifying Small Proteins by
+Ribosome Profiling with Stalled Initiation Complexes. mBio. 2019;10(2):e02819-18.
+doi: 10.1128/mBio.02819-18. PMID: 30837344; PMCID: PMC6401487.
+
+- Discovered stalling peptides dataset from Weaver et al. (2024). PMID: 38565864.

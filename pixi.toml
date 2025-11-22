@@ -1,0 +1,55 @@
+[workspace]
+name = "2a-peptide-search"
+version = "0.1.0"
+description = "Bioinformatics pipeline for identifying 2A peptides using profile HMMs"
+channels = ["conda-forge", "bioconda"]
+platforms = ["linux-64"]
+
+[tasks]
+# Run full pipeline
+run = "snakemake --cores 12"
+# Dry run to preview execution
+dry-run = "snakemake -n"
+# Test with UniProt only
+test = "snakemake test --cores 12"
+# Download databases
+download = "snakemake download_all --cores 4"
+# Build seed models
+build-seeds = "snakemake build_seeds"
+# Generate workflow visualization
+dag = "snakemake --dag | dot -Tpng > workflow.png"
+
+[dependencies]
+# Core Snakemake and workflow management
+snakemake = ">=9.0"
+python = "3.12.*"
+snakemake-executor-plugin-slurm = "*"
+
+# Bioinformatics tools
+hmmer = "3.4.*"
+muscle = ">=5.1"
+
+# Python packages for sequence processing
+biopython = ">=1.83"
+pyfaidx = ">=0.8"
+click = ">=8.1"
+pandas = ">=2.2"
+
+# R and packages for reporting
+r-base = "4.3.*"
+r-tidyverse = ">=2.0"
+r-cowplot = ">=1.1"
+r-glue = ">=1.7"
+r-here = ">=1.0"
+quarto = ">=1.4"
+snakefmt = ">=0.11.2,<0.12"
+
+[feature.dev.dependencies]
+# Development tools for linting, formatting, etc.
+ruff = "*"
+
+[environments]
+# Default environment with just Snakemake
+default = { solve-group = "default" }
+# Development environment with additional tools
+dev = { features = ["dev"], solve-group = "default" }

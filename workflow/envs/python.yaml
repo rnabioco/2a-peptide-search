@@ -1,0 +1,11 @@
+name: python-bio
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.11
+  - biopython=1.83
+  - pyfaidx=0.8.1.1
+  - click=8.1
+  - pandas=2.2

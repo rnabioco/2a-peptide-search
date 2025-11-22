@@ -1,0 +1,87 @@
+# Configuration for 2A peptide search pipeline
+
+# Output directories
+# For local runs, these will be relative to the working directory
+# For Alpine, everything goes to scratch for fast I/O
+# Move important results to /projects manually after pipeline completes
+output_dirs:
+  # Base scratch directory - ALL outputs go here
+  # Fast I/O, 90-day purge on Alpine
+  # Move key results to /projects after completion
+  scratch: "scratch"
+
+  # Results directory (relative to scratch)
+  results: "scratch/results"
+
+  # Downloaded databases (relative to scratch)
+  data: "scratch/data"
+
+# Protein databases to search
+databases:
+  uniprot:
+    url: "https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_sprot.fasta.gz"
+    description: "UniProt Swiss-Prot - curated protein sequences"
+    size: "small"  # ~500k sequences
+
+  reference_proteomes:
+    url: "https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/reference_proteomes/Reference_Proteomes_2024_02.tar.gz"
+    description: "Reference proteomes used by Pfam"
+    size: "medium"  # representative proteomes
+
+  uniparc:
+    url: "https://ftp.uniprot.org/pub/databases/uniprot/current_release/uniparc/uniparc_active.fasta.gz"
+    description: "UniParc - non-redundant archive"
+    size: "very_large"  # millions of sequences
+
+  mgnify:
+    base_url: "https://ftp.ebi.ac.uk/pub/databases/metagenomics/peptide_database/current_release"
+    description: "MGnify environmental/metagenomic sequences (25 split files, ~270GB total)"
+    size: "very_large"
+    num_splits: 25  # Database is split into mgy_proteins_1.fa.gz through mgy_proteins_25.fa.gz
+    # Note: download_mgnify downloads all splits (parallel)
+    #       merge_mgnify_splits creates single file (for existing search rules)
+    #       For best performance on cluster, search splits separately in parallel
+
+  imgvr:
+    # IMG/VR requires web login - download manually and specify local path
+    # Download from: https://img.jgi.doe.gov/vr/
+    # Set local_path to your downloaded file location
+    local_path: null  # e.g., "/path/to/IMGVR_all_proteins.faa.gz"
+    description: "IMG/VR viral genomes database (requires manual download)"
+    size: "very_large"
+
+# Which databases to search (comment out to skip)
+databases_to_search:
+  - uniprot
+  - reference_proteomes
+  # - uniparc  # Warning: very large, takes long time
+  # - mgnify   # Warning: very large, takes long time
+
+# Search and filtering thresholds
+thresholds:
+  evalue: 1e-5           # E-value threshold for including hits
+  identity: 0.95         # Sequence identity threshold for redundancy filtering
+  min_coverage: 0.8      # Minimum alignment coverage
+
+# Iteration parameters
+iterations:
+  iter1:
+    automated: true
+    description: "First automated refinement"
+  iter2:
+    automated: true
+    checkpoint: true
+    description: "Second refinement with manual checkpoint"
+  final:
+    checkpoint: true
+    description: "Final curated models"
+
+# Peptide classes
+peptide_classes:
+  - class-1
+  - class-2
+
+# Resource allocation
+resources:
+  hmmsearch_threads: 12
+  download_retries: 3
