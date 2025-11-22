@@ -44,6 +44,7 @@ r-cowplot = ">=1.2.0,<2"
 r-glue = ">=1.8.0,<2"
 r-here = ">=1.0.2,<2"
 quarto = ">=1.8.26,<2"
+coincbc = ">=2.10.12,<3"
 
 [feature.dev.dependencies]
 # Development tools for linting, formatting, etc.
