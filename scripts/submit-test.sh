@@ -21,6 +21,9 @@
 
 set -euo pipefail
 
+# Change to project root directory (parent of scripts/)
+cd "$(dirname "$0")/.."
+
 # ============================================================================
 # Configure output directories for Alpine scratch filesystem
 # ============================================================================
