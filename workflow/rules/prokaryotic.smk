@@ -71,9 +71,6 @@ def get_prokaryotic_database_file(wildcards):
 # APPROACH 1: Seed-based Discovery with Known Stalling Peptides
 # ============================================================================
 
-# Resolve ambiguity between comprehensive and motif-specific searches
-ruleorder: search_with_comprehensive_hmm > search_with_seed_hmms
-
 
 rule split_known_peptides_by_motif:
     """Split known stalling peptides into separate files by motif type."""
@@ -199,7 +196,11 @@ rule build_seed_hmms:
 
 
 rule search_with_seed_hmms:
-    """Search prokaryotic proteomes with seed HMMs from known peptides."""
+    """Search prokaryotic proteomes with seed HMMs from known peptides.
+
+    Note: This rule is not connected to the DAG (motif-specific searches not used).
+    Kept for potential future use or manual execution.
+    """
     input:
         hmm=RESULTS_DIR + "/prokaryotic/models/seed/{motif}.hmm",
         db=get_prokaryotic_database_file,
@@ -210,6 +211,8 @@ rule search_with_seed_hmms:
         alignment=RESULTS_DIR + "/prokaryotic/seed_searches/{database}/{motif}.sto.gz",
     log:
         LOGS_DIR + "/prokaryotic/seed_search_{database}_{motif}.log",
+    wildcard_constraints:
+        motif="(?!comprehensive)[A-Za-z0-9_]+",  # Exclude "comprehensive" to avoid ambiguity
     threads: 12
     resources:
         runtime=480,
