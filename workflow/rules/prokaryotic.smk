@@ -94,15 +94,15 @@ rule align_all_seed_peptides:
         LOGS_DIR + "/prokaryotic/align_all_seeds.log",
     shell:
         """
-        mkdir -p $(dirname {output.alignment})
+        mkdir -p $(dirname "{output.alignment}")
 
         # Use MUSCLE for alignment, convert to Stockholm format
-        muscle -align {input.fasta} -output {output.alignment}.afa 2> {log}
+        muscle -align {input.fasta} -output "{output.alignment}.afa" 2> {log}
 
         # Convert to Stockholm format
-        esl-reformat stockholm {output.alignment}.afa > {output.alignment} 2>> {log}
+        esl-reformat stockholm "{output.alignment}.afa" > "{output.alignment}" 2>> {log}
 
-        rm {output.alignment}.afa
+        rm "{output.alignment}.afa"
         """
 
 
@@ -153,15 +153,15 @@ rule align_seed_peptides:
         LOGS_DIR + "/prokaryotic/align_seeds_{motif}.log",
     shell:
         """
-        mkdir -p $(dirname {output.alignment})
+        mkdir -p $(dirname "{output.alignment}")
 
         # Use MUSCLE for alignment, convert to Stockholm format
-        muscle -align {input.fasta} -output {output.alignment}.afa 2> {log}
+        muscle -align {input.fasta} -output "{output.alignment}.afa" 2> {log}
 
         # Convert to Stockholm format (hmmer accepts various formats)
-        esl-reformat stockholm {output.alignment}.afa > {output.alignment} 2>> {log}
+        esl-reformat stockholm "{output.alignment}.afa" > "{output.alignment}" 2>> {log}
 
-        rm {output.alignment}.afa
+        rm "{output.alignment}.afa"
         """
 
 
