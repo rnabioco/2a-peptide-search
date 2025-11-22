@@ -39,8 +39,8 @@ rule download_prokaryotic_proteomes:
         LOGS_DIR + "/download/prokaryotic_proteomes.log",
     shell:
         """
-        mkdir -p $(dirname {output.fasta})
-        wget -c -o {log} "{params.url}" -O {output.fasta}
+        mkdir -p $(dirname "{output.fasta}")
+        wget -c -o "{log}" "{params.url}" -O "{output.fasta}"
         """
 
 
@@ -54,9 +54,9 @@ rule download_pfam_database:
         LOGS_DIR + "/download/pfam.log",
     shell:
         """
-        mkdir -p $(dirname {output.hmm})
-        wget -c -o {log} "{params.url}" -O {output.hmm}.gz
-        gunzip -f {output.hmm}.gz
+        mkdir -p $(dirname "{output.hmm}")
+        wget -c -o "{log}" "{params.url}" -O "{output.hmm}.gz"
+        gunzip -f "{output.hmm}.gz"
         """
 
 
@@ -77,10 +77,10 @@ rule split_known_peptides_by_motif:
     shell:
         """
         python workflow/scripts/split_peptides_by_motif.py \
-            --fasta {input.fasta} \
-            --output-dir {output.fastas} \
-            --motif-list {output.motif_list} \
-            > {log} 2>&1
+            --fasta "{input.fasta}" \
+            --output-dir "{output.fastas}" \
+            --motif-list "{output.motif_list}" \
+            > "{log}" 2>&1
         """
 
 
@@ -97,10 +97,10 @@ rule align_all_seed_peptides:
         mkdir -p $(dirname "{output.alignment}")
 
         # Use MUSCLE for alignment, convert to Stockholm format
-        muscle -align {input.fasta} -output "{output.alignment}.afa" 2> {log}
+        muscle -align "{input.fasta}" -output "{output.alignment}.afa" 2> "{log}"
 
         # Convert to Stockholm format
-        esl-reformat stockholm "{output.alignment}.afa" > "{output.alignment}" 2>> {log}
+        esl-reformat stockholm "{output.alignment}.afa" > "{output.alignment}" 2>> "{log}"
 
         rm "{output.alignment}.afa"
         """
@@ -118,7 +118,7 @@ rule build_comprehensive_hmm:
         LOGS_DIR + "/prokaryotic/build_comprehensive_hmm.log",
     shell:
         """
-        hmmbuild -n {params.name} {output.hmm} {input.alignment} 2> {log}
+        hmmbuild -n {params.name} "{output.hmm}" "{input.alignment}" 2> "{log}"
         """
 
 
@@ -136,10 +136,10 @@ rule search_with_comprehensive_hmm:
     shell:
         """
         hmmsearch --cpu {threads} \
-            --tblout >(gzip > {output.tblout}) \
-            -A >(gzip > {output.alignment}) \
+            --tblout >(gzip > "{output.tblout}") \
+            -A >(gzip > "{output.alignment}") \
             --noali \
-            {input.hmm} {input.db} 2> {log} | gzip > {output.hmmsearch}
+            "{input.hmm}" "{input.db}" 2> "{log}" | gzip > "{output.hmmsearch}"
         """
 
 
@@ -156,10 +156,10 @@ rule align_seed_peptides:
         mkdir -p $(dirname "{output.alignment}")
 
         # Use MUSCLE for alignment, convert to Stockholm format
-        muscle -align {input.fasta} -output "{output.alignment}.afa" 2> {log}
+        muscle -align "{input.fasta}" -output "{output.alignment}.afa" 2> "{log}"
 
         # Convert to Stockholm format (hmmer accepts various formats)
-        esl-reformat stockholm "{output.alignment}.afa" > "{output.alignment}" 2>> {log}
+        esl-reformat stockholm "{output.alignment}.afa" > "{output.alignment}" 2>> "{log}"
 
         rm "{output.alignment}.afa"
         """
@@ -177,7 +177,7 @@ rule build_seed_hmms:
         LOGS_DIR + "/prokaryotic/build_seed_hmm_{motif}.log",
     shell:
         """
-        hmmbuild -n {params.name} {output.hmm} {input.alignment} 2> {log}
+        hmmbuild -n {params.name} "{output.hmm}" "{input.alignment}" 2> "{log}"
         """
 
 
@@ -195,10 +195,10 @@ rule search_with_seed_hmms:
     shell:
         """
         hmmsearch --cpu {threads} \
-            --tblout >(gzip > {output.tblout}) \
-            -A >(gzip > {output.alignment}) \
+            --tblout >(gzip > "{output.tblout}") \
+            -A >(gzip > "{output.alignment}") \
             --noali \
-            {input.hmm} {input.db} 2> {log} | gzip > {output.hmmsearch}
+            "{input.hmm}" "{input.db}" 2> "{log}" | gzip > "{output.hmmsearch}"
         """
 
 
@@ -224,12 +224,12 @@ rule extract_gp_motifs:
     shell:
         """
         python workflow/scripts/extract_gp_motifs.py \
-            --fasta {input.fasta} \
-            --motifs-out {output.motifs} \
-            --sequences-out {output.sequences} \
+            --fasta "{input.fasta}" \
+            --motifs-out "{output.motifs}" \
+            --sequences-out "{output.sequences}" \
             --upstream {params.upstream} \
             --downstream {params.downstream} \
-            > {log} 2>&1
+            > "{log}" 2>&1
         """
 
 
@@ -249,13 +249,13 @@ rule run_hmmscan:
     shell:
         """
         # Decompress sequences and run hmmscan
-        zcat {input.sequences} | hmmscan \
+        zcat "{input.sequences}" | hmmscan \
             --cpu {threads} \
-            --domtblout {output.domtblout} \
+            --domtblout "{output.domtblout}" \
             --cut_ga \
-            {input.pfam_db} \
+            "{input.pfam_db}" \
             - \
-            > {log} 2>&1
+            > "{log}" 2>&1
         """
 
 
@@ -271,10 +271,10 @@ rule parse_domain_annotations:
     shell:
         """
         python workflow/scripts/parse_domain_annotations.py \
-            --domtblout {input.domtblout} \
-            --motifs {input.motifs} \
-            --annotations {output.annotations} \
-            > {log} 2>&1
+            --domtblout "{input.domtblout}" \
+            --motifs "{input.motifs}" \
+            --annotations "{output.annotations}" \
+            > "{log}" 2>&1
         """
 
 
@@ -294,12 +294,12 @@ rule filter_interdomain_gp:
     shell:
         """
         python workflow/scripts/filter_interdomain_gp.py \
-            --motifs {input.motifs} \
-            --annotations {input.annotations} \
-            --interdomain-out {output.interdomain} \
-            --intradomain-out {output.intradomain} \
-            --stats-out {output.statistics} \
-            > {log} 2>&1
+            --motifs "{input.motifs}" \
+            --annotations "{input.annotations}" \
+            --interdomain-out "{output.interdomain}" \
+            --intradomain-out "{output.intradomain}" \
+            --stats-out "{output.statistics}" \
+            > "{log}" 2>&1
         """
 
 
@@ -317,9 +317,9 @@ rule prepare_clustering_fasta:
     shell:
         """
         # Extract context sequences to FASTA
-        zcat {input.interdomain} | awk -F'\t' 'NR>1 {{
+        zcat "{input.interdomain}" | awk -F'\t' 'NR>1 {{
             printf ">%s_GP%s_pos%s\\n%s\\n", $1, $4, $5, $6
-        }}' > {output.fasta}
+        }}' > "{output.fasta}"
         """
 
 
@@ -342,31 +342,31 @@ rule run_mmseqs_clustering:
         mem_mb=16000,
     shell:
         """
-        mkdir -p {params.tmpdir}
+        mkdir -p "{params.tmpdir}"
 
         # Create MMseqs2 database
-        mmseqs createdb {input.fasta} {params.prefix}_db 2>> {log}
+        mmseqs createdb "{input.fasta}" "{params.prefix}_db" 2>> "{log}"
 
         # Cluster
         mmseqs cluster \
-            {params.prefix}_db \
-            {params.prefix}_cluster \
-            {params.tmpdir} \
+            "{params.prefix}_db" \
+            "{params.prefix}_cluster" \
+            "{params.tmpdir}" \
             --min-seq-id {params.identity} \
             -c {params.coverage} \
             --threads {threads} \
-            2>> {log}
+            2>> "{log}"
 
         # Create TSV output
         mmseqs createtsv \
-            {params.prefix}_db \
-            {params.prefix}_db \
-            {params.prefix}_cluster \
-            {output.cluster_tsv} \
-            2>> {log}
+            "{params.prefix}_db" \
+            "{params.prefix}_db" \
+            "{params.prefix}_cluster" \
+            "{output.cluster_tsv}" \
+            2>> "{log}"
 
         # Cleanup temp files
-        rm -rf {params.tmpdir} {params.prefix}_db* {params.prefix}_cluster*
+        rm -rf "{params.tmpdir}" "{params.prefix}_db"* "{params.prefix}_cluster"*
         """
 
 
@@ -383,11 +383,11 @@ rule parse_gp_clusters:
     shell:
         """
         python workflow/scripts/parse_gp_clusters.py \
-            --cluster-tsv {input.cluster_tsv} \
-            --interdomain {input.interdomain} \
-            --clusters-out {output.clusters} \
-            --representatives-out {output.representatives} \
-            > {log} 2>&1
+            --cluster-tsv "{input.cluster_tsv}" \
+            --interdomain "{input.interdomain}" \
+            --clusters-out "{output.clusters}" \
+            --representatives-out "{output.representatives}" \
+            > "{log}" 2>&1
         """
 
 
@@ -412,13 +412,13 @@ rule analyze_cluster_conservation:
     shell:
         """
         python workflow/scripts/analyze_gp_conservation.py \
-            --clusters {input.clusters} \
-            --motifs {input.motifs} \
-            --conservation {output.conservation} \
-            --logos-dir {params.logos_dir} \
+            --clusters "{input.clusters}" \
+            --motifs "{input.motifs}" \
+            --conservation "{output.conservation}" \
+            --logos-dir "{params.logos_dir}" \
             --min-cluster-size {params.min_cluster_size} \
             --top-n 20 \
-            > {log} 2>&1
+            > "{log}" 2>&1
         """
 
 
@@ -445,15 +445,15 @@ rule identify_consensus_patterns:
     shell:
         """
         python workflow/scripts/identify_consensus_patterns.py \
-            --conservation {input.conservation} \
-            --clusters {input.clusters} \
-            --motifs {input.motifs} \
-            --consensus {output.consensus} \
-            --alignments-dir {params.alignments_dir} \
+            --conservation "{input.conservation}" \
+            --clusters "{input.clusters}" \
+            --motifs "{input.motifs}" \
+            --consensus "{output.consensus}" \
+            --alignments-dir "{params.alignments_dir}" \
             --min-conservation {params.min_conservation} \
             --min-cluster-size {params.min_cluster_size} \
             --top-n 20 \
-            > {log} 2>&1
+            > "{log}" 2>&1
         """
 
 
@@ -476,7 +476,7 @@ rule build_prokaryotic_hmms:
         "../envs/hmmer.yaml"
     shell:
         """
-        hmmbuild -n {params.name} {output.hmm} {input.alignment} 2> {log}
+        hmmbuild -n {params.name} "{output.hmm}" "{input.alignment}" 2> "{log}"
         """
 
 
@@ -501,10 +501,10 @@ rule search_prokaryotic_proteomes:
     shell:
         """
         hmmsearch --cpu {threads} \
-            --tblout >(gzip > {output.tblout}) \
-            -A >(gzip > {output.alignment}) \
+            --tblout >(gzip > "{output.tblout}") \
+            -A >(gzip > "{output.alignment}") \
             --noali \
-            {input.hmm} {input.db} 2> {log} | gzip > {output.hmmsearch}
+            "{input.hmm}" "{input.db}" 2> "{log}" | gzip > "{output.hmmsearch}"
         """
 
 
@@ -535,11 +535,11 @@ rule validate_against_known_peptides:
         """
         python workflow/scripts/validate_stalling_peptides.py \
             --hmms '{params.hmms_pattern}' \
-            --known-peptides {input.known_peptides} \
-            --validation {output.validation} \
-            --summary {output.summary} \
+            --known-peptides "{input.known_peptides}" \
+            --validation "{output.validation}" \
+            --summary "{output.summary}" \
             --threads {threads} \
-            > {log} 2>&1
+            > "{log}" 2>&1
         """
 
 
@@ -568,13 +568,13 @@ rule compare_approaches:
     shell:
         """
         python workflow/scripts/compare_gp_approaches.py \
-            --all-gp-motifs {input.all_gp_motifs} \
-            --interdomain-motifs {input.interdomain_motifs} \
-            --clusters {input.clusters} \
-            --validation {input.validation} \
-            --comparison {output.comparison} \
-            --plots {output.plots} \
-            > {log} 2>&1
+            --all-gp-motifs "{input.all_gp_motifs}" \
+            --interdomain-motifs "{input.interdomain_motifs}" \
+            --clusters "{input.clusters}" \
+            --validation "{input.validation}" \
+            --comparison "{output.comparison}" \
+            --plots "{output.plots}" \
+            > "{log}" 2>&1
         """
 
 
