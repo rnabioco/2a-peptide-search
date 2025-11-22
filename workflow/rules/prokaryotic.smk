@@ -474,6 +474,8 @@ rule compare_approaches:
         + "/prokaryotic/gp_motifs/interdomain_gp_motifs.tsv.gz",
         clusters=RESULTS_DIR + "/prokaryotic/clusters/gp_clusters.tsv.gz",
         validation=RESULTS_DIR + "/prokaryotic/validation/known_peptide_hits.tsv",
+        # APPROACH 1: Seed-based searches
+        seed_comprehensive=RESULTS_DIR + "/prokaryotic/seed_searches/comprehensive.sto.gz",
     output:
         comparison=RESULTS_DIR + "/prokaryotic/analysis/approach_comparison.tsv",
         plots=directory(RESULTS_DIR + "/prokaryotic/analysis/comparison_plots/"),
