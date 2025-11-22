@@ -63,15 +63,16 @@ rule download_domain_annotations:
 # APPROACH 1: Seed-based Discovery with Known Stalling Peptides
 # ============================================================================
 
+
 rule split_known_peptides_by_motif:
     """Split known stalling peptides into separate files by motif type."""
     input:
-        fasta="resources/stalling-peptides/known_stalling_peptides.fasta"
+        fasta="resources/stalling-peptides/known_stalling_peptides.fasta",
     output:
         motif_list=RESULTS_DIR + "/prokaryotic/seeds/motif_list.txt",
-        fastas=directory(RESULTS_DIR + "/prokaryotic/seeds/by_motif/")
+        fastas=directory(RESULTS_DIR + "/prokaryotic/seeds/by_motif/"),
     log:
-        LOGS_DIR + "/prokaryotic/split_peptides_by_motif.log"
+        LOGS_DIR + "/prokaryotic/split_peptides_by_motif.log",
     script:
         "../scripts/split_peptides_by_motif.py"
 
@@ -79,11 +80,11 @@ rule split_known_peptides_by_motif:
 rule align_all_seed_peptides:
     """Create comprehensive alignment from all known stalling peptides."""
     input:
-        fasta="resources/stalling-peptides/known_stalling_peptides.fasta"
+        fasta="resources/stalling-peptides/known_stalling_peptides.fasta",
     output:
-        alignment=RESULTS_DIR + "/prokaryotic/seeds/alignments/comprehensive.sto"
+        alignment=RESULTS_DIR + "/prokaryotic/seeds/alignments/comprehensive.sto",
     log:
-        LOGS_DIR + "/prokaryotic/align_all_seeds.log"
+        LOGS_DIR + "/prokaryotic/align_all_seeds.log",
     shell:
         """
         # Use MUSCLE for alignment, convert to Stockholm format
@@ -97,13 +98,13 @@ rule align_all_seed_peptides:
 rule build_comprehensive_hmm:
     """Build comprehensive 'pan-stalling' HMM from all known peptides."""
     input:
-        alignment=RESULTS_DIR + "/prokaryotic/seeds/alignments/comprehensive.sto"
+        alignment=RESULTS_DIR + "/prokaryotic/seeds/alignments/comprehensive.sto",
     output:
-        hmm=RESULTS_DIR + "/prokaryotic/models/seed/comprehensive.hmm"
+        hmm=RESULTS_DIR + "/prokaryotic/models/seed/comprehensive.hmm",
     params:
-        name="stall-pan"
+        name="stall-pan",
     log:
-        LOGS_DIR + "/prokaryotic/build_comprehensive_hmm.log"
+        LOGS_DIR + "/prokaryotic/build_comprehensive_hmm.log",
     shell:
         """
         hmmbuild -n {params.name} {output.hmm} {input.alignment} 2> {log}
@@ -114,13 +115,13 @@ rule search_with_comprehensive_hmm:
     """Search prokaryotic proteomes with comprehensive pan-stalling HMM."""
     input:
         hmm=RESULTS_DIR + "/prokaryotic/models/seed/comprehensive.hmm",
-        db=DATA_DIR + "/prokaryotic/uniprot_bacteria.fasta.gz"
+        db=DATA_DIR + "/prokaryotic/uniprot_bacteria.fasta.gz",
     output:
         hmmsearch=RESULTS_DIR + "/prokaryotic/seed_searches/comprehensive.hmmsearch.gz",
         tblout=RESULTS_DIR + "/prokaryotic/seed_searches/comprehensive.tblout.gz",
-        alignment=RESULTS_DIR + "/prokaryotic/seed_searches/comprehensive.sto.gz"
+        alignment=RESULTS_DIR + "/prokaryotic/seed_searches/comprehensive.sto.gz",
     log:
-        LOGS_DIR + "/prokaryotic/search_comprehensive.log"
+        LOGS_DIR + "/prokaryotic/search_comprehensive.log",
     shell:
         """
         hmmsearch --cpu {threads} \
@@ -134,11 +135,11 @@ rule search_with_comprehensive_hmm:
 rule align_seed_peptides:
     """Create multiple sequence alignment for each motif family."""
     input:
-        fasta=RESULTS_DIR + "/prokaryotic/seeds/by_motif/{motif}.fasta"
+        fasta=RESULTS_DIR + "/prokaryotic/seeds/by_motif/{motif}.fasta",
     output:
-        alignment=RESULTS_DIR + "/prokaryotic/seeds/alignments/{motif}.sto"
+        alignment=RESULTS_DIR + "/prokaryotic/seeds/alignments/{motif}.sto",
     log:
-        LOGS_DIR + "/prokaryotic/align_seeds_{motif}.log"
+        LOGS_DIR + "/prokaryotic/align_seeds_{motif}.log",
     shell:
         """
         # Use MUSCLE for alignment, convert to Stockholm format
@@ -152,13 +153,13 @@ rule align_seed_peptides:
 rule build_seed_hmms:
     """Build HMMs from seed alignments of known stalling peptides."""
     input:
-        alignment=RESULTS_DIR + "/prokaryotic/seeds/alignments/{motif}.sto"
+        alignment=RESULTS_DIR + "/prokaryotic/seeds/alignments/{motif}.sto",
     output:
-        hmm=RESULTS_DIR + "/prokaryotic/models/seed/{motif}.hmm"
+        hmm=RESULTS_DIR + "/prokaryotic/models/seed/{motif}.hmm",
     params:
-        name=lambda w: f"stall-{w.motif}"
+        name=lambda w: f"stall-{w.motif}",
     log:
-        LOGS_DIR + "/prokaryotic/build_seed_hmm_{motif}.log"
+        LOGS_DIR + "/prokaryotic/build_seed_hmm_{motif}.log",
     shell:
         """
         hmmbuild -n {params.name} {output.hmm} {input.alignment} 2> {log}
@@ -169,13 +170,13 @@ rule search_with_seed_hmms:
     """Search prokaryotic proteomes with seed HMMs from known peptides."""
     input:
         hmm=RESULTS_DIR + "/prokaryotic/models/seed/{motif}.hmm",
-        db=DATA_DIR + "/prokaryotic/uniprot_bacteria.fasta.gz"
+        db=DATA_DIR + "/prokaryotic/uniprot_bacteria.fasta.gz",
     output:
         hmmsearch=RESULTS_DIR + "/prokaryotic/seed_searches/{motif}.hmmsearch.gz",
         tblout=RESULTS_DIR + "/prokaryotic/seed_searches/{motif}.tblout.gz",
-        alignment=RESULTS_DIR + "/prokaryotic/seed_searches/{motif}.sto.gz"
+        alignment=RESULTS_DIR + "/prokaryotic/seed_searches/{motif}.sto.gz",
     log:
-        LOGS_DIR + "/prokaryotic/seed_search_{motif}.log"
+        LOGS_DIR + "/prokaryotic/seed_search_{motif}.log",
     shell:
         """
         hmmsearch --cpu {threads} \
@@ -374,7 +375,7 @@ rule validate_against_known_peptides:
             RESULTS_DIR + "/prokaryotic/models/initial/cluster_{cluster_id}.hmm",
             cluster_id=range(1, 21),
         ),
-        known_peptides="resources/stalling-peptides/known_stalling_peptides.fasta"
+        known_peptides="resources/stalling-peptides/known_stalling_peptides.fasta",
     output:
         validation=RESULTS_DIR + "/prokaryotic/validation/known_peptide_hits.tsv",
         summary=RESULTS_DIR + "/prokaryotic/validation/validation_summary.txt",

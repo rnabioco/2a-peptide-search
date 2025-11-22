@@ -6,7 +6,10 @@ Rules for searching protein databases with HMM models.
 def get_database_file(wildcards):
     """Map database name to its file path."""
     # Check if database has a local_path configured (e.g., IMG/VR)
-    if wildcards.database in config["databases"] and "local_path" in config["databases"][wildcards.database]:
+    if (
+        wildcards.database in config["databases"]
+        and "local_path" in config["databases"][wildcards.database]
+    ):
         local_path = config["databases"][wildcards.database]["local_path"]
         if local_path:
             return local_path
@@ -49,7 +52,7 @@ rule hmmsearch:
     """Search protein database with HMM model."""
     input:
         hmm=get_model_path,
-        db=get_database_file
+        db=get_database_file,
     output:
         hmmsearch=SCRATCH_DIR
         + "/searches/{database}/{iteration}/2A-{peptide_class}.hmmsearch.gz",
