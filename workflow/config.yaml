@@ -34,9 +34,13 @@ databases:
     size: "very_large"  # millions of sequences
 
   mgnify:
-    url: "https://ftp.ebi.ac.uk/pub/databases/metagenomics/peptide_database/current_release/mgnify_proteins.fasta.gz"
-    description: "MGnify environmental/metagenomic sequences"
+    base_url: "https://ftp.ebi.ac.uk/pub/databases/metagenomics/peptide_database/current_release"
+    description: "MGnify environmental/metagenomic sequences (25 split files, ~270GB total)"
     size: "very_large"
+    num_splits: 25  # Database is split into mgy_proteins_1.fa.gz through mgy_proteins_25.fa.gz
+    # Note: download_mgnify downloads all splits (parallel)
+    #       merge_mgnify_splits creates single file (for existing search rules)
+    #       For best performance on cluster, search splits separately in parallel
 
 # Which databases to search (comment out to skip)
 databases_to_search:

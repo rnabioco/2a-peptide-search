@@ -6,19 +6,26 @@ This pipeline discovers prokaryotic ribosomal stalling peptides using principles
 
 ## Strategy
 
-### Two Parallel Approaches
+### Three Complementary Approaches
 
-#### 1. Domain-Guided Discovery (Primary)
+#### 1. Seed-Based Discovery (Targeted - NEW!)
+**Starting from known stalling peptides (PMID 38565864)**
+- **Comprehensive HMM**: Align all 47 known peptides → build pan-stalling HMM → broad search
+- **Motif-Specific HMMs**: Split by motif type (RAGP, QAPP, etc.) → build family-specific HMMs → targeted search
+- **Advantages**: High-quality starting points, finds close homologs and divergent variants
+- **Outputs**: `results/prokaryotic/seed_searches/`
+
+#### 2. Domain-Guided Discovery (Hypothesis-Driven)
 - Extract all GP-containing sequences from prokaryotic proteomes
 - Annotate protein domains (Pfam/InterPro)
 - **Focus on inter-domain GP motifs** (hypothesis: stalling peptides occur at domain boundaries)
 - Cluster by sequence context
 - Build consensus patterns and HMMs
 
-#### 2. Comprehensive GP Discovery (Control)
+#### 3. Comprehensive GP Discovery (Unbiased Control)
 - Extract ALL GP motifs regardless of domain position
 - Should recover known stalling peptides (SecM, TnaC, MifM)
-- Provides validation of domain-guided approach
+- Provides validation of other approaches
 
 ### Key Principles
 
@@ -159,27 +166,47 @@ sbatch submit-prokaryotic.sh
 ### Specific Targets
 
 ```bash
+# Seed-based discovery (NEW!)
+snakemake search_with_comprehensive_hmm      # Broad search with pan-stalling HMM
+snakemake search_with_seed_hmms             # Motif-specific searches
+
 # Extract GP motifs from bacteria
-snakemake --configfile workflow/config-prokaryotic.yaml \
-          extract_gp_motifs
+snakemake extract_gp_motifs
 
 # Predict ORFs from phage genomes
-snakemake --configfile workflow/config-prokaryotic.yaml \
-          merge_predicted_orfs
+snakemake merge_predicted_orfs
 
 # Cluster motifs
-snakemake --configfile workflow/config-prokaryotic.yaml \
-          cluster_gp_motifs
+snakemake cluster_gp_motifs
 
 # Validate against known peptides
-snakemake --configfile workflow/config-prokaryotic.yaml \
-          validate_against_known_peptides
+snakemake validate_against_known_peptides
 ```
 
 ## Output Structure
 
 ```
 results/prokaryotic/
+├── seeds/                                   # NEW: Seed-based discovery
+│   ├── by_motif/                           # Peptides split by motif type
+│   │   ├── RAGP.fasta
+│   │   ├── RAPG.fasta
+│   │   ├── QAPP.fasta
+│   │   └── ...
+│   ├── alignments/
+│   │   ├── comprehensive.sto               # Alignment of all 47 peptides
+│   │   ├── RAGP.sto                        # Motif-specific alignments
+│   │   └── ...
+│   └── motif_list.txt                      # List of motif types
+├── models/
+│   └── seed/
+│       ├── comprehensive.hmm               # Pan-stalling HMM (all peptides)
+│       ├── RAGP.hmm                        # Motif-specific HMMs
+│       └── ...
+├── seed_searches/                          # NEW: Searches with seed HMMs
+│   ├── comprehensive.{hmmsearch,tblout,sto}.gz  # Comprehensive HMM results
+│   ├── RAGP.{hmmsearch,tblout,sto}.gz           # Motif-specific results
+│   └── ...
 ├── gp_motifs/
 │   ├── all_gp_motifs.tsv.gz              # All GP motifs
 │   ├── interdomain_gp_motifs.tsv.gz      # Inter-domain GP

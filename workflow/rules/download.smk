@@ -64,16 +64,48 @@ rule download_uniparc:
         """
 
 
-rule download_mgnify:
-    """Download MGnify protein database."""
+rule download_mgnify_split:
+    """Download one split file from MGnify protein database."""
     output:
-        fasta=DATA_DIR + "/mgnify/mgnify_proteins.fasta.gz",
+        fasta=DATA_DIR + "/mgnify/splits/mgy_proteins_{split_num}.fa.gz"
     params:
-        url=config["databases"]["mgnify"]["url"],
+        base_url=config["databases"]["mgnify"]["base_url"]
     log:
-        LOGS_DIR + "/download/mgnify.log",
+        LOGS_DIR + "/download/mgnify_split_{split_num}.log"
     shell:
         """
         mkdir -p $(dirname {output.fasta})
-        wget -c -o {log} {params.url} -O {output.fasta}
+        wget -c -o {log} {params.base_url}/mgy_proteins_{wildcards.split_num}.fa.gz -O {output.fasta}
+        """
+
+
+rule download_mgnify:
+    """Download all MGnify protein database splits."""
+    input:
+        splits=expand(
+            DATA_DIR + "/mgnify/splits/mgy_proteins_{split_num}.fa.gz",
+            split_num=range(1, config["databases"]["mgnify"]["num_splits"] + 1)
+        )
+    output:
+        flag=DATA_DIR + "/mgnify/download_complete.flag"
+    shell:
+        """
+        touch {output.flag}
+        """
+
+
+rule merge_mgnify_splits:
+    """Merge MGnify split files into single database (optional, for convenience)."""
+    input:
+        splits=expand(
+            DATA_DIR + "/mgnify/splits/mgy_proteins_{split_num}.fa.gz",
+            split_num=range(1, config["databases"]["mgnify"]["num_splits"] + 1)
+        )
+    output:
+        fasta=DATA_DIR + "/mgnify/mgnify_proteins.fasta.gz"
+    log:
+        LOGS_DIR + "/download/merge_mgnify.log"
+    shell:
+        """
+        cat {input.splits} > {output.fasta} 2> {log}
         """
