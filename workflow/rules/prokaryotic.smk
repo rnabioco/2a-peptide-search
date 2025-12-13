@@ -292,13 +292,14 @@ rule run_hmmscan:
     shell:
         """
         # Decompress sequences and run hmmscan
+        # stdout (verbose alignments) discarded; domtblout has parsed hits
         zcat "{input.sequences}" | hmmscan \
             --cpu {threads} \
             --domtblout "{output.domtblout}" \
             --cut_ga \
             "{input.pfam_db}" \
             - \
-            > "{log}" 2>&1
+            > /dev/null 2> "{log}"
         """
 
 
