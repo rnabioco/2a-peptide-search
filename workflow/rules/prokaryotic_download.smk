@@ -151,3 +151,52 @@ rule download_pfam_database:
         # Press HMM database to create binary auxfiles
         hmmpress "{output.hmm}" 2>> "{log}"
         """
+
+
+rule sanitize_fasta:
+    """Sanitize FASTA file by removing invalid IUPAC characters.
+
+    Use this rule for external databases that may contain non-standard
+    characters (gaps, invalid amino acids, etc.) that cause HMMER to fail.
+
+    Usage:
+        snakemake sanitize_fasta --config input=/path/to/input.fasta.gz output=/path/to/output.fasta.gz
+    """
+    input:
+        fasta=config.get("sanitize_input", "{input_fasta}"),
+    output:
+        fasta=DATA_DIR + "/sanitized/{basename}.sanitized.fasta.gz",
+    log:
+        LOGS_DIR + "/sanitize/{basename}.log",
+    resources:
+        runtime=480,  # 8 hours for large files
+        mem_mb=4000,
+    shell:
+        """
+        python workflow/scripts/sanitize_fasta.py \
+            "{input.fasta}" \
+            "{output.fasta}" \
+            --report-interval 10000000 \
+            2>&1 | tee "{log}"
+        """
+
+
+rule sanitize_imgvr:
+    """Sanitize IMG/VR database specifically."""
+    input:
+        fasta=config["prokaryotic_databases"]["imgvr"]["local_path"],
+    output:
+        fasta=DATA_DIR + "/prokaryotic/imgvr.sanitized.fasta.gz",
+    log:
+        LOGS_DIR + "/sanitize/imgvr.log",
+    resources:
+        runtime=480,  # 8 hours for large files
+        mem_mb=4000,
+    shell:
+        """
+        python workflow/scripts/sanitize_fasta.py \
+            "{input.fasta}" \
+            "{output.fasta}" \
+            --report-interval 10000000 \
+            2>&1 | tee "{log}"
+        """
