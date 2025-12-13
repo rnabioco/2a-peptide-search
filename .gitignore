@@ -29,3 +29,6 @@ logs/
 
 # Pixi environments (keep pixi.lock for reproducibility)
 .pixi/
+
+# python build
+__pycache__/
