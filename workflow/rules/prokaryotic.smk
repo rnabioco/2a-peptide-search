@@ -291,15 +291,24 @@ rule run_hmmscan:
         mem_mb=16000,
     shell:
         """
-        # Decompress sequences and run hmmscan
-        # stdout (verbose alignments) discarded; domtblout has parsed hits
+        # Copy Pfam DB to local scratch if available (much faster on clusters)
+        if [[ -n "${{TMPDIR:-}}" && -d "$TMPDIR" ]]; then
+            echo "Copying Pfam database to local scratch..." >> "{log}"
+            cp "{input.pfam_db}" "{input.h3f}" "{input.h3i}" "{input.h3m}" "{input.h3p}" "$TMPDIR/"
+            PFAM_DB="$TMPDIR/Pfam-A.hmm"
+        else
+            PFAM_DB="{input.pfam_db}"
+        fi
+
+        # Run hmmscan with --noali (skip alignment output for speed)
         zcat "{input.sequences}" | hmmscan \
             --cpu {threads} \
             --domtblout "{output.domtblout}" \
+            --noali \
             --cut_ga \
-            "{input.pfam_db}" \
+            "$PFAM_DB" \
             - \
-            > /dev/null 2> "{log}"
+            > /dev/null 2>> "{log}"
         """
 
 
