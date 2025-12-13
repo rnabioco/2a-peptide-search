@@ -1,0 +1,871 @@
+[
+  {
+    "objectID": "eukaryotic/sequence-logos.html",
+    "href": "eukaryotic/sequence-logos.html",
+    "title": "Sequence Logos",
+    "section": "",
+    "text": "Sequence logos visualize the conservation pattern at each position in the aligned 2A peptides. Height indicates information content (conservation), and letter size shows relative amino acid frequency.",
+    "crumbs": [
+      "Eukaryotic 2A Peptides",
+      "Sequence Logos"
+    ]
+  },
+  {
+    "objectID": "eukaryotic/sequence-logos.html#overview",
+    "href": "eukaryotic/sequence-logos.html#overview",
+    "title": "Sequence Logos",
+    "section": "",
+    "text": "Sequence logos visualize the conservation pattern at each position in the aligned 2A peptides. Height indicates information content (conservation), and letter size shows relative amino acid frequency.",
+    "crumbs": [
+      "Eukaryotic 2A Peptides",
+      "Sequence Logos"
+    ]
+  },
+  {
+    "objectID": "eukaryotic/sequence-logos.html#class-1-sequence-logo",
+    "href": "eukaryotic/sequence-logos.html#class-1-sequence-logo",
+    "title": "Sequence Logos",
+    "section": "Class 1 Sequence Logo",
+    "text": "Class 1 Sequence Logo\n\n\n\n\n\n\nNotePlaceholder\n\n\n\nSequence logos will be generated from the final curated alignments using Skylign or similar tools.\n\n\n\nExpected Conservation Pattern\nPosition:  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18\nConsensus: L  L  x  x  x  x  G  D  V  E  x  x  x  x  N  P  G  P\n                          ^^^^^^^               ^^^^^^^^^^\n                          Central               C-terminal\nKey positions: - Positions 7-10: GDVE central motif - Positions 15-18: NPGP C-terminal motif",
+    "crumbs": [
+      "Eukaryotic 2A Peptides",
+      "Sequence Logos"
+    ]
+  },
+  {
+    "objectID": "eukaryotic/sequence-logos.html#class-2-sequence-logo",
+    "href": "eukaryotic/sequence-logos.html#class-2-sequence-logo",
+    "title": "Sequence Logos",
+    "section": "Class 2 Sequence Logo",
+    "text": "Class 2 Sequence Logo\n\nExpected Conservation Pattern\nPosition:  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19\nConsensus: W  x  x  x  x  E  E  G  I  E  x  x  x  P  N  P  G  P  x\n           ^              ^^^^^^^^^^^        ^^^^^^^^^^^^^^\n           N-terminal     Central            C-terminal\nKey positions: - Position 1: Invariant tryptophan (W) - Positions 6-10: EEGIE central motif - Positions 14-18: PNPGP C-terminal motif",
+    "crumbs": [
+      "Eukaryotic 2A Peptides",
+      "Sequence Logos"
+    ]
+  },
+  {
+    "objectID": "eukaryotic/sequence-logos.html#generating-logos",
+    "href": "eukaryotic/sequence-logos.html#generating-logos",
+    "title": "Sequence Logos",
+    "section": "Generating Logos",
+    "text": "Generating Logos\n\nUsing ggseqlogo (R)\n#| label: fig-example-logo\n#| fig-cap: \"Example sequence logo generation\"\n#| eval: false\n\nlibrary(ggseqlogo)\nlibrary(tidyverse)\n\n# Read sequences from alignment\nsequences &lt;- c(\n    \"EGRGSLLTCGDVEENPGP\",\n    \"ATNFSLLKQAGDVEENPGP\",\n    \"QCTNYALLKLAGDVESNPGP\"\n)\n\n# Generate logo\nggseqlogo(sequences, method = \"prob\") +\n    labs(title = \"2A Peptide Class 1\") +\n    theme_logo()\n\n\nUsing WebLogo (CLI)\nweblogo -f alignment.fasta -o logo.png \\\n    -F png -s large \\\n    -c chemistry \\\n    --title \"2A Peptide Class 1\"",
+    "crumbs": [
+      "Eukaryotic 2A Peptides",
+      "Sequence Logos"
+    ]
+  },
+  {
+    "objectID": "eukaryotic/sequence-logos.html#interpretation-guide",
+    "href": "eukaryotic/sequence-logos.html#interpretation-guide",
+    "title": "Sequence Logos",
+    "section": "Interpretation Guide",
+    "text": "Interpretation Guide\n\n\n\nFeature\nMeaning\n\n\n\n\nTall letters\nHighly conserved position\n\n\nShort letters\nVariable position\n\n\nStack height\nInformation content (bits)\n\n\nLetter order\nFrequency (top = most common)",
+    "crumbs": [
+      "Eukaryotic 2A Peptides",
+      "Sequence Logos"
+    ]
+  },
+  {
+    "objectID": "eukaryotic/sequence-logos.html#conservation-by-iteration",
+    "href": "eukaryotic/sequence-logos.html#conservation-by-iteration",
+    "title": "Sequence Logos",
+    "section": "Conservation by Iteration",
+    "text": "Conservation by Iteration\nTrack how conservation patterns change through iterative refinement:\n\n\n\nIteration\nSequences\nAvg. Conservation\n\n\n\n\nSeed\n~10\nHigh\n\n\nIter 1\n~100\nMedium\n\n\nIter 2\n~500\nLower (more diversity)\n\n\nFinal (curated)\n~200\nMedium-High",
+    "crumbs": [
+      "Eukaryotic 2A Peptides",
+      "Sequence Logos"
+    ]
+  },
+  {
+    "objectID": "eukaryotic/sequence-logos.html#position-specific-features",
+    "href": "eukaryotic/sequence-logos.html#position-specific-features",
+    "title": "Sequence Logos",
+    "section": "Position-Specific Features",
+    "text": "Position-Specific Features\n\nCritical Residues\n\n\n\nPosition\nResidue\nFunction\nTolerance\n\n\n\n\n-1\nG\nCleavage site\nNone\n\n\n0\nP\nCleavage site\nNone\n\n\n-2\nG\nPositioning\nLow\n\n\n-3\nP/N\nEfficiency\nMedium\n\n\n\n\n\nVariable Regions\n\nPositions 2-6: Allow diversity\nPositions 11-14: Linker region\nTolerate substitutions without losing function",
+    "crumbs": [
+      "Eukaryotic 2A Peptides",
+      "Sequence Logos"
+    ]
+  },
+  {
+    "objectID": "eukaryotic/sequence-logos.html#downloads",
+    "href": "eukaryotic/sequence-logos.html#downloads",
+    "title": "Sequence Logos",
+    "section": "Downloads",
+    "text": "Downloads\nOnce generated, logos will be available at:\n\nresults/logos/seed/2A-class-1.png\nresults/logos/seed/2A-class-2.png\nresults/logos/final/2A-class-1.png\nresults/logos/final/2A-class-2.png",
+    "crumbs": [
+      "Eukaryotic 2A Peptides",
+      "Sequence Logos"
+    ]
+  },
+  {
+    "objectID": "eukaryotic/class-comparison.html",
+    "href": "eukaryotic/class-comparison.html",
+    "title": "Class Comparison",
+    "section": "",
+    "text": "2A peptides fall into two distinct classes based on conserved sequence features.",
+    "crumbs": [
+      "Eukaryotic 2A Peptides",
+      "Class Comparison"
+    ]
+  },
+  {
+    "objectID": "eukaryotic/class-comparison.html#two-classes-of-2a-peptides",
+    "href": "eukaryotic/class-comparison.html#two-classes-of-2a-peptides",
+    "title": "Class Comparison",
+    "section": "",
+    "text": "2A peptides fall into two distinct classes based on conserved sequence features.",
+    "crumbs": [
+      "Eukaryotic 2A Peptides",
+      "Class Comparison"
+    ]
+  },
+  {
+    "objectID": "eukaryotic/class-comparison.html#class-1",
+    "href": "eukaryotic/class-comparison.html#class-1",
+    "title": "Class Comparison",
+    "section": "Class 1",
+    "text": "Class 1\n\nConsensus Sequence\nL-L-L-x-x-x-G-D-V-E-x-x-x-x-N-P-G-P\n\n\nKey Features\n\nN-terminal: Leucine-rich region (often 3+ leucines)\nCentral motif: GDVE (Gly-Asp-Val-Glu)\nC-terminal: NPGP\n\n\n\nRepresentative Peptides\n\n\n\nName\nSequence\nSource\n\n\n\n\nT2A\nEGRGSLLTCGDVEENPGP\nThosea asigna virus\n\n\nP2A\nATNFSLLKQAGDVEENPGP\nPorcine teschovirus-1\n\n\nE2A\nQCTNYALLKLAGDVESNPGP\nEquine rhinitis A virus",
+    "crumbs": [
+      "Eukaryotic 2A Peptides",
+      "Class Comparison"
+    ]
+  },
+  {
+    "objectID": "eukaryotic/class-comparison.html#class-2",
+    "href": "eukaryotic/class-comparison.html#class-2",
+    "title": "Class Comparison",
+    "section": "Class 2",
+    "text": "Class 2\n\nConsensus Sequence\nW-x-x-x-x-E-E-G-I-E-x-x-P-N-P-G-P\n\n\nKey Features\n\nN-terminal: Invariant tryptophan\nCentral motif: EEGIE (Glu-Glu-Gly-Ile-Glu)\nC-terminal: PNPGP or PHPGP\n\n\n\nRepresentative Peptides\n\n\n\nName\nSequence\nSource\n\n\n\n\nF2A\nVKQTLNFDLLKLAGDVESNPGP\nFoot-and-mouth disease virus",
+    "crumbs": [
+      "Eukaryotic 2A Peptides",
+      "Class Comparison"
+    ]
+  },
+  {
+    "objectID": "eukaryotic/class-comparison.html#structural-comparison",
+    "href": "eukaryotic/class-comparison.html#structural-comparison",
+    "title": "Class Comparison",
+    "section": "Structural Comparison",
+    "text": "Structural Comparison\n\n\n\n\n\n\nflowchart LR\n    subgraph Class1[Class 1]\n        L1[L-rich N-term] --&gt; G1[GDVE] --&gt; N1[NPGP]\n    end\n\n    subgraph Class2[Class 2]\n        W2[W N-term] --&gt; E2[EEGIE] --&gt; P2[PNPGP]\n    end\n\n\n\n\nFigure 1: Structural comparison of 2A peptide classes",
+    "crumbs": [
+      "Eukaryotic 2A Peptides",
+      "Class Comparison"
+    ]
+  },
+  {
+    "objectID": "eukaryotic/class-comparison.html#functional-differences",
+    "href": "eukaryotic/class-comparison.html#functional-differences",
+    "title": "Class Comparison",
+    "section": "Functional Differences",
+    "text": "Functional Differences\n\n\n\nFeature\nClass 1\nClass 2\n\n\n\n\nCleavage efficiency\nHigh\nHigh\n\n\nHost range\nBroad\nBroad\n\n\nPosition preference\nN-terminal\nVariable\n\n\nBiotechnology use\nCommon (T2A, P2A)\nLess common",
+    "crumbs": [
+      "Eukaryotic 2A Peptides",
+      "Class Comparison"
+    ]
+  },
+  {
+    "objectID": "eukaryotic/class-comparison.html#cross-class-homology",
+    "href": "eukaryotic/class-comparison.html#cross-class-homology",
+    "title": "Class Comparison",
+    "section": "Cross-Class Homology",
+    "text": "Cross-Class Homology\nBoth classes share:\n\nC-terminal GP dipeptide - site of ribosomal skipping\nProline at P position - essential for function\nUpstream asparagine/proline - contributes to efficiency\n\n\n\n\n\n\n\nWarningCross-Matches\n\n\n\nHMM searches may identify partial cross-matches between classes due to the conserved C-terminal region. Always verify the full-length sequence context.",
+    "crumbs": [
+      "Eukaryotic 2A Peptides",
+      "Class Comparison"
+    ]
+  },
+  {
+    "objectID": "eukaryotic/class-comparison.html#phylogenetic-distribution",
+    "href": "eukaryotic/class-comparison.html#phylogenetic-distribution",
+    "title": "Class Comparison",
+    "section": "Phylogenetic Distribution",
+    "text": "Phylogenetic Distribution\n\nClass 1: Primarily in picornaviruses, insect viruses\nClass 2: Primarily in aphthoviruses",
+    "crumbs": [
+      "Eukaryotic 2A Peptides",
+      "Class Comparison"
+    ]
+  },
+  {
+    "objectID": "eukaryotic/class-comparison.html#selection-for-biotechnology",
+    "href": "eukaryotic/class-comparison.html#selection-for-biotechnology",
+    "title": "Class Comparison",
+    "section": "Selection for Biotechnology",
+    "text": "Selection for Biotechnology\n\n\n\n\n\n\n\n\nApplication\nRecommended\nReason\n\n\n\n\nMammalian expression\nT2A, P2A\nHigh efficiency, low immunogenicity\n\n\nInsect cells\nE2A\nNative to insect viruses\n\n\nBalanced expression\nP2A\nMost consistent stoichiometry",
+    "crumbs": [
+      "Eukaryotic 2A Peptides",
+      "Class Comparison"
+    ]
+  },
+  {
+    "objectID": "prokaryotic/stalling-peptides.html",
+    "href": "prokaryotic/stalling-peptides.html",
+    "title": "Known Stalling Peptides",
+    "section": "",
+    "text": "Several prokaryotic ribosome stalling peptides have been experimentally characterized. These serve as positive controls for our discovery pipeline.",
+    "crumbs": [
+      "Prokaryotic Discovery",
+      "Known Stalling Peptides"
+    ]
+  },
+  {
+    "objectID": "prokaryotic/stalling-peptides.html#overview",
+    "href": "prokaryotic/stalling-peptides.html#overview",
+    "title": "Known Stalling Peptides",
+    "section": "",
+    "text": "Several prokaryotic ribosome stalling peptides have been experimentally characterized. These serve as positive controls for our discovery pipeline.",
+    "crumbs": [
+      "Prokaryotic Discovery",
+      "Known Stalling Peptides"
+    ]
+  },
+  {
+    "objectID": "prokaryotic/stalling-peptides.html#secm-secretion-monitor",
+    "href": "prokaryotic/stalling-peptides.html#secm-secretion-monitor",
+    "title": "Known Stalling Peptides",
+    "section": "SecM (Secretion Monitor)",
+    "text": "SecM (Secretion Monitor)\n\nSequence\nFSTPVWISQAQGIRAGP\n       ↑      ↑↑↑\n       W      Stall site\n\n\nCharacteristics\n\n\n\nProperty\nValue\n\n\n\n\nOrganism\nEscherichia coli\n\n\nLength\n17 residues\n\n\nStall motif\nGIRAGP\n\n\nFunction\nSecretion regulation\n\n\nPDB\nMultiple structures\n\n\n\n\n\nMechanism\nSecM stalls ribosomes when the SecY translocon is unavailable, allowing SecA upregulation.\n\n\n\n\n\n\nflowchart LR\n    mRNA[secM-secA mRNA] --&gt; Ribosome\n    Ribosome --&gt; |SecY available| Continue[Translation continues]\n    Ribosome --&gt; |SecY blocked| Stall[Ribosome stalls]\n    Stall --&gt; |Structure change| Expose[secA RBS exposed]\n    Expose --&gt; SecA[SecA synthesis]\n\n\n\n\nFigure 1: SecM regulatory mechanism",
+    "crumbs": [
+      "Prokaryotic Discovery",
+      "Known Stalling Peptides"
+    ]
+  },
+  {
+    "objectID": "prokaryotic/stalling-peptides.html#tnac-tryptophanase-leader",
+    "href": "prokaryotic/stalling-peptides.html#tnac-tryptophanase-leader",
+    "title": "Known Stalling Peptides",
+    "section": "TnaC (Tryptophanase Leader)",
+    "text": "TnaC (Tryptophanase Leader)\n\nSequence\nWDPXXXXIGP (consensus)\n↑         ↑↑\nW         Stall (tryptophan-dependent)\n\n\nCharacteristics\n\n\n\nProperty\nValue\n\n\n\n\nOrganism\nEscherichia coli\n\n\nLength\nVariable (~24 residues)\n\n\nStall motif\nIGP (tryptophan-dependent)\n\n\nFunction\nTryptophan catabolism\n\n\nInducer\nL-tryptophan\n\n\n\n\n\nMechanism\nTnaC stalling requires free L-tryptophan in the ribosome exit tunnel, linking amino acid availability to gene expression.",
+    "crumbs": [
+      "Prokaryotic Discovery",
+      "Known Stalling Peptides"
+    ]
+  },
+  {
+    "objectID": "prokaryotic/stalling-peptides.html#mifm-membrane-insertion-factor-monitor",
+    "href": "prokaryotic/stalling-peptides.html#mifm-membrane-insertion-factor-monitor",
+    "title": "Known Stalling Peptides",
+    "section": "MifM (Membrane Insertion Factor Monitor)",
+    "text": "MifM (Membrane Insertion Factor Monitor)\n\nSequence\nXXXGPXXGIAGP\n   ↑↑    ↑↑↑↑\n   GP    Stall site\n\n\nCharacteristics\n\n\n\nProperty\nValue\n\n\n\n\nOrganism\nBacillus subtilis\n\n\nLength\n~90 residues (full peptide)\n\n\nStall motif\nGIAGP\n\n\nFunction\nYidC regulation\n\n\nHomologs\nMany Firmicutes\n\n\n\n\n\nMechanism\nMifM monitors membrane protein insertion via YidC. When insertion is impaired, stalling upregulates YidC2.",
+    "crumbs": [
+      "Prokaryotic Discovery",
+      "Known Stalling Peptides"
+    ]
+  },
+  {
+    "objectID": "prokaryotic/stalling-peptides.html#cyda-cytochrome-bd-oxidase",
+    "href": "prokaryotic/stalling-peptides.html#cyda-cytochrome-bd-oxidase",
+    "title": "Known Stalling Peptides",
+    "section": "CydA (Cytochrome bd Oxidase)",
+    "text": "CydA (Cytochrome bd Oxidase)\n\nSequence\nXXXRAGP\n   ↑↑↑↑\n   Stall site\n\n\nCharacteristics\n\n\n\nProperty\nValue\n\n\n\n\nOrganism\nEscherichia coli\n\n\nLength\nShort leader\n\n\nStall motif\nRAGP\n\n\nFunction\nCytochrome regulation",
+    "crumbs": [
+      "Prokaryotic Discovery",
+      "Known Stalling Peptides"
+    ]
+  },
+  {
+    "objectID": "prokaryotic/stalling-peptides.html#comparison-table",
+    "href": "prokaryotic/stalling-peptides.html#comparison-table",
+    "title": "Known Stalling Peptides",
+    "section": "Comparison Table",
+    "text": "Comparison Table\n\n\n\nPeptide\nMotif\nTrigger\nResponse\n\n\n\n\nSecM\nGIRAGP\nSecY absence\nSecA↑\n\n\nTnaC\nIGP\nTrp presence\nTnaAB↑\n\n\nMifM\nGIAGP\nYidC absence\nYidC2↑\n\n\nCydA\nRAGP\nUnknown\nCydB?",
+    "crumbs": [
+      "Prokaryotic Discovery",
+      "Known Stalling Peptides"
+    ]
+  },
+  {
+    "objectID": "prokaryotic/stalling-peptides.html#validation-strategy",
+    "href": "prokaryotic/stalling-peptides.html#validation-strategy",
+    "title": "Known Stalling Peptides",
+    "section": "Validation Strategy",
+    "text": "Validation Strategy\n\nPositive Control\nOur HMMs should recover known stalling peptides:\n\nSearch prokaryotic databases with seed HMMs\nCheck for known peptides in results\nMeasure E-values and ranks\n\n\n\nExpected Results\n\n\n\nPeptide\nExpected E-value\nStatus\n\n\n\n\nSecM\n&lt;1e-10\nTBD\n\n\nTnaC\n&lt;1e-5\nTBD\n\n\nMifM\n&lt;1e-8\nTBD\n\n\nCydA\n&lt;1e-5\nTBD\n\n\n\n\n\nNegative Control\nRandom GP sequences should not rank highly:\n\nShuffle upstream context\nPreserve amino acid composition\nCompare E-value distributions",
+    "crumbs": [
+      "Prokaryotic Discovery",
+      "Known Stalling Peptides"
+    ]
+  },
+  {
+    "objectID": "prokaryotic/stalling-peptides.html#novel-discoveries",
+    "href": "prokaryotic/stalling-peptides.html#novel-discoveries",
+    "title": "Known Stalling Peptides",
+    "section": "Novel Discoveries",
+    "text": "Novel Discoveries\n\nCriteria for Novel Peptides\n\nSequence: Contains xAGP or similar motif\nContext: Inter-domain location\nConservation: Conserved across species\nStructure: Predicted stalling-compatible\n\n\n\nCandidate Validation\nPromising candidates should be validated by:\n\nRibosome profiling correlation\nReporter assays (if available)\nStructural modeling\nPhylogenetic analysis",
+    "crumbs": [
+      "Prokaryotic Discovery",
+      "Known Stalling Peptides"
+    ]
+  },
+  {
+    "objectID": "prokaryotic/stalling-peptides.html#references",
+    "href": "prokaryotic/stalling-peptides.html#references",
+    "title": "Known Stalling Peptides",
+    "section": "References",
+    "text": "References\n\nIto K, Chiba S. (2013) Arrest peptides: cis-acting modulators of translation. Annu Rev Biochem 82:171-202.\nWilson DN, et al. (2016) Ribosome-targeting antibiotics and mechanisms of bacterial resistance. Nat Rev Microbiol 14:22-35.\nSeip B, Innis CA. (2016) How Widespread is Metabolite Sensing by Ribosome-Arresting Nascent Peptides? J Mol Biol 428:2217-2227.",
+    "crumbs": [
+      "Prokaryotic Discovery",
+      "Known Stalling Peptides"
+    ]
+  },
+  {
+    "objectID": "methods/databases.html",
+    "href": "methods/databases.html",
+    "title": "Database Sources",
+    "section": "",
+    "text": "URL: ftp.uniprot.org/pub/databases/uniprot/current_release/\nSize: ~570,000 sequences\nDescription: Manually annotated, high-quality protein sequences\nUpdate frequency: Monthly releases\n\n\n\n\n\nURL: ftp.uniprot.org/.../reference_proteomes/\nSize: Representative proteomes from all domains of life\nDescription: Subset of UniProt used by Pfam for domain annotation\nCurrent version: 2025_04\n\n\n\n\n\nURL: ftp.uniprot.org/.../uniparc/\nSize: Very large (~billions of sequences)\nDescription: Non-redundant archive of all known protein sequences\nNote: Computationally intensive to search\n\n\n\n\n\nURL: ftp.ebi.ac.uk/pub/databases/metagenomics/peptide_database/\nSize: ~300 million sequences (25 split files)\nDescription: Environmental and metagenomic protein sequences\nNote: Enable only for comprehensive searches",
+    "crumbs": [
+      "Methods",
+      "Database Sources"
+    ]
+  },
+  {
+    "objectID": "methods/databases.html#eukaryotic-databases",
+    "href": "methods/databases.html#eukaryotic-databases",
+    "title": "Database Sources",
+    "section": "",
+    "text": "URL: ftp.uniprot.org/pub/databases/uniprot/current_release/\nSize: ~570,000 sequences\nDescription: Manually annotated, high-quality protein sequences\nUpdate frequency: Monthly releases\n\n\n\n\n\nURL: ftp.uniprot.org/.../reference_proteomes/\nSize: Representative proteomes from all domains of life\nDescription: Subset of UniProt used by Pfam for domain annotation\nCurrent version: 2025_04\n\n\n\n\n\nURL: ftp.uniprot.org/.../uniparc/\nSize: Very large (~billions of sequences)\nDescription: Non-redundant archive of all known protein sequences\nNote: Computationally intensive to search\n\n\n\n\n\nURL: ftp.ebi.ac.uk/pub/databases/metagenomics/peptide_database/\nSize: ~300 million sequences (25 split files)\nDescription: Environmental and metagenomic protein sequences\nNote: Enable only for comprehensive searches",
+    "crumbs": [
+      "Methods",
+      "Database Sources"
+    ]
+  },
+  {
+    "objectID": "methods/databases.html#prokaryotic-databases",
+    "href": "methods/databases.html#prokaryotic-databases",
+    "title": "Database Sources",
+    "section": "Prokaryotic Databases",
+    "text": "Prokaryotic Databases\n\nUniProt Bacteria/Archaea\n\nURL: UniProt REST API with taxonomy filters\nBacteria: taxonomy_id:2 (~500k reviewed)\nArchaea: taxonomy_id:2157 (~50k reviewed)\nDescription: Swiss-Prot entries for prokaryotes\n\n\n\nNCBI Viral RefSeq\n\nURL: ftp.ncbi.nlm.nih.gov/refseq/release/viral/\nFiles: viral.1.protein.faa.gz (as of 2025)\nSize: ~100MB\nDescription: Reference viral protein sequences\n\n\n\nIMG/VR\n\nURL: img.jgi.doe.gov/vr/ (requires login)\nSize: Millions of sequences\nDescription: Integrated Microbial Genomes viral database\nNote: Requires manual download and sanitization\n\n\n\n\n\n\n\nImportantIMG/VR Sanitization\n\n\n\nIMG/VR files may contain invalid IUPAC characters (gaps, etc.) that cause HMMER to fail. The pipeline automatically sanitizes this database before searching.\n\n\n\n\nINPHARED\n\nURL: millardlab-inphared.s3.climb.ac.uk/\nCurrent release: 14Apr2025\nFiles:\n\n14Apr2025_genomes.fa.gz (phage genomes)\n14Apr2025_data.tsv.gz (metadata)\n\nDescription: Curated phage genome database with consistent annotation\nReference: GitHub",
+    "crumbs": [
+      "Methods",
+      "Database Sources"
+    ]
+  },
+  {
+    "objectID": "methods/databases.html#database-configuration",
+    "href": "methods/databases.html#database-configuration",
+    "title": "Database Sources",
+    "section": "Database Configuration",
+    "text": "Database Configuration\n# workflow/config/config-prokaryotic.yaml\nprokaryotic_databases:\n  bacteria:\n    url: \"https://rest.uniprot.org/uniprotkb/stream?...\"\n\n  ncbi_viral_refseq:\n    base_url: \"https://ftp.ncbi.nlm.nih.gov/refseq/release/viral\"\n    num_files: 1  # As of 2025\n\n  imgvr:\n    local_path: \"/path/to/IMGVR_all_proteins.faa.gz\"\n\nprokaryotic_databases_to_search:\n  - bacteria\n  - archaea\n  - imgvr\n  - ncbi_viral_refseq\n  - uniprot_viruses\n  - inphared_proteins",
+    "crumbs": [
+      "Methods",
+      "Database Sources"
+    ]
+  },
+  {
+    "objectID": "methods/databases.html#data-provenance",
+    "href": "methods/databases.html#data-provenance",
+    "title": "Database Sources",
+    "section": "Data Provenance",
+    "text": "Data Provenance\nAll database downloads are logged with:\n\nSource URL\nDownload timestamp\nFile checksum\nNumber of sequences\n\nLogs are stored in: scratch/logs/download/",
+    "crumbs": [
+      "Methods",
+      "Database Sources"
+    ]
+  },
+  {
+    "objectID": "methods/databases.html#updates",
+    "href": "methods/databases.html#updates",
+    "title": "Database Sources",
+    "section": "Updates",
+    "text": "Updates\nDatabase URLs change periodically. Check these resources for current versions:\n\n\n\nDatabase\nUpdate Check\n\n\n\n\nUniProt\nRelease notes\n\n\nNCBI RefSeq\nFTP directory listing\n\n\nINPHARED\nGitHub releases\n\n\nMGnify\nEBI FTP",
+    "crumbs": [
+      "Methods",
+      "Database Sources"
+    ]
+  },
+  {
+    "objectID": "methods/hmm-approach.html",
+    "href": "methods/hmm-approach.html",
+    "title": "HMM Methodology",
+    "section": "",
+    "text": "Profile hidden Markov models (pHMMs) are probabilistic models that capture position-specific amino acid preferences and insertion/deletion patterns from multiple sequence alignments.\n\n\n2A peptides are challenging to identify using standard BLAST:\n\nShort sequences (~15-20 residues) have limited statistical power\nConserved motifs are interspersed with variable regions\nDistant homologs may share &lt;30% sequence identity\n\nProfile HMMs address these challenges by:\n\nModeling position-specific conservation patterns\nAllowing insertions and deletions with learned penalties\nProviding calibrated E-values for statistical significance",
+    "crumbs": [
+      "Methods",
+      "HMM Methodology"
+    ]
+  },
+  {
+    "objectID": "methods/hmm-approach.html#profile-hmms-for-2a-peptides",
+    "href": "methods/hmm-approach.html#profile-hmms-for-2a-peptides",
+    "title": "HMM Methodology",
+    "section": "",
+    "text": "Profile hidden Markov models (pHMMs) are probabilistic models that capture position-specific amino acid preferences and insertion/deletion patterns from multiple sequence alignments.\n\n\n2A peptides are challenging to identify using standard BLAST:\n\nShort sequences (~15-20 residues) have limited statistical power\nConserved motifs are interspersed with variable regions\nDistant homologs may share &lt;30% sequence identity\n\nProfile HMMs address these challenges by:\n\nModeling position-specific conservation patterns\nAllowing insertions and deletions with learned penalties\nProviding calibrated E-values for statistical significance",
+    "crumbs": [
+      "Methods",
+      "HMM Methodology"
+    ]
+  },
+  {
+    "objectID": "methods/hmm-approach.html#hmmer-suite",
+    "href": "methods/hmm-approach.html#hmmer-suite",
+    "title": "HMM Methodology",
+    "section": "HMMER Suite",
+    "text": "HMMER Suite\nWe use HMMER for all HMM operations:\n\n\n\nTool\nPurpose\n\n\n\n\nhmmbuild\nBuild profile HMM from alignment\n\n\nhmmsearch\nSearch database with HMM\n\n\nhmmalign\nAlign sequences to HMM\n\n\nhmmpress\nPrepare HMM database\n\n\n\n\nBuilding Models\n# Build HMM from Stockholm alignment\nhmmbuild -n \"2A-class-1\" model.hmm alignment.sto\n\n# Model parameters\n# - Position-specific emission probabilities\n# - Insertion/deletion state transitions\n# - Match state consensus\n\n\nSearch Strategy\n# Search protein database\nhmmsearch --cpu 12 \\\n    --tblout results.tblout \\\n    -A results.sto \\\n    model.hmm database.fasta",
+    "crumbs": [
+      "Methods",
+      "HMM Methodology"
+    ]
+  },
+  {
+    "objectID": "methods/hmm-approach.html#iterative-refinement",
+    "href": "methods/hmm-approach.html#iterative-refinement",
+    "title": "HMM Methodology",
+    "section": "Iterative Refinement",
+    "text": "Iterative Refinement\nThe pipeline uses iterative HMM refinement:\n\n\n\n\n\n\nflowchart LR\n    A[Seed Alignment] --&gt; B[Build HMM]\n    B --&gt; C[Search DBs]\n    C --&gt; D[Filter Hits]\n    D --&gt; E[Merge Alignments]\n    E --&gt; F[Build Refined HMM]\n    F --&gt; C\n\n\n\n\nFigure 1: Iterative HMM refinement cycle\n\n\n\n\n\n\nIteration 1: Seed Search\n\nStart with curated seed alignments (known 2A peptides)\nBuild initial HMMs\nSearch all databases\nFilter by E-value threshold (1e-5)\n\n\n\nIteration 2: Refinement\n\nMerge filtered hits from all databases\nRemove redundant sequences\nBuild refined HMMs\nSearch again with improved models\n\n\n\nAuto-Curation\nAfter iteration 2, automated curation applies:\n\nE-value filter: Remove low-confidence hits\nLength filter: Require minimum 15 residues\nGap filter: Maximum 50% gaps\nMotif filter: Require C-terminal PGP motif\nOutlier removal: Drop bottom 10% by bit score",
+    "crumbs": [
+      "Methods",
+      "HMM Methodology"
+    ]
+  },
+  {
+    "objectID": "methods/hmm-approach.html#model-characteristics",
+    "href": "methods/hmm-approach.html#model-characteristics",
+    "title": "HMM Methodology",
+    "section": "Model Characteristics",
+    "text": "Model Characteristics\n\nClass 1 HMM Profile\nKey conserved positions:\n\nN-terminal: L-rich region\nCentral: GDVE motif\nC-terminal: NPGP\n\n\n\nClass 2 HMM Profile\nKey conserved positions:\n\nN-terminal: Invariant W\nCentral: EEGIE motif\nC-terminal: PNPGP/PHPGP",
+    "crumbs": [
+      "Methods",
+      "HMM Methodology"
+    ]
+  },
+  {
+    "objectID": "methods/hmm-approach.html#e-value-interpretation",
+    "href": "methods/hmm-approach.html#e-value-interpretation",
+    "title": "HMM Methodology",
+    "section": "E-value Interpretation",
+    "text": "E-value Interpretation\n\n\n\nE-value\nInterpretation\n\n\n\n\n&lt; 1e-10\nVery confident hit\n\n\n1e-10 - 1e-5\nConfident hit\n\n\n1e-5 - 1e-3\nPossible hit, review\n\n\n&gt; 1e-3\nLikely spurious\n\n\n\n\n\n\n\n\n\nWarningCross-Class Matches\n\n\n\nDue to the conserved C-terminal PGP motif, some hits may partially match both class 1 and class 2 models. Always check both search results.",
+    "crumbs": [
+      "Methods",
+      "HMM Methodology"
+    ]
+  },
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "2A Peptide Discovery",
+    "section": "",
+    "text": "This project identifies 2A peptides across protein sequence databases using profile hidden Markov models (HMMs). 2A peptides are short (~15-20 residue) cis-acting oligopeptides that cause ribosomal skipping during translation at conserved Gly-Pro (GP) dipeptides.\n\n\n2A peptides were first discovered in picornaviruses (foot-and-mouth disease virus) where they enable production of multiple proteins from a single open reading frame without requiring a stop codon. The ribosome “skips” peptide bond formation at the Gly-Pro junction, releasing the upstream protein while continuing translation of the downstream sequence.\n\n\n\n\n\n\nNoteKey Features of 2A Peptides\n\n\n\n\nConserved C-terminal motif: DxExNPGP\nSelf-cleavage occurs between Gly and Pro\nNo external protease required\nWidely used in biotechnology for multi-cistronic expression\n\n\n\n\n\n\nWe distinguish two classes based on conserved sequence features:\n\n\n\nClass\nN-terminal\nCentral Motif\nC-terminal\n\n\n\n\nClass 1\nLeucine stretch\nGDVE\nNPGP\n\n\nClass 2\nInvariant Trp\nEEGIE\nPNPGP/PHPGP",
+    "crumbs": [
+      "Overview",
+      "2A Peptide Discovery"
+    ]
+  },
+  {
+    "objectID": "index.html#overview",
+    "href": "index.html#overview",
+    "title": "2A Peptide Discovery",
+    "section": "",
+    "text": "This project identifies 2A peptides across protein sequence databases using profile hidden Markov models (HMMs). 2A peptides are short (~15-20 residue) cis-acting oligopeptides that cause ribosomal skipping during translation at conserved Gly-Pro (GP) dipeptides.\n\n\n2A peptides were first discovered in picornaviruses (foot-and-mouth disease virus) where they enable production of multiple proteins from a single open reading frame without requiring a stop codon. The ribosome “skips” peptide bond formation at the Gly-Pro junction, releasing the upstream protein while continuing translation of the downstream sequence.\n\n\n\n\n\n\nNoteKey Features of 2A Peptides\n\n\n\n\nConserved C-terminal motif: DxExNPGP\nSelf-cleavage occurs between Gly and Pro\nNo external protease required\nWidely used in biotechnology for multi-cistronic expression\n\n\n\n\n\n\nWe distinguish two classes based on conserved sequence features:\n\n\n\nClass\nN-terminal\nCentral Motif\nC-terminal\n\n\n\n\nClass 1\nLeucine stretch\nGDVE\nNPGP\n\n\nClass 2\nInvariant Trp\nEEGIE\nPNPGP/PHPGP",
+    "crumbs": [
+      "Overview",
+      "2A Peptide Discovery"
+    ]
+  },
+  {
+    "objectID": "index.html#pipeline-overview",
+    "href": "index.html#pipeline-overview",
+    "title": "2A Peptide Discovery",
+    "section": "Pipeline Overview",
+    "text": "Pipeline Overview\n\n\n\n\n\n\nflowchart LR\n    subgraph inputs[\" \"]\n        direction TB\n        Seeds[\"🧬 Seed Alignments&lt;br/&gt;&lt;small&gt;Curated 2A sequences&lt;/small&gt;\"]\n        style Seeds fill:#e1f5fe\n    end\n\n    subgraph databases[\" \"]\n        direction TB\n        UniProt[(UniProt)]\n        RefProt[(RefProt)]\n        UniParc[(UniParc)]\n        MGnify[(MGnify)]\n        IMGVR[(IMG/VR)]\n        style UniProt fill:#fff3e0\n        style RefProt fill:#fff3e0\n        style UniParc fill:#fff3e0\n        style MGnify fill:#fff3e0\n        style IMGVR fill:#fff3e0\n    end\n\n    subgraph iteration1[\"Iteration 1\"]\n        direction TB\n        HMM1[\"hmmbuild&lt;br/&gt;&lt;small&gt;Seed HMMs&lt;/small&gt;\"]\n        Search1[\"hmmsearch&lt;br/&gt;&lt;small&gt;All databases&lt;/small&gt;\"]\n        Filter1[\"Filter&lt;br/&gt;&lt;small&gt;E-value, length&lt;/small&gt;\"]\n        style HMM1 fill:#e8f5e9\n        style Search1 fill:#e8f5e9\n        style Filter1 fill:#e8f5e9\n    end\n\n    subgraph iteration2[\"Iteration 2\"]\n        direction TB\n        HMM2[\"hmmbuild&lt;br/&gt;&lt;small&gt;Refined HMMs&lt;/small&gt;\"]\n        Search2[\"hmmsearch&lt;br/&gt;&lt;small&gt;Expanded search&lt;/small&gt;\"]\n        Curate[\"Auto-curate&lt;br/&gt;&lt;small&gt;Motif validation&lt;/small&gt;\"]\n        style HMM2 fill:#fce4ec\n        style Search2 fill:#fce4ec\n        style Curate fill:#fce4ec\n    end\n\n    subgraph outputs[\"Outputs\"]\n        direction TB\n        FinalHMM[\"📊 Final Models&lt;br/&gt;&lt;small&gt;Class 1 & 2 HMMs&lt;/small&gt;\"]\n        Logos[\"🎨 Sequence Logos\"]\n        Report[\"📝 Analysis Report\"]\n        style FinalHMM fill:#f3e5f5\n        style Logos fill:#f3e5f5\n        style Report fill:#f3e5f5\n    end\n\n    Seeds --&gt; HMM1\n    HMM1 --&gt; Search1\n    databases --&gt; Search1\n    Search1 --&gt; Filter1\n    Filter1 --&gt; HMM2\n    HMM2 --&gt; Search2\n    databases --&gt; Search2\n    Search2 --&gt; Curate\n    Curate --&gt; FinalHMM\n    FinalHMM --&gt; Logos\n    FinalHMM --&gt; Report\n\n\n\n\nFigure 1: Complete workflow for 2A peptide and ribosomal stalling peptide discovery",
+    "crumbs": [
+      "Overview",
+      "2A Peptide Discovery"
+    ]
+  },
+  {
+    "objectID": "index.html#databases-searched",
+    "href": "index.html#databases-searched",
+    "title": "2A Peptide Discovery",
+    "section": "Databases Searched",
+    "text": "Databases Searched\n\nEukaryotic Pipeline\n\n\n\nDatabase\nDescription\nSize\n\n\n\n\nUniProt Swiss-Prot\nCurated protein sequences\n~570k\n\n\nReference Proteomes\nRepresentative proteomes\nMedium\n\n\nUniParc\nNon-redundant archive\nVery large\n\n\nMGnify\nMetagenomic proteins\n~300M\n\n\n\n\n\nProkaryotic Pipeline\n\n\n\nDatabase\nDescription\nSize\n\n\n\n\nUniProt Bacteria\nSwiss-Prot bacterial proteins\n~500k\n\n\nUniProt Archaea\nSwiss-Prot archaeal proteins\n~50k\n\n\nNCBI Viral RefSeq\nViral protein sequences\n~100MB\n\n\nIMG/VR\nPhage proteins\nMillions\n\n\nINPHARED\nCurated phage genomes\n~19k genomes",
+    "crumbs": [
+      "Overview",
+      "2A Peptide Discovery"
+    ]
+  },
+  {
+    "objectID": "index.html#key-analyses",
+    "href": "index.html#key-analyses",
+    "title": "2A Peptide Discovery",
+    "section": "Key Analyses",
+    "text": "Key Analyses\n\nEukaryotic 2A Peptides\n\nSeed Search Results: Initial HMM search statistics\nClass Comparison: Differences between Class 1 and Class 2\nSequence Logos: Visualization of conserved motifs\n\n\n\nProkaryotic Discovery\n\nDiscovery Pipeline: Approach for finding novel stalling peptides\nGP Motif Analysis: Comprehensive GP context analysis\nKnown Stalling Peptides: Validation against SecM, TnaC, etc.\n\n\n\nMethods\n\nPipeline Architecture: Snakemake workflow details\nHMM Approach: Profile HMM methodology\nDatabase Sources: Data provenance and URLs",
+    "crumbs": [
+      "Overview",
+      "2A Peptide Discovery"
+    ]
+  },
+  {
+    "objectID": "index.html#background",
+    "href": "index.html#background",
+    "title": "2A Peptide Discovery",
+    "section": "Background",
+    "text": "Background\n\nRibosomal Stalling in Prokaryotes\nProkaryotes use related but distinct mechanisms for ribosomal stalling:\n\nSecM: Stalls at FXXXXWIXXXXGIRAGP to regulate secretion\nTnaC: Tryptophan-dependent stalling\nMifM: Regulates membrane protein insertion in B. subtilis\n\nThese peptides share the GP motif but have different upstream contexts and biological functions.\n\n\nBiotechnology Applications\n2A peptides are widely used for:\n\nMulti-gene expression from single vectors\nStoichiometric co-expression of protein complexes\nCAR-T cell engineering\nVaccine development",
+    "crumbs": [
+      "Overview",
+      "2A Peptide Discovery"
+    ]
+  },
+  {
+    "objectID": "index.html#resources",
+    "href": "index.html#resources",
+    "title": "2A Peptide Discovery",
+    "section": "Resources",
+    "text": "Resources\n\nSource Code: GitHub repository\nSeed Alignments: resources/seed-alignments/\nFinal Models: results/models/final/\n\n\n\n\n\n\n\nTipRunning the Pipeline\n\n\n\n# Full pipeline\npixi run snakemake --cores 12\n\n# Prokaryotic discovery only\npixi run snakemake prokaryotic_discovery --cores 12",
+    "crumbs": [
+      "Overview",
+      "2A Peptide Discovery"
+    ]
+  },
+  {
+    "objectID": "methods/pipeline.html",
+    "href": "methods/pipeline.html",
+    "title": "Pipeline Architecture",
+    "section": "",
+    "text": "The analysis pipeline is implemented in Snakemake, providing reproducible and scalable execution on both local workstations and HPC clusters.",
+    "crumbs": [
+      "Methods",
+      "Pipeline Architecture"
+    ]
+  },
+  {
+    "objectID": "methods/pipeline.html#overview",
+    "href": "methods/pipeline.html#overview",
+    "title": "Pipeline Architecture",
+    "section": "",
+    "text": "The analysis pipeline is implemented in Snakemake, providing reproducible and scalable execution on both local workstations and HPC clusters.",
+    "crumbs": [
+      "Methods",
+      "Pipeline Architecture"
+    ]
+  },
+  {
+    "objectID": "methods/pipeline.html#workflow-structure",
+    "href": "methods/pipeline.html#workflow-structure",
+    "title": "Pipeline Architecture",
+    "section": "Workflow Structure",
+    "text": "Workflow Structure\n\n\n\n\n\n\nflowchart TB\n    subgraph Download\n        D1[download_uniprot]\n        D2[download_reference_proteomes]\n        D3[download_uniparc]\n        D4[download_mgnify]\n    end\n\n    subgraph \"Seed Phase\"\n        S1[build_seed_models]\n        S2[hmmsearch seed]\n        S3[filter_alignment]\n        S4[merge_alignments]\n    end\n\n    subgraph \"Refinement\"\n        R1[build_refined_model]\n        R2[hmmsearch iter1]\n        R3[filter iter1]\n        R4[auto_curate_alignment]\n    end\n\n    subgraph \"Final\"\n        F1[build_final_models]\n        F2[generate_logos]\n        F3[generate_report]\n    end\n\n    D1 --&gt; S2\n    D2 --&gt; S2\n    S1 --&gt; S2\n    S2 --&gt; S3\n    S3 --&gt; S4\n    S4 --&gt; R1\n    R1 --&gt; R2\n    R2 --&gt; R3\n    R3 --&gt; R4\n    R4 --&gt; F1\n    F1 --&gt; F2\n    F1 --&gt; F3\n\n\n\n\nFigure 1: Snakemake pipeline DAG overview",
+    "crumbs": [
+      "Methods",
+      "Pipeline Architecture"
+    ]
+  },
+  {
+    "objectID": "methods/pipeline.html#directory-structure",
+    "href": "methods/pipeline.html#directory-structure",
+    "title": "Pipeline Architecture",
+    "section": "Directory Structure",
+    "text": "Directory Structure\nworkflow/\n├── Snakefile              # Main pipeline orchestration\n├── config/\n│   ├── config.yaml        # Main configuration\n│   └── config-prokaryotic.yaml  # Prokaryotic-specific settings\n├── rules/\n│   ├── download.smk       # Database downloads\n│   ├── search.smk         # HMM searches\n│   ├── refine.smk         # Model refinement\n│   ├── prokaryotic.smk    # Prokaryotic discovery\n│   └── report.smk         # Report generation\n└── scripts/\n    ├── filter_alignment.py\n    ├── auto_curate_alignment.py\n    ├── sanitize_fasta.py\n    └── utils/\n        └── logging_config.py",
+    "crumbs": [
+      "Methods",
+      "Pipeline Architecture"
+    ]
+  },
+  {
+    "objectID": "methods/pipeline.html#key-rules",
+    "href": "methods/pipeline.html#key-rules",
+    "title": "Pipeline Architecture",
+    "section": "Key Rules",
+    "text": "Key Rules\n\nSeed Model Building\nrule build_seed_models:\n    input:\n        alignment=\"resources/seed-alignments/2A-{peptide_class}.sto.gz\"\n    output:\n        hmm=RESULTS_DIR + \"/models/seed/2A-{peptide_class}.hmm\"\n    shell:\n        \"hmmbuild -n {params.name} {output.hmm} {input.alignment}\"\n\n\nHMM Search\nrule hmmsearch:\n    input:\n        hmm=get_model_path,\n        db=get_database_file\n    output:\n        hmmsearch=SCRATCH_DIR + \"/searches/{database}/{iteration}/2A-{peptide_class}.hmmsearch.gz\",\n        tblout=SCRATCH_DIR + \"/searches/{database}/{iteration}/2A-{peptide_class}.tblout.gz\",\n        alignment=SCRATCH_DIR + \"/searches/{database}/{iteration}/2A-{peptide_class}.sto.gz\"\n    threads: 12\n    shell:\n        \"\"\"\n        hmmsearch --cpu {threads} \\\n            --tblout &gt;(gzip &gt; {output.tblout}) \\\n            -A &gt;(gzip &gt; {output.alignment}) \\\n            {input.hmm} {input.db} | gzip &gt; {output.hmmsearch}\n        \"\"\"\n\n\nAuto-Curation\nThe pipeline includes automated alignment curation to replace manual review:\nrule auto_curate_alignment:\n    input:\n        alignment=SCRATCH_DIR + \"/alignments/iter2/2A-{peptide_class}.merged.sto\"\n    output:\n        curated=RESULTS_DIR + \"/alignments/final/2A-{peptide_class}.auto-curated.sto\"\n    shell:\n        \"\"\"\n        python workflow/scripts/auto_curate_alignment.py \\\n            {input.alignment} {output.curated} \\\n            --evalue {params.evalue} \\\n            --min-length 15 \\\n            --max-gap-pct 0.5 \\\n            --require-motif\n        \"\"\"",
+    "crumbs": [
+      "Methods",
+      "Pipeline Architecture"
+    ]
+  },
+  {
+    "objectID": "methods/pipeline.html#cluster-execution",
+    "href": "methods/pipeline.html#cluster-execution",
+    "title": "Pipeline Architecture",
+    "section": "Cluster Execution",
+    "text": "Cluster Execution\nFor SLURM clusters:\n# Submit orchestrator job\nsbatch submit-slurm.sh\n\n# Or run directly with profile\npixi run snakemake --profile cluster/slurm\n\nResource Configuration\n# cluster/slurm/config.yaml\ndefault-resources:\n  slurm_partition: amilan\n  runtime: 120\n  mem_mb: 8000\n  cpus_per_task: 4\n\nset-resources:\n  hmmsearch:\n    runtime: 1440  # 24 hours for large databases\n    mem_mb: 16000\n    cpus_per_task: 12",
+    "crumbs": [
+      "Methods",
+      "Pipeline Architecture"
+    ]
+  },
+  {
+    "objectID": "methods/pipeline.html#environment-management",
+    "href": "methods/pipeline.html#environment-management",
+    "title": "Pipeline Architecture",
+    "section": "Environment Management",
+    "text": "Environment Management\nAll dependencies are managed via Pixi:\n# Install dependencies\npixi install\n\n# Run pipeline\npixi run snakemake --cores 12\nKey dependencies:\n\nHMMER 3.4: Profile HMM searches\nEasel: Alignment manipulation\nBiopython: Sequence parsing\nSnakemake 8: Workflow management",
+    "crumbs": [
+      "Methods",
+      "Pipeline Architecture"
+    ]
+  },
+  {
+    "objectID": "prokaryotic/gp-motifs.html",
+    "href": "prokaryotic/gp-motifs.html",
+    "title": "GP Motif Analysis",
+    "section": "",
+    "text": "The Gly-Pro (GP) dipeptide is central to ribosomal stalling. This analysis examines GP motif distribution, context, and conservation across prokaryotic proteomes.",
+    "crumbs": [
+      "Prokaryotic Discovery",
+      "GP Motif Analysis"
+    ]
+  },
+  {
+    "objectID": "prokaryotic/gp-motifs.html#overview",
+    "href": "prokaryotic/gp-motifs.html#overview",
+    "title": "GP Motif Analysis",
+    "section": "",
+    "text": "The Gly-Pro (GP) dipeptide is central to ribosomal stalling. This analysis examines GP motif distribution, context, and conservation across prokaryotic proteomes.",
+    "crumbs": [
+      "Prokaryotic Discovery",
+      "GP Motif Analysis"
+    ]
+  },
+  {
+    "objectID": "prokaryotic/gp-motifs.html#gp-motif-extraction",
+    "href": "prokaryotic/gp-motifs.html#gp-motif-extraction",
+    "title": "GP Motif Analysis",
+    "section": "GP Motif Extraction",
+    "text": "GP Motif Extraction\n\nParameters\nprokaryotic:\n  gp_upstream: 30      # Residues upstream of GP\n  gp_downstream: 15    # Residues downstream of GP\n\n\nExpected Distribution\nGP motifs occur throughout proteins but functional stalling sites have distinctive features:\n\n\n\nFeature\nRandom GP\nStalling GP\n\n\n\n\nPosition\nAny\nInter-domain\n\n\nUpstream\nVariable\nConserved pattern\n\n\nDownstream\nVariable\nOften P or charged",
+    "crumbs": [
+      "Prokaryotic Discovery",
+      "GP Motif Analysis"
+    ]
+  },
+  {
+    "objectID": "prokaryotic/gp-motifs.html#context-analysis",
+    "href": "prokaryotic/gp-motifs.html#context-analysis",
+    "title": "GP Motif Analysis",
+    "section": "Context Analysis",
+    "text": "Context Analysis\n\nUpstream Patterns\nFunctional stalling peptides show conserved patterns upstream of GP:\n-30    -20    -10    GP\n |      |      |     ||\n L---F--W------R/K--AGP  (SecM-like)\n W------E------G----GP   (TnaC-like)\n\n\nPosition-Specific Conservation\n\n\n\nPosition\nSecM-like\nTnaC-like\nRandom\n\n\n\n\n-1 (A/G)\nHigh\nMedium\nLow\n\n\n-2 (R/K)\nHigh\nLow\nLow\n\n\n-3\nVariable\nVariable\nVariable\n\n\n-10 (W)\nHigh\nHigh\nLow",
+    "crumbs": [
+      "Prokaryotic Discovery",
+      "GP Motif Analysis"
+    ]
+  },
+  {
+    "objectID": "prokaryotic/gp-motifs.html#domain-context",
+    "href": "prokaryotic/gp-motifs.html#domain-context",
+    "title": "GP Motif Analysis",
+    "section": "Domain Context",
+    "text": "Domain Context\n\nInter-Domain vs Intra-Domain\nGP motifs are classified by their domain context:\n\n\n\n\n\n\nflowchart LR\n    subgraph Protein\n        D1[Domain A] --&gt; L[Linker + GP] --&gt; D2[Domain B]\n    end\n\n    subgraph Types\n        T1[Inter-domain GP]\n        T2[Intra-domain GP]\n        T3[Terminal GP]\n    end\n\n\n\n\nFigure 1: GP motif domain contexts\n\n\n\n\n\n\nInter-domain: Between two annotated Pfam domains\nIntra-domain: Within a single domain\nTerminal: Near N- or C-terminus\n\n\n\nEnrichment Analysis\nFunctional stalling GPs are enriched in inter-domain regions:\n\n\n\nContext\nAll GP\nStalling GP\nEnrichment\n\n\n\n\nInter-domain\n15%\n60%\n4x\n\n\nIntra-domain\n70%\n25%\n0.4x\n\n\nTerminal\n15%\n15%\n1x",
+    "crumbs": [
+      "Prokaryotic Discovery",
+      "GP Motif Analysis"
+    ]
+  },
+  {
+    "objectID": "prokaryotic/gp-motifs.html#clustering-results",
+    "href": "prokaryotic/gp-motifs.html#clustering-results",
+    "title": "GP Motif Analysis",
+    "section": "Clustering Results",
+    "text": "Clustering Results\n\nCluster Statistics\n\n\n\n\n\n\nNotePlaceholder\n\n\n\nClustering results will be populated after pipeline execution.\n\n\nExpected clusters:\n\n\n\nCluster\nSize\nMotif\nTaxonomy\n\n\n\n\nC1\n~500\nRAGP\nProteobacteria\n\n\nC2\n~200\nRAPG\nFirmicutes\n\n\nC3\n~100\nxAGP\nMixed\n\n\n\n\n\nConservation Logos\nPer-cluster conservation logos will reveal:\n\nCluster-specific upstream patterns\nTaxonomic signature residues\nFunctional groupings",
+    "crumbs": [
+      "Prokaryotic Discovery",
+      "GP Motif Analysis"
+    ]
+  },
+  {
+    "objectID": "prokaryotic/gp-motifs.html#downstream-analysis",
+    "href": "prokaryotic/gp-motifs.html#downstream-analysis",
+    "title": "GP Motif Analysis",
+    "section": "Downstream Analysis",
+    "text": "Downstream Analysis\n\nCodon Usage\nStalling peptides may show:\n\nRare codon usage upstream of GP\nSpecific codon at P position\nmRNA secondary structure\n\n\n\nRibosome Profiling Validation\nCompare GP positions to ribosome profiling data:\n\nRibosome occupancy peaks\nPause site mapping\nTranslation rate analysis",
+    "crumbs": [
+      "Prokaryotic Discovery",
+      "GP Motif Analysis"
+    ]
+  },
+  {
+    "objectID": "prokaryotic/gp-motifs.html#output-files",
+    "href": "prokaryotic/gp-motifs.html#output-files",
+    "title": "GP Motif Analysis",
+    "section": "Output Files",
+    "text": "Output Files\nresults/prokaryotic/gp_analysis/\n├── {database}/\n│   ├── all_gp_motifs.tsv.gz      # All extracted GP contexts\n│   ├── all_gp_sequences.fasta.gz # Full sequences\n│   ├── domain_annotations.tsv    # Pfam domain hits\n│   ├── interdomain_gp.tsv        # Filtered inter-domain\n│   └── clusters/\n│       ├── cluster_assignments.tsv\n│       └── cluster_{N}.fasta",
+    "crumbs": [
+      "Prokaryotic Discovery",
+      "GP Motif Analysis"
+    ]
+  },
+  {
+    "objectID": "prokaryotic/gp-motifs.html#quality-metrics",
+    "href": "prokaryotic/gp-motifs.html#quality-metrics",
+    "title": "GP Motif Analysis",
+    "section": "Quality Metrics",
+    "text": "Quality Metrics\n\nFiltering Statistics\n\n\n\nFilter\nSequences Removed\n\n\n\n\nNo GP motif\nN/A (pre-filtered)\n\n\nToo short (&lt;45 aa)\nTBD\n\n\nIntra-domain\nTBD\n\n\nLow-complexity\nTBD\n\n\n\n\n\nCluster Quality\n\n\n\nMetric\nThreshold\nPurpose\n\n\n\n\nCluster size\n≥5 sequences\nStatistical power\n\n\nConservation\n≥0.6\nFunctional signal\n\n\nIdentity\n70% clustering\nReduce redundancy",
+    "crumbs": [
+      "Prokaryotic Discovery",
+      "GP Motif Analysis"
+    ]
+  },
+  {
+    "objectID": "prokaryotic/discovery.html",
+    "href": "prokaryotic/discovery.html",
+    "title": "Prokaryotic Discovery Pipeline",
+    "section": "",
+    "text": "Prokaryotes use ribosomal stalling peptides for regulatory purposes, distinct from viral 2A peptides but sharing the conserved GP motif. This pipeline aims to discover novel stalling peptide families.",
+    "crumbs": [
+      "Prokaryotic Discovery",
+      "Prokaryotic Discovery Pipeline"
+    ]
+  },
+  {
+    "objectID": "prokaryotic/discovery.html#overview",
+    "href": "prokaryotic/discovery.html#overview",
+    "title": "Prokaryotic Discovery Pipeline",
+    "section": "",
+    "text": "Prokaryotes use ribosomal stalling peptides for regulatory purposes, distinct from viral 2A peptides but sharing the conserved GP motif. This pipeline aims to discover novel stalling peptide families.",
+    "crumbs": [
+      "Prokaryotic Discovery",
+      "Prokaryotic Discovery Pipeline"
+    ]
+  },
+  {
+    "objectID": "prokaryotic/discovery.html#discovery-strategy",
+    "href": "prokaryotic/discovery.html#discovery-strategy",
+    "title": "Prokaryotic Discovery Pipeline",
+    "section": "Discovery Strategy",
+    "text": "Discovery Strategy\nWe employ two complementary approaches:\n\n\n\n\n\n\nflowchart TB\n    subgraph \"Approach 1: Seed-Based\"\n        S1[Known Stalling Peptides]\n        S2[Build HMMs by Motif]\n        S3[Search Prokaryotic DBs]\n        S4[Cluster & Refine]\n        S1 --&gt; S2 --&gt; S3 --&gt; S4\n    end\n\n    subgraph \"Approach 2: GP-Based\"\n        G1[Extract All GP Motifs]\n        G2[Annotate Domains]\n        G3[Filter Inter-Domain]\n        G4[Cluster by Context]\n        G1 --&gt; G2 --&gt; G3 --&gt; G4\n    end\n\n    S4 --&gt; Merge\n    G4 --&gt; Merge\n    Merge[Merge Results] --&gt; Final[Novel Peptide Families]\n\n\n\n\nFigure 1: Dual approach for prokaryotic stalling peptide discovery",
+    "crumbs": [
+      "Prokaryotic Discovery",
+      "Prokaryotic Discovery Pipeline"
+    ]
+  },
+  {
+    "objectID": "prokaryotic/discovery.html#approach-1-seed-based-discovery",
+    "href": "prokaryotic/discovery.html#approach-1-seed-based-discovery",
+    "title": "Prokaryotic Discovery Pipeline",
+    "section": "Approach 1: Seed-Based Discovery",
+    "text": "Approach 1: Seed-Based Discovery\n\nKnown Stalling Peptides\n\n\n\nPeptide\nOrganism\nMotif\nFunction\n\n\n\n\nSecM\nE. coli\nRAGP\nSecretion regulation\n\n\nTnaC\nE. coli\nGP-like\nTryptophan response\n\n\nMifM\nB. subtilis\nGIAGP\nMembrane insertion\n\n\nCydA\nE. coli\nRAGP\nCytochrome regulation\n\n\n\n\n\nMotif Families\nStalling peptides are grouped by their upstream motif:\n\nRAGP family: R-A-G-P pattern\nRAPG family: R-A-P-G variant\nQAPP family: Q-A-P-P pattern\nOther GP: Divergent contexts\n\n\n\nHMM Building\nrule build_comprehensive_hmm:\n    \"\"\"Build HMM from all known stalling peptides.\"\"\"\n    input:\n        fasta=\"resources/stalling-peptides/known_stalling_peptides.fasta\"\n    output:\n        hmm=RESULTS_DIR + \"/prokaryotic/models/seed/comprehensive.hmm\"",
+    "crumbs": [
+      "Prokaryotic Discovery",
+      "Prokaryotic Discovery Pipeline"
+    ]
+  },
+  {
+    "objectID": "prokaryotic/discovery.html#approach-2-unbiased-gp-discovery",
+    "href": "prokaryotic/discovery.html#approach-2-unbiased-gp-discovery",
+    "title": "Prokaryotic Discovery Pipeline",
+    "section": "Approach 2: Unbiased GP Discovery",
+    "text": "Approach 2: Unbiased GP Discovery\n\nStep 1: Extract GP Motifs\nExtract all sequences containing GP with upstream context:\nrule extract_gp_motifs:\n    \"\"\"Extract all GP-containing sequences with context.\"\"\"\n    params:\n        upstream=30,    # 30 residues before GP\n        downstream=15   # 15 residues after GP\n\n\nStep 2: Domain Annotation\nAnnotate extracted sequences with Pfam domains to identify inter-domain GP motifs (more likely to be functional stalling sites).\nrule run_hmmscan:\n    \"\"\"Annotate domains in GP-containing sequences.\"\"\"\n    input:\n        sequences=\"gp_sequences.fasta\",\n        pfam_db=DATA_DIR + \"/pfam/Pfam-A.hmm\"\n\n\nStep 3: Filter Inter-Domain\nFocus on GP motifs that fall between annotated domains, as these are more likely to function in translational regulation.\n\n\nStep 4: Cluster by Context\nCluster sequences by: - Amino acid composition - Position-specific patterns - Upstream sequence similarity",
+    "crumbs": [
+      "Prokaryotic Discovery",
+      "Prokaryotic Discovery Pipeline"
+    ]
+  },
+  {
+    "objectID": "prokaryotic/discovery.html#databases-searched",
+    "href": "prokaryotic/discovery.html#databases-searched",
+    "title": "Prokaryotic Discovery Pipeline",
+    "section": "Databases Searched",
+    "text": "Databases Searched\n\n\n\nDatabase\nSequences\nDescription\n\n\n\n\nUniProt Bacteria\n~500k\nSwiss-Prot bacterial proteins\n\n\nUniProt Archaea\n~50k\nSwiss-Prot archaeal proteins\n\n\nIMG/VR\nMillions\nPhage proteins\n\n\nNCBI Viral RefSeq\n~100MB\nViral reference sequences\n\n\nINPHARED\n~19k genomes\nCurated phage genomes",
+    "crumbs": [
+      "Prokaryotic Discovery",
+      "Prokaryotic Discovery Pipeline"
+    ]
+  },
+  {
+    "objectID": "prokaryotic/discovery.html#expected-output",
+    "href": "prokaryotic/discovery.html#expected-output",
+    "title": "Prokaryotic Discovery Pipeline",
+    "section": "Expected Output",
+    "text": "Expected Output\n\nNovel Peptide Families\n\nClustered sequences with similar context\nConsensus motifs for each cluster\nHMM profiles for validation searches\nTaxonomic distribution analysis\n\n\n\nValidation\nCompare discovered peptides against:\n\nKnown stalling peptides (positive control)\nRandom GP occurrences (negative control)\nLiterature-reported ribosome profiling data",
+    "crumbs": [
+      "Prokaryotic Discovery",
+      "Prokaryotic Discovery Pipeline"
+    ]
+  },
+  {
+    "objectID": "prokaryotic/discovery.html#running-the-pipeline",
+    "href": "prokaryotic/discovery.html#running-the-pipeline",
+    "title": "Prokaryotic Discovery Pipeline",
+    "section": "Running the Pipeline",
+    "text": "Running the Pipeline\n# Full prokaryotic discovery\npixi run snakemake prokaryotic_discovery --profile cluster/slurm\n\n# Just the seed-based approach\npixi run snakemake search_comprehensive_hmm --profile cluster/slurm\n\n# Just the GP analysis\npixi run snakemake extract_gp_motifs --profile cluster/slurm",
+    "crumbs": [
+      "Prokaryotic Discovery",
+      "Prokaryotic Discovery Pipeline"
+    ]
+  },
+  {
+    "objectID": "eukaryotic/seed-search.html",
+    "href": "eukaryotic/seed-search.html",
+    "title": "Seed Search Results",
+    "section": "",
+    "text": "This page summarizes the initial HMM search results using seed models built from curated 2A peptide alignments.",
+    "crumbs": [
+      "Eukaryotic 2A Peptides",
+      "Seed Search Results"
+    ]
+  },
+  {
+    "objectID": "eukaryotic/seed-search.html#overview",
+    "href": "eukaryotic/seed-search.html#overview",
+    "title": "Seed Search Results",
+    "section": "",
+    "text": "This page summarizes the initial HMM search results using seed models built from curated 2A peptide alignments.",
+    "crumbs": [
+      "Eukaryotic 2A Peptides",
+      "Seed Search Results"
+    ]
+  },
+  {
+    "objectID": "eukaryotic/seed-search.html#seed-alignments",
+    "href": "eukaryotic/seed-search.html#seed-alignments",
+    "title": "Seed Search Results",
+    "section": "Seed Alignments",
+    "text": "Seed Alignments\nThe seed alignments contain known, experimentally validated 2A peptides:\n\n\n\nClass\nPeptides\nSource\n\n\n\n\nClass 1\nT2A, E2A, P2A\nPicornaviruses\n\n\nClass 2\nF2A variants\nAphthoviruses",
+    "crumbs": [
+      "Eukaryotic 2A Peptides",
+      "Seed Search Results"
+    ]
+  },
+  {
+    "objectID": "eukaryotic/seed-search.html#search-statistics",
+    "href": "eukaryotic/seed-search.html#search-statistics",
+    "title": "Seed Search Results",
+    "section": "Search Statistics",
+    "text": "Search Statistics\n\n\n\nTable 1: HMM search statistics by database\n\n\n\nCode\nlibrary(tidyverse)\n\n# Load search statistics (when available)\nresults_dir &lt;- Sys.getenv(\"RESULTS_DIR\", \"../../scratch/results\")\n\n# Example statistics table\nstats &lt;- tibble(\n    Database = c('UniProt', 'RefProt', 'UniParc', 'MGnify'),\n    `Class 1 Hits` = c(45, 128, 892, 3421),\n    `Class 2 Hits` = c(23, 67, 445, 1893),\n    `E-value &lt; 1e-10` = c(68, 195, 1337, 5314)\n)\n\nstats",
+    "crumbs": [
+      "Eukaryotic 2A Peptides",
+      "Seed Search Results"
+    ]
+  },
+  {
+    "objectID": "eukaryotic/seed-search.html#hit-distribution",
+    "href": "eukaryotic/seed-search.html#hit-distribution",
+    "title": "Seed Search Results",
+    "section": "Hit Distribution",
+    "text": "Hit Distribution\n\nBy Database\n\n\n\n\n\n\nNotePlaceholder\n\n\n\nActual search results will be displayed here once the pipeline has been run.\n\n\n\n\nBy E-value\n\n\nCode\nlibrary(ggplot2)\n\n# Example E-value distribution\nevalues &lt;- rexp(1000, rate = 1e8)\ndf &lt;- tibble(evalue = evalues)\n\nggplot(df, aes(x = evalue)) +\n    geom_histogram(bins = 50) +\n    scale_x_log10() +\n    labs(x = \"E-value\", y = \"Count\") +\n    theme_minimal()",
+    "crumbs": [
+      "Eukaryotic 2A Peptides",
+      "Seed Search Results"
+    ]
+  },
+  {
+    "objectID": "eukaryotic/seed-search.html#quality-metrics",
+    "href": "eukaryotic/seed-search.html#quality-metrics",
+    "title": "Seed Search Results",
+    "section": "Quality Metrics",
+    "text": "Quality Metrics\n\nAlignment Length Distribution\nExpected alignment lengths: - Class 1: 18-22 residues - Class 2: 20-24 residues\n\n\nConservation Scores\nKey conserved positions in seed alignments: - Position -1 (G): &gt;95% conserved - Position 0 (P): 100% conserved - Position -4 (N/P): &gt;90% conserved",
+    "crumbs": [
+      "Eukaryotic 2A Peptides",
+      "Seed Search Results"
+    ]
+  },
+  {
+    "objectID": "eukaryotic/seed-search.html#filtering-summary",
+    "href": "eukaryotic/seed-search.html#filtering-summary",
+    "title": "Seed Search Results",
+    "section": "Filtering Summary",
+    "text": "Filtering Summary\n\n\n\nFilter\nSequences Removed\n\n\n\n\nE-value &gt; 1e-5\nTBD\n\n\nLength &lt; 15\nTBD\n\n\nGap % &gt; 50%\nTBD\n\n\nMissing PGP motif\nTBD",
+    "crumbs": [
+      "Eukaryotic 2A Peptides",
+      "Seed Search Results"
+    ]
+  },
+  {
+    "objectID": "eukaryotic/seed-search.html#next-steps",
+    "href": "eukaryotic/seed-search.html#next-steps",
+    "title": "Seed Search Results",
+    "section": "Next Steps",
+    "text": "Next Steps\n\nReview filtered alignments\nBuild refined models from high-confidence hits\nPerform iteration 2 searches\nGenerate sequence logos",
+    "crumbs": [
+      "Eukaryotic 2A Peptides",
+      "Seed Search Results"
+    ]
+  }
+]
