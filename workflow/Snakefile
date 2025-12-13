@@ -30,7 +30,9 @@ RESULTS_DIR = os.environ.get(
     "RESULTS_DIR", config.get("output_dirs", {}).get("results", "scratch/results")
 )
 DATA_DIR = os.environ.get(
-    "DATA_DIR", config.get("output_dirs", {}).get("data", "scratch/data")
+    "RESOURCES_DIR", os.environ.get(
+        "DATA_DIR", config.get("output_dirs", {}).get("data", "scratch/data")
+    )
 )
 LOGS_DIR = os.environ.get(
     "LOGS_DIR", config.get("output_dirs", {}).get("logs", "scratch/logs")
