@@ -115,21 +115,6 @@ rule download_inphared_genomes:
         """
 
 
-rule download_millardlab_genomes:
-    """Download Millard Lab phage genomes."""
-    output:
-        genomes=DATA_DIR + "/prokaryotic/phage_genomes/millardlab_genomes.fasta.gz",
-    params:
-        url=config["phage_databases"]["millardlab"]["url"],
-    log:
-        LOGS_DIR + "/download/millardlab_genomes.log",
-    shell:
-        """
-        mkdir -p $(dirname "{output.genomes}")
-        wget -c -o "{log}" "{params.url}" -O "{output.genomes}"
-        """
-
-
 rule download_pfam_database:
     """Download and decompress Pfam-A HMM database."""
     output:
