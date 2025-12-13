@@ -103,7 +103,7 @@ rule download_uniprot_viruses:
 rule download_inphared_genomes:
     """Download INPHARED phage genomes."""
     output:
-        genomes=DATA_DIR + "/prokaryotic/phage_genomes/inphared_genomes.fasta",
+        genomes=DATA_DIR + "/prokaryotic/phage_genomes/inphared_genomes.fasta.gz",
     params:
         url=config["phage_databases"]["inphared"]["genomes_url"],
     log:

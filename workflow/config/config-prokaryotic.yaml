@@ -22,7 +22,7 @@ prokaryotic_databases:
 
   ncbi_viral_refseq:
     base_url: "https://ftp.ncbi.nlm.nih.gov/refseq/release/viral"
-    num_files: 4  # viral.1.protein.faa.gz through viral.4.protein.faa.gz
+    num_files: 1  # Now only viral.1.protein.faa.gz exists (as of 2025)
     description: "NCBI Viral RefSeq protein database"
 
   uniprot_viruses:
@@ -44,38 +44,39 @@ prokaryotic_databases:
 # Phage genome databases
 phage_databases:
   inphared:
-    genomes_url: "https://millardlab-inphared.s3.climb.ac.uk/22Aug2023_genomes.fas"
-    metadata_url: "https://millardlab-inphared.s3.climb.ac.uk/22Aug2023_data.tsv"
-    description: "INPHARED curated phage database"
+    # INPHARED releases monthly updates with date-prefixed filenames
+    # Check https://github.com/RyanCook94/inphared for latest release
+    genomes_url: "https://millardlab-inphared.s3.climb.ac.uk/14Apr2025_genomes.fa.gz"
+    metadata_url: "https://millardlab-inphared.s3.climb.ac.uk/14Apr2025_data.tsv.gz"
+    description: "INPHARED curated phage database (Apr 2025 release)"
 
   imgvr:
     # IMG/VR requires web login - download manually and specify local path
     # Download from: https://img.jgi.doe.gov/vr/
     # Set local_path to your downloaded file location
-    local_path: /scratch/alpine/jhesselberth@xsede.org/db/IMGVR_all_proteins-high_confidence.faa.gz # e.g., "/path/to/IMGVR_all_nucleotides.fna.gz"
+    local_path: /scratch/alpine/jhesselberth@xsede.org/db/IMGVR_all_proteins-high_confidence.faa.gz
     url: "https://img.jgi.doe.gov/vr/IMGVR_all_nucleotides.fna.gz"  # Fallback (requires login)
     description: "IMG/VR phage and virus database (requires manual download)"
 
-  millardlab:
-    url: "https://millardlab.org/phage-genomes/phage_genomes.fasta.gz"
-    description: "Millard Lab phage genome collection"
+  # millardlab: DISABLED - URL no longer available (404)
+  # Was: "https://millardlab.org/phage-genomes/phage_genomes.fasta.gz"
 
 # Which protein databases to search
 prokaryotic_databases_to_search:
   - bacteria              # UniProt bacteria (~500k proteins)
   - archaea               # UniProt archaea (~50k proteins)
   - imgvr                 # IMG/VR phage proteins (millions, local file)
-  - ncbi_viral_refseq     # NCBI viral proteins (~4 files, moderate size)
+  - ncbi_viral_refseq     # NCBI viral proteins (1 file as of 2025)
   - uniprot_viruses       # UniProt viral proteins (moderate size)
   - inphared_proteins     # INPHARED ORF-predicted proteins
-  - millardlab_proteins   # Millard Lab ORF-predicted proteins
+  # - millardlab_proteins # DISABLED - source URL no longer available
   # - mgnify              # MGnify metagenomic proteins (VERY large, ~300M proteins, enable for comprehensive search)
 
-# Which phage databases to use
+# Which phage databases to use for ORF prediction
 phage_databases_to_use:
   - inphared
   - imgvr  # Very large, enable for comprehensive search
-  - millardlab
+  # - millardlab  # DISABLED - URL no longer available
 
 # Prokaryotic analysis parameters
 prokaryotic:
