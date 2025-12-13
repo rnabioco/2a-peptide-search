@@ -115,15 +115,22 @@ Edit `workflow/config.yaml` to:
 - Adjust E-value and identity thresholds
 - Modify resource allocation (threads, retries)
 
-### Manual Curation Checkpoints
+### Automated vs Manual Curation
 
-The pipeline includes manual curation checkpoints:
+By default, the pipeline uses **automated curation** after iteration 2:
+- Quality filters are applied automatically (E-value, sequence length, gap percentage, C-terminal motif)
+- No manual intervention required
+- Pipeline runs end-to-end without pausing
 
-1. Pipeline pauses after iteration 2
-2. Review alignments in `results/alignments/iter2/`
-3. Manually curate and save to `results/alignments/final/*.curated.sto`
-4. Create checkpoint: `touch results/checkpoints/iter2.curated`
-5. Continue pipeline to build final models
+**Optional manual curation** is available for maximum control:
+
+1. Run iteration 2: `pixi run snakemake iter2 --cores 12`
+2. Review alignments in `scratch/results/alignments/iter2/`
+3. Manually curate and save to `scratch/results/alignments/final/2A-class-{1,2}.curated.sto`
+4. Create checkpoint: `touch scratch/results/checkpoints/iter2.curated`
+5. Build manual models: `pixi run snakemake manual_curation --cores 12`
+
+Manual models are saved to `results/models/manual/` (separate from auto-curated models in `results/models/final/`).
 
 ## Pipeline Workflow
 
@@ -132,7 +139,7 @@ The pipeline includes manual curation checkpoints:
 3. **Search Iteration 1** → Search all databases with seed HMMs
 4. **Refine Iteration 1** → Build refined HMMs from high-confidence hits
 5. **Search Iteration 2** → Search with refined HMMs
-6. **Manual Checkpoint** → User reviews and curates alignments
+6. **Auto-Curate** → Apply quality filters to alignments (or optional manual curation)
 7. **Build Final Models** → Create production HMMs from curated alignments
 8. **Generate Report** → Create Quarto document with analysis summary
 
