@@ -1,0 +1,75 @@
+[workspace]
+name = "2a-peptide-search"
+version = "0.1.0"
+description = "Bioinformatics pipeline for identifying 2A peptides using profile HMMs"
+channels = ["conda-forge", "bioconda"]
+platforms = ["linux-64", "osx-arm64"]
+
+[tasks]
+# Run full pipeline
+run = "snakemake --cores 12"
+# Dry run to preview execution
+dry-run = "snakemake -n"
+# Test with UniProt only
+test = "snakemake test --cores 12"
+# Download databases
+download = "snakemake download_all --cores 4"
+# Build seed models
+build-seeds = "snakemake build_seeds"
+# Generate workflow visualization
+dag = "snakemake --dag | dot -Tpng > workflow.png"
+# unlock snakemake
+unlock = "snakemake --snakefile workflow/Snakefile --profile cluster/slurm --unlock build_seeds"
+
+[feature.quarto.tasks]
+# Render Quarto website
+render = { cmd = "quarto render", cwd = "analysis" }
+# Preview Quarto website
+preview = { cmd = "quarto preview", cwd = "analysis" }
+
+[dependencies]
+# Core Snakemake and workflow management
+snakemake = ">=9.13.7,<10"
+python = ">=3.13.9,<3.14"
+snakemake-executor-plugin-slurm = ">=1.9.2,<2"
+# Bioinformatics tools
+hmmer = ">=3.4,<4"
+mafft = ">=7.5,<8"
+mmseqs2 = "*"
+prodigal = ">=2.6.3,<3"
+seqkit = ">=2.12.0,<3"
+# Python packages for sequence processing
+biopython = ">=1.86,<2"
+pyfaidx = ">=0.9.0.3,<0.10"
+click = ">=8.3.1,<9"
+pandas = ">=2.3.3,<3"
+numpy = ">=2.3.5,<3"
+plotnine = ">=0.15.1,<0.16"
+pillow = ">=12.0.0,<13"
+requests = ">=2.32.5,<3"
+coincbc = ">=2.10.12,<3"
+
+[feature.quarto.dependencies]
+# R and packages for reporting
+r-base = ">=4.5.2,<4.6"
+r-tidyverse = ">=2.0.0,<3"
+r-cowplot = ">=1.2.0,<2"
+r-glue = ">=1.8.0,<2"
+r-here = ">=1.0.2,<2"
+r-gt = ">=1.1.0,<2"
+r-fs = ">=1.6.6,<2"
+r-ggseqlogo = ">=0.2,<1"
+quarto = ">=1.8.26,<2"
+
+[feature.dev.dependencies]
+# Development tools for linting, formatting, etc.
+ruff = ">=0.14.6,<0.15"
+snakefmt = ">=0.11.2,<0.12"
+
+[environments]
+# Default environment with just Snakemake
+default = { solve-group = "default" }
+# Development environment with additional tools
+dev = { features = ["dev"], solve-group = "default" }
+# Quarto environment for rendering reports
+quarto = { features = ["quarto"], solve-group = "default" }

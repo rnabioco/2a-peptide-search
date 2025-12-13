@@ -1,0 +1,34 @@
+# R project files
+.Rproj.user
+.Rhistory
+.RData
+.Ruserdata
+
+# Backup and temp files
+*.bak*
+*.swp
+
+# Snakemake
+.snakemake/
+*.snakemake.log
+
+# Downloaded databases (large files)
+data/
+
+# Pipeline results
+results/
+
+# Rendered reports (HTML files can be regenerated)
+*.html
+
+# Logs (optional: commit if needed for debugging)
+logs/
+
+# Conda environments
+.conda/
+
+# Pixi environments (keep pixi.lock for reproducibility)
+.pixi/
+
+# python build
+__pycache__/

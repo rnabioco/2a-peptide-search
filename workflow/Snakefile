@@ -1,0 +1,175 @@
+"""
+Snakemake pipeline for identifying 2A peptides in protein databases.
+
+This pipeline performs:
+1. Download of protein databases
+2. Iterative HMM search and refinement
+3. Manual curation checkpoints
+4. Final report generation
+
+Usage:
+    snakemake --use-conda --cores 12
+"""
+
+from pathlib import Path
+import os
+
+
+# Load configuration
+configfile: "workflow/config/config.yaml"
+configfile: "workflow/config/config-prokaryotic.yaml"
+
+
+# Set up output directories
+# ALL outputs go to scratch by default (fast I/O)
+# User moves important results to /projects after completion
+SCRATCH_DIR = os.environ.get(
+    "SCRATCH_DIR", config.get("output_dirs", {}).get("scratch", "scratch")
+)
+RESULTS_DIR = os.environ.get(
+    "RESULTS_DIR", config.get("output_dirs", {}).get("results", "scratch/results")
+)
+DATA_DIR = os.environ.get(
+    "RESOURCES_DIR", os.environ.get(
+        "DATA_DIR", config.get("output_dirs", {}).get("data", "scratch/data")
+    )
+)
+LOGS_DIR = os.environ.get(
+    "LOGS_DIR", config.get("output_dirs", {}).get("logs", "scratch/logs")
+)
+
+# Expand environment variables (e.g., ${USER})
+SCRATCH_DIR = os.path.expandvars(SCRATCH_DIR)
+RESULTS_DIR = os.path.expandvars(RESULTS_DIR)
+DATA_DIR = os.path.expandvars(DATA_DIR)
+LOGS_DIR = os.path.expandvars(LOGS_DIR)
+
+# Create directories
+Path(SCRATCH_DIR).mkdir(parents=True, exist_ok=True)
+Path(RESULTS_DIR).mkdir(parents=True, exist_ok=True)
+Path(DATA_DIR).mkdir(parents=True, exist_ok=True)
+Path(LOGS_DIR).mkdir(parents=True, exist_ok=True)
+
+# Database file mapping
+DB_FILES = {
+    "uniprot": "uniprot/uniprot_sprot.fasta.gz",
+    "reference_proteomes": "reference_proteomes/reference_proteomes.fasta.gz",
+    "uniparc": "uniparc/uniparc_active.fasta.gz",
+    "mgnify": "mgnify/mgnify_proteins.fasta.gz",
+}
+
+
+# Include rule modules
+include: "rules/download.smk"
+include: "rules/refine.smk"
+include: "rules/search.smk"
+include: "rules/report.smk"
+include: "rules/prokaryotic_download.smk"
+include: "rules/prokaryotic_orf.smk"
+include: "rules/prokaryotic.smk"
+include: "rules/logos.smk"
+
+
+# Default target: generate full report
+rule all:
+    input:
+        RESULTS_DIR + "/reports/2A-peptide-analysis.html",
+    default_target: True
+
+
+# Quick test target with just UniProt
+rule test:
+    input:
+        expand(
+            SCRATCH_DIR + "/searches/uniprot/seed/2A-{peptide_class}.hmmsearch.gz",
+            peptide_class=["class-1", "class-2"],
+        ),
+
+
+# Download all databases
+rule download_all:
+    input:
+        expand(
+            DATA_DIR + "/{db}/{file}",
+            zip,
+            db=config["databases_to_search"],
+            file=[DB_FILES[db] for db in config["databases_to_search"]],
+        ),
+
+
+# Build seed models from curated alignments
+rule build_seeds:
+    input:
+        expand(
+            RESULTS_DIR + "/models/seed/2A-{peptide_class}.hmm",
+            peptide_class=["class-1", "class-2"],
+        ),
+
+
+# Complete iteration 1 (automated)
+rule iter1:
+    input:
+        expand(
+            RESULTS_DIR + "/models/iter1_refined/2A-{peptide_class}.hmm",
+            peptide_class=["class-1", "class-2"],
+        ),
+
+
+# Complete iteration 2 (automated with auto-curation)
+rule iter2:
+    input:
+        expand(
+            RESULTS_DIR + "/alignments/final/2A-{peptide_class}.auto-curated.sto",
+            peptide_class=["class-1", "class-2"],
+        ),
+
+
+# Manual curation workflow (optional - for maximum control)
+rule manual_curation:
+    """Optional workflow using manually curated alignments.
+
+    To use:
+    1. Run: snakemake iter2 --cores 12
+    2. Review alignments in results/alignments/iter2/
+    3. Save curated versions to results/alignments/final/2A-class-{1,2}.curated.sto
+    4. Run: touch results/checkpoints/iter2.curated
+    5. Run: snakemake manual_curation --cores 12
+    """
+    input:
+        expand(
+            RESULTS_DIR + "/models/manual/2A-{peptide_class}.hmm",
+            peptide_class=["class-1", "class-2"],
+        ),
+
+
+# Prokaryotic 2A-like peptide discovery
+rule prokaryotic_discovery:
+    input:
+        RESULTS_DIR + "/prokaryotic/reports/prokaryotic_discovery.html",
+
+
+# Workflow for each iteration
+def get_iteration_outputs(iteration):
+    """Get all outputs for a given iteration."""
+    if iteration == "seed":
+        return {
+            "models": expand(
+                RESULTS_DIR + "/models/seed/2A-{peptide_class}.hmm",
+                peptide_class=["class-1", "class-2"],
+            )
+        }
+    else:
+        return {
+            "searches": expand(
+                SCRATCH_DIR
+                + "/searches/{database}/{iteration}/2A-{peptide_class}.hmmsearch.gz",
+                database=config["databases_to_search"],
+                iteration=iteration,
+                peptide_class=["class-1", "class-2"],
+            ),
+            "merged": expand(
+                SCRATCH_DIR + "/alignments/{iteration}/2A-{peptide_class}.merged.sto",
+                iteration=iteration,
+                peptide_class=["class-1", "class-2"],
+            ),
+        }
