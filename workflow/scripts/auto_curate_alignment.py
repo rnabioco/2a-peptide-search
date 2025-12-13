@@ -13,10 +13,18 @@ without manual intervention:
 
 import re
 import sys
+from pathlib import Path
+
+# Add scripts directory to path for utils import
+sys.path.insert(0, str(Path(__file__).parent))
+
 import click
 import numpy as np
 from Bio import AlignIO, SearchIO
 from Bio.Align import MultipleSeqAlignment
+from utils import get_logger
+
+logger = get_logger(__name__)
 
 
 def parse_hmmer_scores(tblout_path):
@@ -130,18 +138,28 @@ def main(alignment, output, tblout, evalue, min_length, max_gap_pct,
     Applies quality filters to produce a clean alignment suitable for
     building production HMM models without manual curation.
     """
+    logger.info("Starting auto-curation")
+    logger.info(f"  Alignment: {alignment}")
+    logger.info(f"  Output: {output}")
+    logger.info(f"  E-value threshold: {evalue}")
+    logger.info(f"  Min length: {min_length}")
+    logger.info(f"  Max gap %: {max_gap_pct*100:.0f}%")
+    logger.info(f"  Require C-term motif: {require_motif}")
+
     # Parse scores if tblout provided
     scores = parse_hmmer_scores(tblout) if tblout else {}
+    if tblout:
+        logger.info(f"  Loaded {len(scores)} scores from tblout")
 
     # Read alignment
     try:
         aln = AlignIO.read(alignment, 'stockholm')
     except Exception as e:
-        click.echo(f"Error reading alignment: {e}", err=True)
+        logger.error(f"Error reading alignment: {e}")
         sys.exit(1)
 
     initial_count = len(aln)
-    click.echo(f"Input: {initial_count} sequences")
+    logger.info(f"Input: {initial_count} sequences")
 
     filtered_records = []
     filter_stats = {
@@ -151,6 +169,7 @@ def main(alignment, output, tblout, evalue, min_length, max_gap_pct,
         'motif': 0,
     }
 
+    logger.info("Applying filters...")
     for record in aln:
         seq_str = str(record.seq)
         rec_id = record.id.split('/')[0] if '/' in record.id else record.id
@@ -190,21 +209,20 @@ def main(alignment, output, tblout, evalue, min_length, max_gap_pct,
         filter_stats['bitscore'] = before_bitscore - len(filtered_records)
 
     # Report filtering stats
-    click.echo(f"Filtered out:")
-    click.echo(f"  - E-value > {evalue}: {filter_stats['evalue']}")
-    click.echo(f"  - Length < {min_length}: {filter_stats['length']}")
-    click.echo(f"  - Gap % > {max_gap_pct*100:.0f}%: {filter_stats['gaps']}")
+    logger.info("Filtered out:")
+    logger.info(f"  - E-value > {evalue}: {filter_stats['evalue']}")
+    logger.info(f"  - Length < {min_length}: {filter_stats['length']}")
+    logger.info(f"  - Gap % > {max_gap_pct*100:.0f}%: {filter_stats['gaps']}")
     if require_motif:
-        click.echo(f"  - Missing C-term motif: {filter_stats['motif']}")
+        logger.info(f"  - Missing C-term motif: {filter_stats['motif']}")
     if 'bitscore' in filter_stats:
-        click.echo(f"  - Low bit score: {filter_stats['bitscore']}")
+        logger.info(f"  - Low bit score: {filter_stats['bitscore']}")
 
     # Check minimum sequences
     if len(filtered_records) < min_sequences:
-        click.echo(
-            f"Warning: Only {len(filtered_records)} sequences passed filters "
-            f"(minimum: {min_sequences}). Relaxing filters...",
-            err=True
+        logger.warning(
+            f"Only {len(filtered_records)} sequences passed filters "
+            f"(minimum: {min_sequences}). Relaxing filters..."
         )
         # Fall back to less strict filtering
         filtered_records = []
@@ -215,9 +233,8 @@ def main(alignment, output, tblout, evalue, min_length, max_gap_pct,
                 filtered_records.append(record)
 
         if len(filtered_records) < min_sequences:
-            click.echo(
-                f"Error: Cannot produce alignment with >= {min_sequences} sequences",
-                err=True
+            logger.error(
+                f"Cannot produce alignment with >= {min_sequences} sequences"
             )
             # Output whatever we have
             if not filtered_records:
@@ -226,10 +243,11 @@ def main(alignment, output, tblout, evalue, min_length, max_gap_pct,
     # Write output
     filtered_aln = MultipleSeqAlignment(filtered_records)
 
+    logger.info(f"Writing output to {output}")
     with open(output, 'w') as out:
         AlignIO.write(filtered_aln, out, 'stockholm')
 
-    click.echo(f"Output: {len(filtered_aln)} sequences ({output})")
+    logger.info(f"Complete: {initial_count} -> {len(filtered_aln)} sequences")
 
     return 0
 
