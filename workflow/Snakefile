@@ -17,6 +17,7 @@ import os
 
 # Load configuration
 configfile: "workflow/config/config.yaml"
+configfile: "workflow/config/config-prokaryotic.yaml"
 
 
 # Set up output directories
