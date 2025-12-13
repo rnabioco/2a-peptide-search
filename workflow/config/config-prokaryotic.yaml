@@ -119,6 +119,9 @@ prokaryotic:
     min_length: 5        # Minimum linker length
     max_length: 50       # Maximum linker length to consider
 
+  # hmmscan parallelization
+  hmmscan_chunks: 4      # Number of parallel chunks for hmmscan
+
 # ORF prediction parameters
 orf_prediction:
   tool: "prodigal"       # ORF prediction tool

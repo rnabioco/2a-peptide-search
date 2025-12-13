@@ -65,6 +65,20 @@ def get_prokaryotic_database_file(wildcards):
     return DATA_DIR + f"/prokaryotic/downloads/{wildcards.database}.fasta.gz"
 
 
+def aggregate_hmmscan_chunks(wildcards):
+    """Dynamically get all chunk domtblout files after checkpoint completes."""
+    checkpoint_output = checkpoints.split_sequences_for_hmmscan.get(**wildcards).output[0]
+    # Find all chunk files created by the checkpoint
+    chunk_ids = glob_wildcards(
+        RESULTS_DIR + f"/prokaryotic/gp_analysis/{wildcards.database}/chunks/chunk_{{n}}.fasta.gz"
+    ).n
+    return expand(
+        RESULTS_DIR + "/prokaryotic/gp_analysis/{database}/chunks/chunk_{chunk_id}.domtblout",
+        database=wildcards.database,
+        chunk_id=chunk_ids,
+    )
+
+
 # ============================================================================
 # APPROACH 1: Seed-based Discovery with Known Stalling Peptides
 # ============================================================================
@@ -271,24 +285,60 @@ rule extract_gp_motifs:
         """
 
 
-rule run_hmmscan:
-    """Run hmmscan to annotate domains in GP-containing sequences."""
+checkpoint split_sequences_for_hmmscan:
+    """Split GP sequences into chunks for parallel hmmscan."""
     input:
         sequences=RESULTS_DIR + "/prokaryotic/gp_analysis/{database}/all_gp_sequences.fasta.gz",
+    output:
+        chunk_dir=directory(RESULTS_DIR + "/prokaryotic/gp_analysis/{database}/chunks/"),
+    params:
+        n_chunks=config.get("prokaryotic", {}).get("hmmscan_chunks", 4),
+    log:
+        LOGS_DIR + "/prokaryotic/split_sequences_{database}.log",
+    shell:
+        """
+        mkdir -p "{output.chunk_dir}"
+
+        # Split FASTA into N parts using seqkit (preserves record boundaries)
+        seqkit split2 \
+            --by-part {params.n_chunks} \
+            --out-dir "{output.chunk_dir}" \
+            "{input.sequences}" \
+            2>> "{log}"
+
+        # Rename to consistent chunk_N.fasta.gz format
+        cd "{output.chunk_dir}"
+        for f in *.fasta.gz *.fa.gz 2>/dev/null; do
+            if [[ -f "$f" ]]; then
+                # Extract part number from seqkit naming (e.g., .part_001.fasta.gz)
+                part=$(echo "$f" | grep -oP 'part_\\K\\d+')
+                if [[ -n "$part" ]]; then
+                    mv "$f" "chunk_${{part}}.fasta.gz"
+                fi
+            fi
+        done
+
+        echo "Split into {params.n_chunks} chunks" >> "{log}"
+        """
+
+
+rule run_hmmscan_chunk:
+    """Run hmmscan on a single sequence chunk."""
+    input:
+        sequences=RESULTS_DIR + "/prokaryotic/gp_analysis/{database}/chunks/chunk_{chunk_id}.fasta.gz",
         pfam_db=DATA_DIR + "/pfam/Pfam-A.hmm",
-        # Ensure pressed files exist
         h3f=DATA_DIR + "/pfam/Pfam-A.hmm.h3f",
         h3i=DATA_DIR + "/pfam/Pfam-A.hmm.h3i",
         h3m=DATA_DIR + "/pfam/Pfam-A.hmm.h3m",
         h3p=DATA_DIR + "/pfam/Pfam-A.hmm.h3p",
     output:
-        domtblout=RESULTS_DIR + "/prokaryotic/gp_analysis/{database}/domains.domtblout",
+        domtblout=RESULTS_DIR + "/prokaryotic/gp_analysis/{database}/chunks/chunk_{chunk_id}.domtblout",
     log:
-        LOGS_DIR + "/prokaryotic/hmmscan_{database}.log",
-    threads: 8
+        LOGS_DIR + "/prokaryotic/hmmscan_{database}_chunk_{chunk_id}.log",
+    threads: 4
     resources:
-        runtime=480,
-        mem_mb=16000,
+        runtime=240,
+        mem_mb=8000,
     shell:
         """
         # Copy Pfam DB to local scratch if available (much faster on clusters)
@@ -309,6 +359,32 @@ rule run_hmmscan:
             "$PFAM_DB" \
             - \
             > /dev/null 2>> "{log}"
+        """
+
+
+rule merge_hmmscan_results:
+    """Merge domtblout results from all chunks."""
+    input:
+        chunks=aggregate_hmmscan_chunks,
+    output:
+        domtblout=RESULTS_DIR + "/prokaryotic/gp_analysis/{database}/domains.domtblout",
+    log:
+        LOGS_DIR + "/prokaryotic/merge_hmmscan_{database}.log",
+    shell:
+        """
+        # Combine all chunk domtblout files
+        # Keep header from first file, skip headers (lines starting with #) from rest
+        first=true
+        for chunk in {input.chunks}; do
+            if [ "$first" = true ]; then
+                cat "$chunk"
+                first=false
+            else
+                grep -v '^#' "$chunk" || true
+            fi
+        done > "{output.domtblout}"
+
+        echo "Merged $(echo '{input.chunks}' | wc -w) chunk files" >> "{log}"
         """
 
 
