@@ -30,10 +30,18 @@ Known prokaryotic stalling peptides:
 
 
 def get_prokaryotic_database_file(wildcards):
-    """Map database name to its file path, handling different download mechanisms."""
+    """Map database name to its file path, handling different download mechanisms.
+
+    For databases that may contain invalid IUPAC characters (like IMG/VR),
+    automatically use the sanitized version to prevent HMMER parse errors.
+    """
     db_config = config["prokaryotic_databases"][wildcards.database]
 
-    # Check if database has a local_path configured (e.g., IMG/VR)
+    # IMG/VR: Always use sanitized version (may contain invalid chars like '-')
+    if wildcards.database == "imgvr":
+        return DATA_DIR + "/prokaryotic/imgvr.sanitized.fasta.gz"
+
+    # Check if database has a local_path configured
     if "local_path" in db_config and db_config["local_path"]:
         return db_config["local_path"]
 
