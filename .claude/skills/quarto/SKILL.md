@@ -7,12 +7,12 @@ allowed-tools: Read, Write, Edit, Glob, Grep
 # Quarto Document Creation
 
 ## Overview
-This skill creates Quarto documents (.qmd files) following project-specific standards for bioinformatics analysis. This project primarily uses Python for data analysis.
+This skill creates Quarto documents (.qmd files) following project-specific standards for bioinformatics analysis. This project primarily uses R with tidyverse for data analysis.
 
 ## Chunk Options Format
 Always use hash-pipe style for ALL chunk options, including labels:
 
-```python
+```r
 #| label: load-data
 #| echo: false
 #| warning: false
@@ -41,46 +41,43 @@ execute:
 ---
 ```
 
-## Python Package Loading
+## R Package Loading
 Standard imports for this project:
 
-```python
+```r
 #| label: setup
 #| echo: false
+#| message: false
 
-import pandas as pd
-import numpy as np
-from pathlib import Path
-import plotnine as p9
-from Bio import SeqIO, AlignIO
+library(tidyverse)
+library(here)
+library(fs)
+library(ggseqlogo)  # For sequence logos
 ```
 
 ## Directory Configuration
 Use environment variables for cluster/local flexibility:
 
-```python
+```r
 #| label: setup-directories
 
-import os
-results_dir = Path(os.environ.get("RESULTS_DIR", "../scratch/results"))
-data_dir = Path(os.environ.get("RESOURCES_DIR", "../scratch/data"))
+results_dir <- Sys.getenv("RESULTS_DIR", "../scratch/results")
+data_dir <- Sys.getenv("RESOURCES_DIR", "../scratch/data")
 ```
 
-## Plotting with plotnine
-This project uses **plotnine** (ggplot2 for Python), NOT matplotlib or seaborn:
+## Plotting with ggplot2
+This project uses **ggplot2** from the tidyverse for all visualizations:
 
-```python
+```r
 #| label: fig-example
 #| fig-cap: "Example plot"
 
-from plotnine import *
+tbl <- tibble(x = 1:3, y = 4:6)
 
-tbl = pd.DataFrame({'x': [1,2,3], 'y': [4,5,6]})
-
-(ggplot(tbl, aes('x', 'y'))
- + geom_point()
- + theme_minimal()
- + labs(x='X axis', y='Y axis'))
+ggplot(tbl, aes(x, y)) +
+    geom_point() +
+    theme_minimal() +
+    labs(x = "X axis", y = "Y axis")
 ```
 
 ## Common Chunk Options Reference
@@ -110,30 +107,47 @@ Common sizes:
 
 ## Figure Chunks Example
 
-```python
+```r
 #| label: fig-evalue-distribution
 #| fig-cap: "Distribution of E-values from HMM search"
 #| fig-width: 8
 #| fig-height: 5
 
-tbl = results_df.query('evalue < 1e-3')
+tbl <- results_df |>
+    filter(evalue < 1e-3)
 
-(ggplot(tbl, aes(x='evalue'))
- + geom_histogram(bins=50)
- + scale_x_log10()
- + theme_minimal()
- + labs(x='E-value', y='Count', title='HMM Search Results'))
+ggplot(tbl, aes(x = evalue)) +
+    geom_histogram(bins = 50) +
+    scale_x_log10() +
+    theme_minimal() +
+    labs(x = "E-value", y = "Count")
 ```
 
-## Tables with pandas/gt
-For simple tables, use pandas with styling. For publication tables, consider gt:
+## Tables with gt
+For simple tables, use tibbles directly. For publication tables, use gt:
 
-```python
+```r
 #| label: tbl-top-hits
 #| tbl-cap: "Top 10 HMM hits by E-value"
 
-top_hits = results_df.nsmallest(10, 'evalue')[['accession', 'description', 'evalue', 'score']]
+top_hits <- results_df |>
+    slice_min(evalue, n = 10) |>
+    select(accession, description, evalue, score)
+
 top_hits
+```
+
+For polished tables, use the gt package:
+
+```r
+#| label: tbl-formatted-hits
+
+library(gt)
+
+top_hits |>
+    gt() |>
+    fmt_scientific(columns = evalue) |>
+    fmt_number(columns = score, decimals = 1)
 ```
 
 ## Mermaid Diagrams
@@ -173,18 +187,17 @@ Include session info in collapsible callout:
 ::: {.callout-note collapse="true"}
 ## Session Info
 
-```{python}
+```{r}
 #| label: session-info
 
-import session_info
-session_info.show()
+sessionInfo()
 ```
 :::
 ````
 
 ## Project-Specific Notes
 - Analysis documents go in `analysis/` directory
-- Use `plotnine` for plotting (NOT matplotlib/seaborn)
-- Use `Bio` (Biopython) for sequence handling
+- Use `ggplot2` for plotting (tidyverse)
+- Use `ggseqlogo` for sequence logo visualization
 - Results go to `scratch/results/`
 - Render with: `cd analysis && quarto render`

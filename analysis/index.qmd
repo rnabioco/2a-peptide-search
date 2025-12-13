@@ -34,43 +34,73 @@ We distinguish two classes based on conserved sequence features:
 | **Class 1** | Leucine stretch | GDVE | NPGP |
 | **Class 2** | Invariant Trp | EEGIE | PNPGP/PHPGP |
 
-## Analysis Workflow
+## Pipeline Overview
 
 ```{mermaid}
-%%| label: fig-workflow
-%%| fig-cap: "Pipeline for 2A peptide discovery"
-flowchart TB
-    subgraph Input
-        Seeds[Seed Alignments]
-        DBs[(Protein Databases)]
+%%| label: fig-pipeline
+%%| fig-cap: "Complete workflow for 2A peptide and ribosomal stalling peptide discovery"
+flowchart LR
+    subgraph inputs[" "]
+        direction TB
+        Seeds["🧬 Seed Alignments<br/><small>Curated 2A sequences</small>"]
+        style Seeds fill:#e1f5fe
     end
 
-    subgraph "Iterative Refinement"
-        HMM1[Build Seed HMMs]
-        Search1[Search Databases]
-        Filter1[Filter & Merge]
-        HMM2[Refine HMMs]
-        Search2[Search Again]
-        Filter2[Auto-Curate]
+    subgraph databases[" "]
+        direction TB
+        UniProt[(UniProt)]
+        RefProt[(RefProt)]
+        UniParc[(UniParc)]
+        MGnify[(MGnify)]
+        IMGVR[(IMG/VR)]
+        style UniProt fill:#fff3e0
+        style RefProt fill:#fff3e0
+        style UniParc fill:#fff3e0
+        style MGnify fill:#fff3e0
+        style IMGVR fill:#fff3e0
     end
 
-    subgraph Output
-        Final[Final HMMs]
-        Report[Analysis Report]
-        Logos[Sequence Logos]
+    subgraph iteration1["Iteration 1"]
+        direction TB
+        HMM1["hmmbuild<br/><small>Seed HMMs</small>"]
+        Search1["hmmsearch<br/><small>All databases</small>"]
+        Filter1["Filter<br/><small>E-value, length</small>"]
+        style HMM1 fill:#e8f5e9
+        style Search1 fill:#e8f5e9
+        style Filter1 fill:#e8f5e9
+    end
+
+    subgraph iteration2["Iteration 2"]
+        direction TB
+        HMM2["hmmbuild<br/><small>Refined HMMs</small>"]
+        Search2["hmmsearch<br/><small>Expanded search</small>"]
+        Curate["Auto-curate<br/><small>Motif validation</small>"]
+        style HMM2 fill:#fce4ec
+        style Search2 fill:#fce4ec
+        style Curate fill:#fce4ec
+    end
+
+    subgraph outputs["Outputs"]
+        direction TB
+        FinalHMM["📊 Final Models<br/><small>Class 1 & 2 HMMs</small>"]
+        Logos["🎨 Sequence Logos"]
+        Report["📝 Analysis Report"]
+        style FinalHMM fill:#f3e5f5
+        style Logos fill:#f3e5f5
+        style Report fill:#f3e5f5
     end
 
     Seeds --> HMM1
     HMM1 --> Search1
-    DBs --> Search1
+    databases --> Search1
     Search1 --> Filter1
     Filter1 --> HMM2
     HMM2 --> Search2
-    DBs --> Search2
-    Search2 --> Filter2
-    Filter2 --> Final
-    Final --> Report
-    Final --> Logos
+    databases --> Search2
+    Search2 --> Curate
+    Curate --> FinalHMM
+    FinalHMM --> Logos
+    FinalHMM --> Report
 ```
 
 ## Databases Searched

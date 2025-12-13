@@ -46,25 +46,30 @@ Consensus: W  x  x  x  x  E  E  G  I  E  x  x  x  P  N  P  G  P  x
 
 ## Generating Logos
 
-### Using Skylign API
+### Using ggseqlogo (R)
 
-```python
-# workflow/scripts/generate_skylign_logos.py
-import requests
+```r
+#| label: fig-example-logo
+#| fig-cap: "Example sequence logo generation"
+#| eval: false
 
-def generate_logo(alignment_path, output_path):
-    with open(alignment_path) as f:
-        alignment = f.read()
+library(ggseqlogo)
+library(tidyverse)
 
-    response = requests.post(
-        'http://skylign.org/logo/create',
-        files={'file': alignment},
-        data={'processing': 'hmm'}
-    )
-    # Save logo image
+# Read sequences from alignment
+sequences <- c(
+    "EGRGSLLTCGDVEENPGP",
+    "ATNFSLLKQAGDVEENPGP",
+    "QCTNYALLKLAGDVESNPGP"
+)
+
+# Generate logo
+ggseqlogo(sequences, method = "prob") +
+    labs(title = "2A Peptide Class 1") +
+    theme_logo()
 ```
 
-### Using WebLogo
+### Using WebLogo (CLI)
 
 ```bash
 weblogo -f alignment.fasta -o logo.png \
