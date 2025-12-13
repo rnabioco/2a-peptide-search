@@ -19,7 +19,7 @@ build-seeds = "snakemake build_seeds"
 # Generate workflow visualization
 dag = "snakemake --dag | dot -Tpng > workflow.png"
 # unlock snakemake
-unlock = "snakemake --snakefile workflow/Snakefile --profile cluster/slurm --unlock -n"
+unlock = "snakemake --snakefile workflow/Snakefile --profile cluster/slurm --unlock -build_seeds"
 
 [dependencies]
 # Core Snakemake and workflow management
