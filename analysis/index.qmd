@@ -1,0 +1,153 @@
+---
+title: "2A Peptide Discovery"
+subtitle: "Systematic identification of viral 2A self-cleaving peptides and prokaryotic ribosome stalling sequences"
+author: "Hesselberth Lab"
+date: today
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+## Overview
+
+This project identifies **2A peptides** across protein sequence databases using profile hidden Markov models (HMMs). 2A peptides are short (~15-20 residue) *cis*-acting oligopeptides that cause ribosomal skipping during translation at conserved Gly-Pro (GP) dipeptides.
+
+### What are 2A Peptides?
+
+2A peptides were first discovered in picornaviruses (foot-and-mouth disease virus) where they enable production of multiple proteins from a single open reading frame without requiring a stop codon. The ribosome "skips" peptide bond formation at the Gly-Pro junction, releasing the upstream protein while continuing translation of the downstream sequence.
+
+::: {.callout-note}
+## Key Features of 2A Peptides
+- Conserved C-terminal motif: **DxExNPGP**
+- Self-cleavage occurs between Gly and Pro
+- No external protease required
+- Widely used in biotechnology for multi-cistronic expression
+:::
+
+### Two Classes of 2A Peptides
+
+We distinguish two classes based on conserved sequence features:
+
+| Class | N-terminal | Central Motif | C-terminal |
+|-------|------------|---------------|------------|
+| **Class 1** | Leucine stretch | GDVE | NPGP |
+| **Class 2** | Invariant Trp | EEGIE | PNPGP/PHPGP |
+
+## Analysis Workflow
+
+```{mermaid}
+%%| label: fig-workflow
+%%| fig-cap: "Pipeline for 2A peptide discovery"
+flowchart TB
+    subgraph Input
+        Seeds[Seed Alignments]
+        DBs[(Protein Databases)]
+    end
+
+    subgraph "Iterative Refinement"
+        HMM1[Build Seed HMMs]
+        Search1[Search Databases]
+        Filter1[Filter & Merge]
+        HMM2[Refine HMMs]
+        Search2[Search Again]
+        Filter2[Auto-Curate]
+    end
+
+    subgraph Output
+        Final[Final HMMs]
+        Report[Analysis Report]
+        Logos[Sequence Logos]
+    end
+
+    Seeds --> HMM1
+    HMM1 --> Search1
+    DBs --> Search1
+    Search1 --> Filter1
+    Filter1 --> HMM2
+    HMM2 --> Search2
+    DBs --> Search2
+    Search2 --> Filter2
+    Filter2 --> Final
+    Final --> Report
+    Final --> Logos
+```
+
+## Databases Searched
+
+### Eukaryotic Pipeline
+
+| Database | Description | Size |
+|----------|-------------|------|
+| UniProt Swiss-Prot | Curated protein sequences | ~570k |
+| Reference Proteomes | Representative proteomes | Medium |
+| UniParc | Non-redundant archive | Very large |
+| MGnify | Metagenomic proteins | ~300M |
+
+### Prokaryotic Pipeline
+
+| Database | Description | Size |
+|----------|-------------|------|
+| UniProt Bacteria | Swiss-Prot bacterial proteins | ~500k |
+| UniProt Archaea | Swiss-Prot archaeal proteins | ~50k |
+| NCBI Viral RefSeq | Viral protein sequences | ~100MB |
+| IMG/VR | Phage proteins | Millions |
+| INPHARED | Curated phage genomes | ~19k genomes |
+
+## Key Analyses
+
+### Eukaryotic 2A Peptides
+
+- [**Seed Search Results**](eukaryotic/seed-search.qmd): Initial HMM search statistics
+- [**Class Comparison**](eukaryotic/class-comparison.qmd): Differences between Class 1 and Class 2
+- [**Sequence Logos**](eukaryotic/sequence-logos.qmd): Visualization of conserved motifs
+
+### Prokaryotic Discovery
+
+- [**Discovery Pipeline**](prokaryotic/discovery.qmd): Approach for finding novel stalling peptides
+- [**GP Motif Analysis**](prokaryotic/gp-motifs.qmd): Comprehensive GP context analysis
+- [**Known Stalling Peptides**](prokaryotic/stalling-peptides.qmd): Validation against SecM, TnaC, etc.
+
+### Methods
+
+- [**Pipeline Architecture**](methods/pipeline.qmd): Snakemake workflow details
+- [**HMM Approach**](methods/hmm-approach.qmd): Profile HMM methodology
+- [**Database Sources**](methods/databases.qmd): Data provenance and URLs
+
+## Background
+
+### Ribosomal Stalling in Prokaryotes
+
+Prokaryotes use related but distinct mechanisms for ribosomal stalling:
+
+- **SecM**: Stalls at FXXXXWIXXXXGIRAGP to regulate secretion
+- **TnaC**: Tryptophan-dependent stalling
+- **MifM**: Regulates membrane protein insertion in *B. subtilis*
+
+These peptides share the GP motif but have different upstream contexts and biological functions.
+
+### Biotechnology Applications
+
+2A peptides are widely used for:
+
+- Multi-gene expression from single vectors
+- Stoichiometric co-expression of protein complexes
+- CAR-T cell engineering
+- Vaccine development
+
+## Resources
+
+- **Source Code**: [GitHub repository](https://github.com/rnabioco/2a-peptide-search)
+- **Seed Alignments**: `resources/seed-alignments/`
+- **Final Models**: `results/models/final/`
+
+::: {.callout-tip}
+## Running the Pipeline
+```bash
+# Full pipeline
+pixi run snakemake --cores 12
+
+# Prokaryotic discovery only
+pixi run snakemake prokaryotic_discovery --cores 12
+```
+:::

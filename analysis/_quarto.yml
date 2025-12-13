@@ -1,0 +1,45 @@
+project:
+  type: website
+  output-dir: _site
+
+execute:
+  freeze: auto
+
+website:
+  title: "2A Peptide Discovery"
+  description: "Systematic identification of 2A self-cleaving peptides using profile HMMs"
+  sidebar:
+    style: floating
+    search: true
+    contents:
+      - section: "Overview"
+        contents:
+          - index.qmd
+      - section: "Methods"
+        contents:
+          - methods/pipeline.qmd
+          - methods/hmm-approach.qmd
+          - methods/databases.qmd
+      - section: "Eukaryotic 2A Peptides"
+        contents:
+          - eukaryotic/seed-search.qmd
+          - eukaryotic/class-comparison.qmd
+          - eukaryotic/sequence-logos.qmd
+      - section: "Prokaryotic Discovery"
+        contents:
+          - prokaryotic/discovery.qmd
+          - prokaryotic/gp-motifs.qmd
+          - prokaryotic/stalling-peptides.qmd
+
+format:
+  html:
+    theme:
+      light: [cosmo, style/quarto-main.scss]
+    code-fold: true
+    code-copy: true
+    code-overflow: wrap
+    toc: true
+    toc-location: right
+    toc-depth: 3
+    mermaid:
+      theme: neutral

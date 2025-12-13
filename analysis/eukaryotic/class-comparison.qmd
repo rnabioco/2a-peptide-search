@@ -1,0 +1,101 @@
+---
+title: "Class Comparison"
+subtitle: "Differences between Class 1 and Class 2 2A peptides"
+date: today
+---
+
+## Two Classes of 2A Peptides
+
+2A peptides fall into two distinct classes based on conserved sequence features.
+
+## Class 1
+
+### Consensus Sequence
+
+```
+L-L-L-x-x-x-G-D-V-E-x-x-x-x-N-P-G-P
+```
+
+### Key Features
+
+- **N-terminal**: Leucine-rich region (often 3+ leucines)
+- **Central motif**: GDVE (Gly-Asp-Val-Glu)
+- **C-terminal**: NPGP
+
+### Representative Peptides
+
+| Name | Sequence | Source |
+|------|----------|--------|
+| T2A | EGRGSLLTCGDVEENPGP | *Thosea asigna* virus |
+| P2A | ATNFSLLKQAGDVEENPGP | Porcine teschovirus-1 |
+| E2A | QCTNYALLKLAGDVESNPGP | Equine rhinitis A virus |
+
+## Class 2
+
+### Consensus Sequence
+
+```
+W-x-x-x-x-E-E-G-I-E-x-x-P-N-P-G-P
+```
+
+### Key Features
+
+- **N-terminal**: Invariant tryptophan
+- **Central motif**: EEGIE (Glu-Glu-Gly-Ile-Glu)
+- **C-terminal**: PNPGP or PHPGP
+
+### Representative Peptides
+
+| Name | Sequence | Source |
+|------|----------|--------|
+| F2A | VKQTLNFDLLKLAGDVESNPGP | Foot-and-mouth disease virus |
+
+## Structural Comparison
+
+```{mermaid}
+%%| label: fig-structure
+%%| fig-cap: "Structural comparison of 2A peptide classes"
+flowchart LR
+    subgraph Class1[Class 1]
+        L1[L-rich N-term] --> G1[GDVE] --> N1[NPGP]
+    end
+
+    subgraph Class2[Class 2]
+        W2[W N-term] --> E2[EEGIE] --> P2[PNPGP]
+    end
+```
+
+## Functional Differences
+
+| Feature | Class 1 | Class 2 |
+|---------|---------|---------|
+| Cleavage efficiency | High | High |
+| Host range | Broad | Broad |
+| Position preference | N-terminal | Variable |
+| Biotechnology use | Common (T2A, P2A) | Less common |
+
+## Cross-Class Homology
+
+Both classes share:
+
+1. **C-terminal GP dipeptide** - site of ribosomal skipping
+2. **Proline at P position** - essential for function
+3. **Upstream asparagine/proline** - contributes to efficiency
+
+::: {.callout-warning}
+## Cross-Matches
+HMM searches may identify partial cross-matches between classes due to the conserved C-terminal region. Always verify the full-length sequence context.
+:::
+
+## Phylogenetic Distribution
+
+- **Class 1**: Primarily in picornaviruses, insect viruses
+- **Class 2**: Primarily in aphthoviruses
+
+## Selection for Biotechnology
+
+| Application | Recommended | Reason |
+|-------------|-------------|--------|
+| Mammalian expression | T2A, P2A | High efficiency, low immunogenicity |
+| Insect cells | E2A | Native to insect viruses |
+| Balanced expression | P2A | Most consistent stoichiometry |

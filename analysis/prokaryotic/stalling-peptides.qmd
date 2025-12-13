@@ -1,0 +1,171 @@
+---
+title: "Known Stalling Peptides"
+subtitle: "Validation against characterized prokaryotic ribosome stalling sequences"
+date: today
+---
+
+## Overview
+
+Several prokaryotic ribosome stalling peptides have been experimentally characterized. These serve as positive controls for our discovery pipeline.
+
+## SecM (Secretion Monitor)
+
+### Sequence
+
+```
+FSTPVWISQAQGIRAGP
+       ↑      ↑↑↑
+       W      Stall site
+```
+
+### Characteristics
+
+| Property | Value |
+|----------|-------|
+| Organism | *Escherichia coli* |
+| Length | 17 residues |
+| Stall motif | GIRAGP |
+| Function | Secretion regulation |
+| PDB | Multiple structures |
+
+### Mechanism
+
+SecM stalls ribosomes when the SecY translocon is unavailable, allowing SecA upregulation.
+
+```{mermaid}
+%%| label: fig-secm
+%%| fig-cap: "SecM regulatory mechanism"
+flowchart LR
+    mRNA[secM-secA mRNA] --> Ribosome
+    Ribosome --> |SecY available| Continue[Translation continues]
+    Ribosome --> |SecY blocked| Stall[Ribosome stalls]
+    Stall --> |Structure change| Expose[secA RBS exposed]
+    Expose --> SecA[SecA synthesis]
+```
+
+## TnaC (Tryptophanase Leader)
+
+### Sequence
+
+```
+WDPXXXXIGP (consensus)
+↑         ↑↑
+W         Stall (tryptophan-dependent)
+```
+
+### Characteristics
+
+| Property | Value |
+|----------|-------|
+| Organism | *Escherichia coli* |
+| Length | Variable (~24 residues) |
+| Stall motif | IGP (tryptophan-dependent) |
+| Function | Tryptophan catabolism |
+| Inducer | L-tryptophan |
+
+### Mechanism
+
+TnaC stalling requires free L-tryptophan in the ribosome exit tunnel, linking amino acid availability to gene expression.
+
+## MifM (Membrane Insertion Factor Monitor)
+
+### Sequence
+
+```
+XXXGPXXGIAGP
+   ↑↑    ↑↑↑↑
+   GP    Stall site
+```
+
+### Characteristics
+
+| Property | Value |
+|----------|-------|
+| Organism | *Bacillus subtilis* |
+| Length | ~90 residues (full peptide) |
+| Stall motif | GIAGP |
+| Function | YidC regulation |
+| Homologs | Many Firmicutes |
+
+### Mechanism
+
+MifM monitors membrane protein insertion via YidC. When insertion is impaired, stalling upregulates YidC2.
+
+## CydA (Cytochrome bd Oxidase)
+
+### Sequence
+
+```
+XXXRAGP
+   ↑↑↑↑
+   Stall site
+```
+
+### Characteristics
+
+| Property | Value |
+|----------|-------|
+| Organism | *Escherichia coli* |
+| Length | Short leader |
+| Stall motif | RAGP |
+| Function | Cytochrome regulation |
+
+## Comparison Table
+
+| Peptide | Motif | Trigger | Response |
+|---------|-------|---------|----------|
+| SecM | GIRAGP | SecY absence | SecA↑ |
+| TnaC | IGP | Trp presence | TnaAB↑ |
+| MifM | GIAGP | YidC absence | YidC2↑ |
+| CydA | RAGP | Unknown | CydB? |
+
+## Validation Strategy
+
+### Positive Control
+
+Our HMMs should recover known stalling peptides:
+
+1. Search prokaryotic databases with seed HMMs
+2. Check for known peptides in results
+3. Measure E-values and ranks
+
+### Expected Results
+
+| Peptide | Expected E-value | Status |
+|---------|-----------------|--------|
+| SecM | <1e-10 | TBD |
+| TnaC | <1e-5 | TBD |
+| MifM | <1e-8 | TBD |
+| CydA | <1e-5 | TBD |
+
+### Negative Control
+
+Random GP sequences should not rank highly:
+
+- Shuffle upstream context
+- Preserve amino acid composition
+- Compare E-value distributions
+
+## Novel Discoveries
+
+### Criteria for Novel Peptides
+
+1. **Sequence**: Contains xAGP or similar motif
+2. **Context**: Inter-domain location
+3. **Conservation**: Conserved across species
+4. **Structure**: Predicted stalling-compatible
+
+### Candidate Validation
+
+Promising candidates should be validated by:
+
+1. Ribosome profiling correlation
+2. Reporter assays (if available)
+3. Structural modeling
+4. Phylogenetic analysis
+
+## References
+
+1. Ito K, Chiba S. (2013) Arrest peptides: cis-acting modulators of translation. *Annu Rev Biochem* 82:171-202.
+2. Wilson DN, et al. (2016) Ribosome-targeting antibiotics and mechanisms of bacterial resistance. *Nat Rev Microbiol* 14:22-35.
+3. Seip B, Innis CA. (2016) How Widespread is Metabolite Sensing by Ribosome-Arresting Nascent Peptides? *J Mol Biol* 428:2217-2227.

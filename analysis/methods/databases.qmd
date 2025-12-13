@@ -1,0 +1,119 @@
+---
+title: "Database Sources"
+subtitle: "Protein sequence databases used in 2A peptide discovery"
+date: today
+---
+
+## Eukaryotic Databases
+
+### UniProt Swiss-Prot
+
+- **URL**: `ftp.uniprot.org/pub/databases/uniprot/current_release/`
+- **Size**: ~570,000 sequences
+- **Description**: Manually annotated, high-quality protein sequences
+- **Update frequency**: Monthly releases
+
+### Reference Proteomes
+
+- **URL**: `ftp.uniprot.org/.../reference_proteomes/`
+- **Size**: Representative proteomes from all domains of life
+- **Description**: Subset of UniProt used by Pfam for domain annotation
+- **Current version**: 2025_04
+
+### UniParc
+
+- **URL**: `ftp.uniprot.org/.../uniparc/`
+- **Size**: Very large (~billions of sequences)
+- **Description**: Non-redundant archive of all known protein sequences
+- **Note**: Computationally intensive to search
+
+### MGnify
+
+- **URL**: `ftp.ebi.ac.uk/pub/databases/metagenomics/peptide_database/`
+- **Size**: ~300 million sequences (25 split files)
+- **Description**: Environmental and metagenomic protein sequences
+- **Note**: Enable only for comprehensive searches
+
+## Prokaryotic Databases
+
+### UniProt Bacteria/Archaea
+
+- **URL**: UniProt REST API with taxonomy filters
+- **Bacteria**: taxonomy_id:2 (~500k reviewed)
+- **Archaea**: taxonomy_id:2157 (~50k reviewed)
+- **Description**: Swiss-Prot entries for prokaryotes
+
+### NCBI Viral RefSeq
+
+- **URL**: `ftp.ncbi.nlm.nih.gov/refseq/release/viral/`
+- **Files**: `viral.1.protein.faa.gz` (as of 2025)
+- **Size**: ~100MB
+- **Description**: Reference viral protein sequences
+
+### IMG/VR
+
+- **URL**: `img.jgi.doe.gov/vr/` (requires login)
+- **Size**: Millions of sequences
+- **Description**: Integrated Microbial Genomes viral database
+- **Note**: Requires manual download and sanitization
+
+::: {.callout-important}
+## IMG/VR Sanitization
+IMG/VR files may contain invalid IUPAC characters (gaps, etc.) that cause HMMER to fail. The pipeline automatically sanitizes this database before searching.
+:::
+
+### INPHARED
+
+- **URL**: `millardlab-inphared.s3.climb.ac.uk/`
+- **Current release**: 14Apr2025
+- **Files**:
+  - `14Apr2025_genomes.fa.gz` (phage genomes)
+  - `14Apr2025_data.tsv.gz` (metadata)
+- **Description**: Curated phage genome database with consistent annotation
+- **Reference**: [GitHub](https://github.com/RyanCook94/inphared)
+
+## Database Configuration
+
+```yaml
+# workflow/config/config-prokaryotic.yaml
+prokaryotic_databases:
+  bacteria:
+    url: "https://rest.uniprot.org/uniprotkb/stream?..."
+
+  ncbi_viral_refseq:
+    base_url: "https://ftp.ncbi.nlm.nih.gov/refseq/release/viral"
+    num_files: 1  # As of 2025
+
+  imgvr:
+    local_path: "/path/to/IMGVR_all_proteins.faa.gz"
+
+prokaryotic_databases_to_search:
+  - bacteria
+  - archaea
+  - imgvr
+  - ncbi_viral_refseq
+  - uniprot_viruses
+  - inphared_proteins
+```
+
+## Data Provenance
+
+All database downloads are logged with:
+
+- Source URL
+- Download timestamp
+- File checksum
+- Number of sequences
+
+Logs are stored in: `scratch/logs/download/`
+
+## Updates
+
+Database URLs change periodically. Check these resources for current versions:
+
+| Database | Update Check |
+|----------|-------------|
+| UniProt | [Release notes](https://www.uniprot.org/release-notes) |
+| NCBI RefSeq | [FTP directory listing](https://ftp.ncbi.nlm.nih.gov/refseq/release/viral/) |
+| INPHARED | [GitHub releases](https://github.com/RyanCook94/inphared) |
+| MGnify | [EBI FTP](https://ftp.ebi.ac.uk/pub/databases/metagenomics/) |
