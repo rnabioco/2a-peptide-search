@@ -1,0 +1,145 @@
+---
+title: "Prokaryotic Discovery Pipeline"
+subtitle: "Systematic identification of novel ribosomal stalling peptides"
+date: today
+---
+## Overview
+
+Prokaryotes use ribosomal stalling peptides for regulatory purposes, distinct from viral 2A peptides but sharing the conserved GP motif. This pipeline aims to discover novel stalling peptide families.
+
+## Discovery Strategy
+
+We employ two complementary approaches:
+
+```{mermaid}
+%%| label: fig-strategy
+%%| fig-cap: "Dual approach for prokaryotic stalling peptide discovery"
+flowchart TB
+    subgraph "Approach 1: Seed-Based"
+        S1[Known Stalling Peptides]
+        S2[Build HMMs by Motif]
+        S3[Search Prokaryotic DBs]
+        S4[Cluster & Refine]
+        S1 --> S2 --> S3 --> S4
+    end
+
+    subgraph "Approach 2: GP-Based"
+        G1[Extract All GP Motifs]
+        G2[Annotate Domains]
+        G3[Filter Inter-Domain]
+        G4[Cluster by Context]
+        G1 --> G2 --> G3 --> G4
+    end
+
+    S4 --> Merge
+    G4 --> Merge
+    Merge[Merge Results] --> Final[Novel Peptide Families]
+```
+
+## Approach 1: Seed-Based Discovery
+
+### Known Stalling Peptides
+
+| Peptide | Organism | Motif | Function |
+|---------|----------|-------|----------|
+| SecM | *E. coli* | RAGP | Secretion regulation |
+| TnaC | *E. coli* | GP-like | Tryptophan response |
+| MifM | *B. subtilis* | GIAGP | Membrane insertion |
+| CydA | *E. coli* | RAGP | Cytochrome regulation |
+
+### Motif Families
+
+Stalling peptides are grouped by their upstream motif:
+
+- **RAGP family**: R-A-G-P pattern
+- **RAPG family**: R-A-P-G variant
+- **QAPP family**: Q-A-P-P pattern
+- **Other GP**: Divergent contexts
+
+### HMM Building
+
+```python
+rule build_comprehensive_hmm:
+    """Build HMM from all known stalling peptides."""
+    input:
+        fasta="resources/stalling-peptides/known_stalling_peptides.fasta"
+    output:
+        hmm=RESULTS_DIR + "/prokaryotic/models/seed/comprehensive.hmm"
+```
+
+## Approach 2: Unbiased GP Discovery
+
+### Step 1: Extract GP Motifs
+
+Extract all sequences containing GP with upstream context:
+
+```python
+rule extract_gp_motifs:
+    """Extract all GP-containing sequences with context."""
+    params:
+        upstream=30,    # 30 residues before GP
+        downstream=15   # 15 residues after GP
+```
+
+### Step 2: Domain Annotation
+
+Annotate extracted sequences with Pfam domains to identify inter-domain GP motifs (more likely to be functional stalling sites).
+
+```python
+rule run_hmmscan:
+    """Annotate domains in GP-containing sequences."""
+    input:
+        sequences="gp_sequences.fasta",
+        pfam_db=DATA_DIR + "/pfam/Pfam-A.hmm"
+```
+
+### Step 3: Filter Inter-Domain
+
+Focus on GP motifs that fall between annotated domains, as these are more likely to function in translational regulation.
+
+### Step 4: Cluster by Context
+
+Cluster sequences by:
+- Amino acid composition
+- Position-specific patterns
+- Upstream sequence similarity
+
+## Databases Searched
+
+| Database | Sequences | Description |
+|----------|-----------|-------------|
+| UniProt Bacteria | ~500k | Swiss-Prot bacterial proteins |
+| UniProt Archaea | ~50k | Swiss-Prot archaeal proteins |
+| IMG/VR | Millions | Phage proteins |
+| NCBI Viral RefSeq | ~100MB | Viral reference sequences |
+| INPHARED | ~19k genomes | Curated phage genomes |
+
+## Expected Output
+
+### Novel Peptide Families
+
+- Clustered sequences with similar context
+- Consensus motifs for each cluster
+- HMM profiles for validation searches
+- Taxonomic distribution analysis
+
+### Validation
+
+Compare discovered peptides against:
+
+1. Known stalling peptides (positive control)
+2. Random GP occurrences (negative control)
+3. Literature-reported ribosome profiling data
+
+## Running the Pipeline
+
+```bash
+# Full prokaryotic discovery
+pixi run snakemake prokaryotic_discovery --profile cluster/slurm
+
+# Just the seed-based approach
+pixi run snakemake search_comprehensive_hmm --profile cluster/slurm
+
+# Just the GP analysis
+pixi run snakemake extract_gp_motifs --profile cluster/slurm
+```

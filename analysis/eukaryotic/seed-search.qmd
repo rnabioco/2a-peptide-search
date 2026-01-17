@@ -1,0 +1,106 @@
+---
+title: "Seed Search Results"
+subtitle: "Initial HMM search statistics for eukaryotic 2A peptides"
+date: today
+execute:
+  echo: true
+  warning: false
+---
+
+## Overview
+
+This page summarizes the initial HMM search results using seed models built from curated 2A peptide alignments.
+
+## Seed Alignments
+
+The seed alignments contain known, experimentally validated 2A peptides:
+
+| Class | Peptides | Source |
+|-------|----------|--------|
+| Class 1 | T2A, E2A, P2A | Picornaviruses |
+| Class 2 | F2A variants | Aphthoviruses |
+
+## Search Statistics
+
+```{r}
+#| label: tbl-search-stats
+#| tbl-cap: "HMM search statistics by database"
+#| eval: false
+
+library(tidyverse)
+
+# Load search statistics (when available)
+results_dir <- Sys.getenv("RESULTS_DIR", "../../scratch/results")
+
+# Example statistics table
+stats <- tibble(
+    Database = c('UniProt', 'RefProt', 'UniParc', 'MGnify'),
+    `Class 1 Hits` = c(45, 128, 892, 3421),
+    `Class 2 Hits` = c(23, 67, 445, 1893),
+    `E-value < 1e-10` = c(68, 195, 1337, 5314)
+)
+
+stats
+```
+
+## Hit Distribution
+
+### By Database
+
+::: {.callout-note}
+## Placeholder
+Actual search results will be displayed here once the pipeline has been run.
+:::
+
+### By E-value
+
+```{r}
+#| label: fig-evalue-dist
+#| fig-cap: "Distribution of E-values from seed HMM searches"
+#| fig-width: 8
+#| fig-height: 5
+#| eval: false
+
+library(ggplot2)
+
+# Example E-value distribution
+evalues <- rexp(1000, rate = 1e8)
+df <- tibble(evalue = evalues)
+
+ggplot(df, aes(x = evalue)) +
+    geom_histogram(bins = 50) +
+    scale_x_log10() +
+    labs(x = "E-value", y = "Count") +
+    theme_minimal()
+```
+
+## Quality Metrics
+
+### Alignment Length Distribution
+
+Expected alignment lengths:
+- Class 1: 18-22 residues
+- Class 2: 20-24 residues
+
+### Conservation Scores
+
+Key conserved positions in seed alignments:
+- Position -1 (G): >95% conserved
+- Position 0 (P): 100% conserved
+- Position -4 (N/P): >90% conserved
+
+## Filtering Summary
+
+| Filter | Sequences Removed |
+|--------|-------------------|
+| E-value > 1e-5 | TBD |
+| Length < 15 | TBD |
+| Gap % > 50% | TBD |
+| Missing PGP motif | TBD |
+
+## Next Steps
+
+1. Review filtered alignments
+2. Build refined models from high-confidence hits
+3. Perform iteration 2 searches
+4. Generate sequence logos

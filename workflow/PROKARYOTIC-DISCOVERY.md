@@ -129,7 +129,7 @@ This pipeline discovers prokaryotic ribosomal stalling peptides using principles
 
 ## Configuration
 
-Edit `workflow/config-prokaryotic.yaml`:
+Edit `workflow/config/config-prokaryotic.yaml`:
 
 ```yaml
 # Select phage databases
@@ -150,7 +150,7 @@ prokaryotic:
 
 ```bash
 # Include prokaryotic rules
-snakemake --configfile workflow/config-prokaryotic.yaml \
+snakemake --configfile workflow/config/config-prokaryotic.yaml \
           --use-conda --cores 12 \
           --snakefile workflow/rules/prokaryotic.smk \
           prokaryotic_discovery_report

@@ -1,0 +1,185 @@
+---
+title: "Pipeline Architecture"
+subtitle: "Snakemake workflow for 2A peptide discovery"
+date: today
+execute:
+  echo: false
+  warning: false
+---
+
+## Overview
+
+The analysis pipeline is implemented in [Snakemake](https://snakemake.github.io/), providing reproducible and scalable execution on both local workstations and HPC clusters.
+
+## Workflow Structure
+
+```{mermaid}
+%%| label: fig-pipeline
+%%| fig-cap: "Snakemake pipeline DAG overview"
+flowchart TB
+    subgraph Download
+        D1[download_uniprot]
+        D2[download_reference_proteomes]
+        D3[download_uniparc]
+        D4[download_mgnify]
+    end
+
+    subgraph "Seed Phase"
+        S1[build_seed_models]
+        S2[hmmsearch seed]
+        S3[filter_alignment]
+        S4[merge_alignments]
+    end
+
+    subgraph "Refinement"
+        R1[build_refined_model]
+        R2[hmmsearch iter1]
+        R3[filter iter1]
+        R4[auto_curate_alignment]
+    end
+
+    subgraph "Final"
+        F1[build_final_models]
+        F2[generate_logos]
+        F3[generate_report]
+    end
+
+    D1 --> S2
+    D2 --> S2
+    S1 --> S2
+    S2 --> S3
+    S3 --> S4
+    S4 --> R1
+    R1 --> R2
+    R2 --> R3
+    R3 --> R4
+    R4 --> F1
+    F1 --> F2
+    F1 --> F3
+```
+
+## Directory Structure
+
+```
+workflow/
+├── Snakefile              # Main pipeline orchestration
+├── config/
+│   ├── config.yaml        # Main configuration
+│   └── config-prokaryotic.yaml  # Prokaryotic-specific settings
+├── rules/
+│   ├── download.smk       # Database downloads
+│   ├── search.smk         # HMM searches
+│   ├── refine.smk         # Model refinement
+│   ├── prokaryotic.smk    # Prokaryotic discovery
+│   └── report.smk         # Report generation
+└── scripts/
+    ├── filter_alignment.py
+    ├── auto_curate_alignment.py
+    ├── sanitize_fasta.py
+    └── utils/
+        └── logging_config.py
+```
+
+## Key Rules
+
+### Seed Model Building
+
+```python
+rule build_seed_models:
+    input:
+        alignment="resources/seed-alignments/2A-{peptide_class}.sto.gz"
+    output:
+        hmm=RESULTS_DIR + "/models/seed/2A-{peptide_class}.hmm"
+    shell:
+        "hmmbuild -n {params.name} {output.hmm} {input.alignment}"
+```
+
+### HMM Search
+
+```python
+rule hmmsearch:
+    input:
+        hmm=get_model_path,
+        db=get_database_file
+    output:
+        hmmsearch=SCRATCH_DIR + "/searches/{database}/{iteration}/2A-{peptide_class}.hmmsearch.gz",
+        tblout=SCRATCH_DIR + "/searches/{database}/{iteration}/2A-{peptide_class}.tblout.gz",
+        alignment=SCRATCH_DIR + "/searches/{database}/{iteration}/2A-{peptide_class}.sto.gz"
+    threads: 12
+    shell:
+        """
+        hmmsearch --cpu {threads} \
+            --tblout >(gzip > {output.tblout}) \
+            -A >(gzip > {output.alignment}) \
+            {input.hmm} {input.db} | gzip > {output.hmmsearch}
+        """
+```
+
+### Auto-Curation
+
+The pipeline includes automated alignment curation to replace manual review:
+
+```python
+rule auto_curate_alignment:
+    input:
+        alignment=SCRATCH_DIR + "/alignments/iter2/2A-{peptide_class}.merged.sto"
+    output:
+        curated=RESULTS_DIR + "/alignments/final/2A-{peptide_class}.auto-curated.sto"
+    shell:
+        """
+        python workflow/scripts/auto_curate_alignment.py \
+            {input.alignment} {output.curated} \
+            --evalue {params.evalue} \
+            --min-length 15 \
+            --max-gap-pct 0.5 \
+            --require-motif
+        """
+```
+
+## Cluster Execution
+
+For SLURM clusters:
+
+```bash
+# Submit orchestrator job
+sbatch submit-slurm.sh
+
+# Or run directly with profile
+pixi run snakemake --profile cluster/slurm
+```
+
+### Resource Configuration
+
+```yaml
+# cluster/slurm/config.yaml
+default-resources:
+  slurm_partition: amilan
+  runtime: 120
+  mem_mb: 8000
+  cpus_per_task: 4
+
+set-resources:
+  hmmsearch:
+    runtime: 1440  # 24 hours for large databases
+    mem_mb: 16000
+    cpus_per_task: 12
+```
+
+## Environment Management
+
+All dependencies are managed via [Pixi](https://pixi.sh/):
+
+```bash
+# Install dependencies
+pixi install
+
+# Run pipeline
+pixi run snakemake --cores 12
+```
+
+Key dependencies:
+
+- **HMMER 3.4**: Profile HMM searches
+- **Easel**: Alignment manipulation
+- **Biopython**: Sequence parsing
+- **Snakemake 8**: Workflow management

@@ -27,7 +27,7 @@
 #
 # Configuration:
 #   - Edit cluster/slurm/config.yaml to set your SLURM account
-#   - Edit workflow/config-prokaryotic.yaml to configure phage databases and parameters
+#   - Edit workflow/config/config-prokaryotic.yaml to configure phage databases and parameters
 #
 # See workflow/PROKARYOTIC-DISCOVERY.md for detailed documentation
 
@@ -45,7 +45,7 @@ TARGET="${1:-prokaryotic_discovery}"
 
 # Snakemake configuration
 SNAKEFILE="workflow/Snakefile"
-CONFIGFILE="workflow/config-prokaryotic.yaml"
+CONFIGFILE="workflow/config/config-prokaryotic.yaml"
 PROFILE="cluster/slurm"
 
 # ============================================================================
@@ -55,6 +55,7 @@ PROFILE="cluster/slurm"
 # Use Alpine's fast scratch filesystem for all outputs
 # Format: /scratch/alpine/<username>/<project-name>
 # Note: Scratch has 90-day purge policy - move important results to /projects after completion
+# Use $USER as-is (contains @ on Alpine cluster)
 export SCRATCH_DIR="/scratch/alpine/${USER}/2a-peptide-search"
 export RESULTS_DIR="${SCRATCH_DIR}/results"
 export DATA_DIR="${SCRATCH_DIR}/data"

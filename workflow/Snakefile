@@ -16,7 +16,8 @@ import os
 
 
 # Load configuration
-configfile: "workflow/config.yaml"
+configfile: "workflow/config/config.yaml"
+configfile: "workflow/config/config-prokaryotic.yaml"
 
 
 # Set up output directories
@@ -29,7 +30,9 @@ RESULTS_DIR = os.environ.get(
     "RESULTS_DIR", config.get("output_dirs", {}).get("results", "scratch/results")
 )
 DATA_DIR = os.environ.get(
-    "DATA_DIR", config.get("output_dirs", {}).get("data", "scratch/data")
+    "RESOURCES_DIR", os.environ.get(
+        "DATA_DIR", config.get("output_dirs", {}).get("data", "scratch/data")
+    )
 )
 LOGS_DIR = os.environ.get(
     "LOGS_DIR", config.get("output_dirs", {}).get("logs", "scratch/logs")
@@ -61,6 +64,8 @@ include: "rules/download.smk"
 include: "rules/refine.smk"
 include: "rules/search.smk"
 include: "rules/report.smk"
+include: "rules/prokaryotic_download.smk"
+include: "rules/prokaryotic_orf.smk"
 include: "rules/prokaryotic.smk"
 include: "rules/logos.smk"
 
@@ -110,10 +115,31 @@ rule iter1:
         ),
 
 
-# Complete iteration 2 (requires checkpoint)
+# Complete iteration 2 (automated with auto-curation)
 rule iter2:
     input:
-        RESULTS_DIR + "/checkpoints/iter2.curated",
+        expand(
+            RESULTS_DIR + "/alignments/final/2A-{peptide_class}.auto-curated.sto",
+            peptide_class=["class-1", "class-2"],
+        ),
+
+
+# Manual curation workflow (optional - for maximum control)
+rule manual_curation:
+    """Optional workflow using manually curated alignments.
+
+    To use:
+    1. Run: snakemake iter2 --cores 12
+    2. Review alignments in results/alignments/iter2/
+    3. Save curated versions to results/alignments/final/2A-class-{1,2}.curated.sto
+    4. Run: touch results/checkpoints/iter2.curated
+    5. Run: snakemake manual_curation --cores 12
+    """
+    input:
+        expand(
+            RESULTS_DIR + "/models/manual/2A-{peptide_class}.hmm",
+            peptide_class=["class-1", "class-2"],
+        ),
 
 
 # Prokaryotic 2A-like peptide discovery

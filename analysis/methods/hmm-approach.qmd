@@ -1,0 +1,128 @@
+---
+title: "HMM Methodology"
+subtitle: "Profile hidden Markov models for sequence homology detection"
+date: today
+---
+
+## Profile HMMs for 2A Peptides
+
+Profile hidden Markov models (pHMMs) are probabilistic models that capture position-specific amino acid preferences and insertion/deletion patterns from multiple sequence alignments.
+
+### Why Profile HMMs?
+
+2A peptides are challenging to identify using standard BLAST:
+
+1. **Short sequences** (~15-20 residues) have limited statistical power
+2. **Conserved motifs** are interspersed with variable regions
+3. **Distant homologs** may share <30% sequence identity
+
+Profile HMMs address these challenges by:
+
+- Modeling position-specific conservation patterns
+- Allowing insertions and deletions with learned penalties
+- Providing calibrated E-values for statistical significance
+
+## HMMER Suite
+
+We use [HMMER](http://hmmer.org/) for all HMM operations:
+
+| Tool | Purpose |
+|------|---------|
+| `hmmbuild` | Build profile HMM from alignment |
+| `hmmsearch` | Search database with HMM |
+| `hmmalign` | Align sequences to HMM |
+| `hmmpress` | Prepare HMM database |
+
+### Building Models
+
+```bash
+# Build HMM from Stockholm alignment
+hmmbuild -n "2A-class-1" model.hmm alignment.sto
+
+# Model parameters
+# - Position-specific emission probabilities
+# - Insertion/deletion state transitions
+# - Match state consensus
+```
+
+### Search Strategy
+
+```bash
+# Search protein database
+hmmsearch --cpu 12 \
+    --tblout results.tblout \
+    -A results.sto \
+    model.hmm database.fasta
+```
+
+## Iterative Refinement
+
+The pipeline uses iterative HMM refinement:
+
+```{mermaid}
+%%| label: fig-iteration
+%%| fig-cap: "Iterative HMM refinement cycle"
+flowchart LR
+    A[Seed Alignment] --> B[Build HMM]
+    B --> C[Search DBs]
+    C --> D[Filter Hits]
+    D --> E[Merge Alignments]
+    E --> F[Build Refined HMM]
+    F --> C
+```
+
+### Iteration 1: Seed Search
+
+- Start with curated seed alignments (known 2A peptides)
+- Build initial HMMs
+- Search all databases
+- Filter by E-value threshold (1e-5)
+
+### Iteration 2: Refinement
+
+- Merge filtered hits from all databases
+- Remove redundant sequences
+- Build refined HMMs
+- Search again with improved models
+
+### Auto-Curation
+
+After iteration 2, automated curation applies:
+
+1. **E-value filter**: Remove low-confidence hits
+2. **Length filter**: Require minimum 15 residues
+3. **Gap filter**: Maximum 50% gaps
+4. **Motif filter**: Require C-terminal PGP motif
+5. **Outlier removal**: Drop bottom 10% by bit score
+
+## Model Characteristics
+
+### Class 1 HMM Profile
+
+Key conserved positions:
+
+- N-terminal: L-rich region
+- Central: GDVE motif
+- C-terminal: NPGP
+
+### Class 2 HMM Profile
+
+Key conserved positions:
+
+- N-terminal: Invariant W
+- Central: EEGIE motif
+- C-terminal: PNPGP/PHPGP
+
+## E-value Interpretation
+
+| E-value | Interpretation |
+|---------|----------------|
+| < 1e-10 | Very confident hit |
+| 1e-10 - 1e-5 | Confident hit |
+| 1e-5 - 1e-3 | Possible hit, review |
+| > 1e-3 | Likely spurious |
+
+::: {.callout-warning}
+## Cross-Class Matches
+Due to the conserved C-terminal PGP motif, some hits may partially match both class 1 and class 2 models. Always check both search results.
+:::

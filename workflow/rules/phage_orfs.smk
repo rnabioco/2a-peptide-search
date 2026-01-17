@@ -29,17 +29,46 @@ rule download_phage_genomes:
 
 
 rule download_imgvr_phages:
-    """Download IMG/VR phage database."""
+    """
+    Download IMG/VR phage database or symlink from local path.
+
+    IMG/VR requires web login. To use:
+    1. Download manually from https://img.jgi.doe.gov/vr/
+    2. Set phage_databases.imgvr.local_path in config to downloaded file
+    """
     output:
         genomes=DATA_DIR + "/phage/imgvr/IMGVR_all_nucleotides.fna.gz",
     params:
-        url=config["phage_databases"]["imgvr"]["url"],
+        url=lambda w: config["phage_databases"]["imgvr"].get("url", ""),
+        local_path=lambda w: config["phage_databases"]["imgvr"].get("local_path", None),
     log:
         LOGS_DIR + "/download/phage_imgvr.log",
     shell:
         """
-        mkdir -p data/phage/imgvr
-        wget -c -o {log} {params.url} -O {output.genomes}
+        mkdir -p $(dirname {output.genomes})
+
+        # Check if local path is specified
+        if [ ! -z "{params.local_path}" ] && [ "{params.local_path}" != "None" ]; then
+            echo "Using local file: {params.local_path}" > {log}
+
+            # Check if file exists
+            if [ ! -f "{params.local_path}" ]; then
+                echo "ERROR: Local file not found: {params.local_path}" >> {log}
+                echo "Please download IMG/VR manually and update config.local_path" >> {log}
+                exit 1
+            fi
+
+            # Create symlink to local file
+            ln -sf $(readlink -f {params.local_path}) {output.genomes}
+            echo "Created symlink to {params.local_path}" >> {log}
+        else
+            echo "No local_path configured, attempting download (requires login)..." > {log}
+            echo "Note: IMG/VR download requires authentication" >> {log}
+            wget -c -o {log} {params.url} -O {output.genomes} 2>> {log} || \
+                (echo "ERROR: Download failed. IMG/VR requires manual download." >> {log} && \
+                 echo "Please download from https://img.jgi.doe.gov/vr/ and set local_path in config" >> {log} && \
+                 exit 1)
+        fi
         """
 
 

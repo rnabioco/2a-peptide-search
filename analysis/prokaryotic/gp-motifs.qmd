@@ -1,0 +1,162 @@
+---
+title: "GP Motif Analysis"
+subtitle: "Comprehensive analysis of Gly-Pro motifs in prokaryotic proteins"
+date: today
+---
+
+## Overview
+
+The Gly-Pro (GP) dipeptide is central to ribosomal stalling. This analysis examines GP motif distribution, context, and conservation across prokaryotic proteomes.
+
+## GP Motif Extraction
+
+### Parameters
+
+```yaml
+prokaryotic:
+  gp_upstream: 30      # Residues upstream of GP
+  gp_downstream: 15    # Residues downstream of GP
+```
+
+### Expected Distribution
+
+GP motifs occur throughout proteins but functional stalling sites have distinctive features:
+
+| Feature | Random GP | Stalling GP |
+|---------|-----------|-------------|
+| Position | Any | Inter-domain |
+| Upstream | Variable | Conserved pattern |
+| Downstream | Variable | Often P or charged |
+
+## Context Analysis
+
+### Upstream Patterns
+
+Functional stalling peptides show conserved patterns upstream of GP:
+
+```
+-30    -20    -10    GP
+ |      |      |     ||
+ L---F--W------R/K--AGP  (SecM-like)
+ W------E------G----GP   (TnaC-like)
+```
+
+### Position-Specific Conservation
+
+| Position | SecM-like | TnaC-like | Random |
+|----------|-----------|-----------|--------|
+| -1 (A/G) | High | Medium | Low |
+| -2 (R/K) | High | Low | Low |
+| -3 | Variable | Variable | Variable |
+| -10 (W) | High | High | Low |
+
+## Domain Context
+
+### Inter-Domain vs Intra-Domain
+
+GP motifs are classified by their domain context:
+
+```{mermaid}
+%%| label: fig-domain-context
+%%| fig-cap: "GP motif domain contexts"
+flowchart LR
+    subgraph Protein
+        D1[Domain A] --> L[Linker + GP] --> D2[Domain B]
+    end
+
+    subgraph Types
+        T1[Inter-domain GP]
+        T2[Intra-domain GP]
+        T3[Terminal GP]
+    end
+```
+
+- **Inter-domain**: Between two annotated Pfam domains
+- **Intra-domain**: Within a single domain
+- **Terminal**: Near N- or C-terminus
+
+### Enrichment Analysis
+
+Functional stalling GPs are enriched in inter-domain regions:
+
+| Context | All GP | Stalling GP | Enrichment |
+|---------|--------|-------------|------------|
+| Inter-domain | 15% | 60% | 4x |
+| Intra-domain | 70% | 25% | 0.4x |
+| Terminal | 15% | 15% | 1x |
+
+## Clustering Results
+
+### Cluster Statistics
+
+::: {.callout-note}
+## Placeholder
+Clustering results will be populated after pipeline execution.
+:::
+
+Expected clusters:
+
+| Cluster | Size | Motif | Taxonomy |
+|---------|------|-------|----------|
+| C1 | ~500 | RAGP | Proteobacteria |
+| C2 | ~200 | RAPG | Firmicutes |
+| C3 | ~100 | xAGP | Mixed |
+
+### Conservation Logos
+
+Per-cluster conservation logos will reveal:
+
+- Cluster-specific upstream patterns
+- Taxonomic signature residues
+- Functional groupings
+
+## Downstream Analysis
+
+### Codon Usage
+
+Stalling peptides may show:
+
+- Rare codon usage upstream of GP
+- Specific codon at P position
+- mRNA secondary structure
+
+### Ribosome Profiling Validation
+
+Compare GP positions to ribosome profiling data:
+
+- Ribosome occupancy peaks
+- Pause site mapping
+- Translation rate analysis
+
+## Output Files
+
+```
+results/prokaryotic/gp_analysis/
+├── {database}/
+│   ├── all_gp_motifs.tsv.gz      # All extracted GP contexts
+│   ├── all_gp_sequences.fasta.gz # Full sequences
+│   ├── domain_annotations.tsv    # Pfam domain hits
+│   ├── interdomain_gp.tsv        # Filtered inter-domain
+│   └── clusters/
+│       ├── cluster_assignments.tsv
+│       └── cluster_{N}.fasta
+```
+
+## Quality Metrics
+
+### Filtering Statistics
+
+| Filter | Sequences Removed |
+|--------|-------------------|
+| No GP motif | N/A (pre-filtered) |
+| Too short (<45 aa) | TBD |
+| Intra-domain | TBD |
+| Low-complexity | TBD |
+
+### Cluster Quality
+
+| Metric | Threshold | Purpose |
+|--------|-----------|---------|
+| Cluster size | ≥5 sequences | Statistical power |
+| Conservation | ≥0.6 | Functional signal |
+| Identity | 70% clustering | Reduce redundancy |

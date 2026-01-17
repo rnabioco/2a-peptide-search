@@ -115,15 +115,22 @@ Edit `workflow/config.yaml` to:
 - Adjust E-value and identity thresholds
 - Modify resource allocation (threads, retries)
 
-### Manual Curation Checkpoints
+### Automated vs Manual Curation
 
-The pipeline includes manual curation checkpoints:
+By default, the pipeline uses **automated curation** after iteration 2:
+- Quality filters are applied automatically (E-value, sequence length, gap percentage, C-terminal motif)
+- No manual intervention required
+- Pipeline runs end-to-end without pausing
 
-1. Pipeline pauses after iteration 2
-2. Review alignments in `results/alignments/iter2/`
-3. Manually curate and save to `results/alignments/final/*.curated.sto`
-4. Create checkpoint: `touch results/checkpoints/iter2.curated`
-5. Continue pipeline to build final models
+**Optional manual curation** is available for maximum control:
+
+1. Run iteration 2: `pixi run snakemake iter2 --cores 12`
+2. Review alignments in `scratch/results/alignments/iter2/`
+3. Manually curate and save to `scratch/results/alignments/final/2A-class-{1,2}.curated.sto`
+4. Create checkpoint: `touch scratch/results/checkpoints/iter2.curated`
+5. Build manual models: `pixi run snakemake manual_curation --cores 12`
+
+Manual models are saved to `results/models/manual/` (separate from auto-curated models in `results/models/final/`).
 
 ## Pipeline Workflow
 
@@ -132,7 +139,7 @@ The pipeline includes manual curation checkpoints:
 3. **Search Iteration 1** → Search all databases with seed HMMs
 4. **Refine Iteration 1** → Build refined HMMs from high-confidence hits
 5. **Search Iteration 2** → Search with refined HMMs
-6. **Manual Checkpoint** → User reviews and curates alignments
+6. **Auto-Curate** → Apply quality filters to alignments (or optional manual curation)
 7. **Build Final Models** → Create production HMMs from curated alignments
 8. **Generate Report** → Create Quarto document with analysis summary
 
@@ -172,10 +179,33 @@ Major protein databases searched:
 - **UniParc** - Non-redundant uncurated proteins (millions of sequences)
 - **MGnify** - Environmental/metagenomic sequences (very large)
 
+### Databases Requiring Manual Download
+
+Some databases require authentication or manual download:
+
+**IMG/VR (Phage Database)**
+
+IMG/VR requires web login and cannot be downloaded directly via wget. To use IMG/VR:
+
+1. Download manually from https://img.jgi.doe.gov/vr/
+2. Save the file locally (e.g., `IMGVR_all_nucleotides.fna.gz`)
+3. Edit `workflow/config/config-prokaryotic.yaml` and set the local path:
+   ```yaml
+   phage_databases:
+     imgvr:
+       local_path: "/path/to/IMGVR_all_nucleotides.fna.gz"
+   ```
+4. The pipeline will create a symlink to your local file instead of attempting download
+
+If `local_path` is not configured, the pipeline will attempt to download and provide clear error messages about authentication requirements.
+
 ## Development Notes
 
 - Scripts in `workflow/scripts/` are called by Snakemake rules
 - Each script should be standalone and use click for CLI
+- **Plotting**: Use `plotnine` (NOT matplotlib or seaborn) for all data visualization
+- **Image manipulation**: Use `pillow` (PIL) for creating images
+- **Code formatting**: Use `ruff` for Python formatting (available in dev environment)
 - Test rules individually: `pixi run snakemake <target> --cores 1`
 - Legacy code is archived in `legacy/` for reference
 - The models can identify partial cross-matches between classes due to the conserved C-terminal PGP motif
@@ -225,3 +255,4 @@ See `cluster/slurm/README.md` for complete SLURM documentation.
 - **Missing checkpoint**: Manually create the checkpoint file to continue pipeline
 - **SLURM job fails**: Check `.snakemake/slurm_logs/` and increase resources in cluster config
 - **Timeout on cluster**: Increase `runtime` in `cluster/slurm/config.yaml` for specific rules
+- **IMG/VR authentication error**: Download manually from https://img.jgi.doe.gov/vr/ and set `local_path` in `workflow/config/config-prokaryotic.yaml`

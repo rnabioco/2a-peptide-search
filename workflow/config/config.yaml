@@ -24,7 +24,7 @@ databases:
     size: "small"  # ~500k sequences
 
   reference_proteomes:
-    url: "https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/reference_proteomes/Reference_Proteomes_2024_02.tar.gz"
+    url: "https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/reference_proteomes/Reference_Proteomes_2025_04.tar.gz"
     description: "Reference proteomes used by Pfam"
     size: "medium"  # representative proteomes
 
@@ -34,8 +34,20 @@ databases:
     size: "very_large"  # millions of sequences
 
   mgnify:
-    url: "https://ftp.ebi.ac.uk/pub/databases/metagenomics/peptide_database/current_release/mgnify_proteins.fasta.gz"
-    description: "MGnify environmental/metagenomic sequences"
+    base_url: "https://ftp.ebi.ac.uk/pub/databases/metagenomics/peptide_database/current_release"
+    description: "MGnify environmental/metagenomic sequences (25 split files, ~270GB total)"
+    size: "very_large"
+    num_splits: 25  # Database is split into mgy_proteins_1.fa.gz through mgy_proteins_25.fa.gz
+    # Note: download_mgnify downloads all splits (parallel)
+    #       merge_mgnify_splits creates single file (for existing search rules)
+    #       For best performance on cluster, search splits separately in parallel
+
+  imgvr:
+    # IMG/VR requires web login - download manually and specify local path
+    # Download from: https://img.jgi.doe.gov/vr/
+    # Set local_path to your downloaded file location
+    local_path: null  # e.g., "/path/to/IMGVR_all_proteins.faa.gz"
+    description: "IMG/VR viral genomes database (requires manual download)"
     size: "very_large"
 
 # Which databases to search (comment out to skip)
@@ -73,3 +85,24 @@ peptide_classes:
 resources:
   hmmsearch_threads: 12
   download_retries: 3
+
+# Skylign sequence logo generation
+skylign:
+  api_url: "http://skylign.org"
+  processing: "hmm"  # hmm or obs
+  retry_attempts: 3
+  retry_delay: 5  # seconds between retries
+
+# Prokaryotic databases (for prokaryotic 2A-like peptide discovery)
+prokaryotic_databases:
+  bacteria:
+    url: "https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/taxonomic_divisions/uniprot_sprot_bacteria.dat.gz"
+  pfam:
+    url: "http://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/Pfam-A.hmm.gz"
+
+# Prokaryotic analysis parameters
+prokaryotic:
+  clustering_identity: 0.7
+  clustering_coverage: 0.8
+  min_cluster_size: 5
+  min_conservation: 0.5

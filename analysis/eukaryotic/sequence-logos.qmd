@@ -1,0 +1,125 @@
+---
+title: "Sequence Logos"
+subtitle: "Visualization of conserved motifs in 2A peptides"
+date: today
+---
+
+## Overview
+
+Sequence logos visualize the conservation pattern at each position in the aligned 2A peptides. Height indicates information content (conservation), and letter size shows relative amino acid frequency.
+
+## Class 1 Sequence Logo
+
+::: {.callout-note}
+## Placeholder
+Sequence logos will be generated from the final curated alignments using Skylign or similar tools.
+:::
+
+### Expected Conservation Pattern
+
+```
+Position:  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18
+Consensus: L  L  x  x  x  x  G  D  V  E  x  x  x  x  N  P  G  P
+                          ^^^^^^^               ^^^^^^^^^^
+                          Central               C-terminal
+```
+
+**Key positions:**
+- Positions 7-10: GDVE central motif
+- Positions 15-18: NPGP C-terminal motif
+
+## Class 2 Sequence Logo
+
+### Expected Conservation Pattern
+
+```
+Position:  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19
+Consensus: W  x  x  x  x  E  E  G  I  E  x  x  x  P  N  P  G  P  x
+           ^              ^^^^^^^^^^^        ^^^^^^^^^^^^^^
+           N-terminal     Central            C-terminal
+```
+
+**Key positions:**
+- Position 1: Invariant tryptophan (W)
+- Positions 6-10: EEGIE central motif
+- Positions 14-18: PNPGP C-terminal motif
+
+## Generating Logos
+
+### Using ggseqlogo (R)
+
+```r
+#| label: fig-example-logo
+#| fig-cap: "Example sequence logo generation"
+#| eval: false
+
+library(ggseqlogo)
+library(tidyverse)
+
+# Read sequences from alignment
+sequences <- c(
+    "EGRGSLLTCGDVEENPGP",
+    "ATNFSLLKQAGDVEENPGP",
+    "QCTNYALLKLAGDVESNPGP"
+)
+
+# Generate logo
+ggseqlogo(sequences, method = "prob") +
+    labs(title = "2A Peptide Class 1") +
+    theme_logo()
+```
+
+### Using WebLogo (CLI)
+
+```bash
+weblogo -f alignment.fasta -o logo.png \
+    -F png -s large \
+    -c chemistry \
+    --title "2A Peptide Class 1"
+```
+
+## Interpretation Guide
+
+| Feature | Meaning |
+|---------|---------|
+| Tall letters | Highly conserved position |
+| Short letters | Variable position |
+| Stack height | Information content (bits) |
+| Letter order | Frequency (top = most common) |
+
+## Conservation by Iteration
+
+Track how conservation patterns change through iterative refinement:
+
+| Iteration | Sequences | Avg. Conservation |
+|-----------|-----------|-------------------|
+| Seed | ~10 | High |
+| Iter 1 | ~100 | Medium |
+| Iter 2 | ~500 | Lower (more diversity) |
+| Final (curated) | ~200 | Medium-High |
+
+## Position-Specific Features
+
+### Critical Residues
+
+| Position | Residue | Function | Tolerance |
+|----------|---------|----------|-----------|
+| -1 | G | Cleavage site | None |
+| 0 | P | Cleavage site | None |
+| -2 | G | Positioning | Low |
+| -3 | P/N | Efficiency | Medium |
+
+### Variable Regions
+
+- Positions 2-6: Allow diversity
+- Positions 11-14: Linker region
+- Tolerate substitutions without losing function
+
+## Downloads
+
+Once generated, logos will be available at:
+
+- `results/logos/seed/2A-class-1.png`
+- `results/logos/seed/2A-class-2.png`
+- `results/logos/final/2A-class-1.png`
+- `results/logos/final/2A-class-2.png`

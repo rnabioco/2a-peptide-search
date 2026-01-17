@@ -1,0 +1,131 @@
+/*-- scss:defaults --*/
+
+// Colors
+$primary: #2c5282;
+$secondary: #4a5568;
+$success: #38a169;
+$info: #3182ce;
+$warning: #d69e2e;
+$danger: #e53e3e;
+
+// Fonts
+$font-family-sans-serif: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+$font-family-monospace: "Fira Code", "JetBrains Mono", "Cascadia Code", monospace;
+
+// Font sizes
+$font-size-root: 16px;
+$h1-font-size: 2rem;
+$h2-font-size: 1.5rem;
+$h3-font-size: 1.25rem;
+
+// Code
+$code-font-size: 0.875rem;
+$code-color: $primary;
+
+/*-- scss:rules --*/
+
+// Improved table styling
+.table {
+  font-size: 0.9rem;
+
+  th {
+    background-color: rgba($primary, 0.1);
+    font-weight: 600;
+  }
+
+  td {
+    vertical-align: middle;
+  }
+}
+
+// Callout improvements
+.callout {
+  margin: 1.5rem 0;
+
+  .callout-title {
+    font-weight: 600;
+  }
+}
+
+// Code block styling
+pre.sourceCode {
+  border-radius: 0.5rem;
+  border: 1px solid rgba($secondary, 0.2);
+}
+
+// Mermaid diagram styling
+.mermaid {
+  text-align: center;
+  margin: 1.5rem 0;
+
+  svg {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+// Sidebar improvements
+.sidebar {
+  .sidebar-title {
+    font-weight: 700;
+    color: $primary;
+  }
+
+  .sidebar-item {
+    padding: 0.25rem 0;
+
+    &.active {
+      font-weight: 600;
+      border-left: 3px solid $primary;
+      padding-left: 0.5rem;
+    }
+  }
+}
+
+// TOC styling
+.toc {
+  font-size: 0.875rem;
+
+  .toc-title {
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+  }
+}
+
+// Figure captions
+.figure-caption {
+  font-size: 0.875rem;
+  color: $secondary;
+  font-style: italic;
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+// Sequence display (monospace)
+.sequence {
+  font-family: $font-family-monospace;
+  background-color: rgba($secondary, 0.05);
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  overflow-x: auto;
+}
+
+// Motif highlighting
+.motif {
+  font-family: $font-family-monospace;
+  font-weight: 700;
+  color: $primary;
+}
+
+// Conservation coloring
+.conserved-high {
+  background-color: rgba($success, 0.3);
+}
+
+.conserved-medium {
+  background-color: rgba($warning, 0.3);
+}
+
+.conserved-low {
+  background-color: rgba($danger, 0.1);
+}

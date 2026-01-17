@@ -28,7 +28,7 @@ rule generate_report:
             peptide_class=["class-1", "class-2"],
         ),
         alignments=expand(
-            RESULTS_DIR + "/alignments/final/2A-{peptide_class}.curated.sto",
+            RESULTS_DIR + "/alignments/final/2A-{peptide_class}.auto-curated.sto",
             peptide_class=["class-1", "class-2"],
         ),
     output:
