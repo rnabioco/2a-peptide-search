@@ -1,0 +1,84 @@
+# Snakemake LSF Profile - 2A Peptide Search Pipeline
+# =====================================================
+# LSF cluster configuration (e.g., Fiji)
+# Usage: snakemake --profile cluster/lsf
+
+executor: lsf
+jobs: 100
+latency-wait: 60
+restart-times: 2
+rerun-incomplete: true
+keep-going: true
+printshellcmds: true
+show-failed-logs: true
+
+# N.B. mem_mb values are in GB for LSF executor
+default-resources:
+  - 'mem_mb=8'
+  - 'lsf_queue=rna'
+  - 'lsf_project=2a-peptide'  # CHANGE THIS to your LSF project
+  - 'lsf_extra=""'
+  - 'runtime=120'
+
+# Rule-specific resources
+# Format: rule:resource=value
+set-resources:
+  # ============================================================================
+  # Database Download Rules
+  # ============================================================================
+  - download_uniprot:runtime=60
+  - download_uniprot:mem_mb=2
+  - download_reference_proteomes:runtime=120
+  - download_reference_proteomes:mem_mb=2
+  - extract_reference_proteomes:runtime=60
+  - extract_reference_proteomes:mem_mb=8
+  - download_uniparc:runtime=480
+  - download_uniparc:mem_mb=4
+  - download_mgnify:runtime=480
+  - download_mgnify:mem_mb=4
+  # ============================================================================
+  # HMM Building Rules
+  # ============================================================================
+  - build_seed_models:runtime=10
+  - build_seed_models:mem_mb=2
+  - build_refined_model:runtime=30
+  - build_refined_model:mem_mb=4
+  - build_final_models:runtime=30
+  - build_final_models:mem_mb=4
+  # ============================================================================
+  # HMM Search Rules (resource intensive)
+  # ============================================================================
+  - hmmsearch:runtime=1440
+  - hmmsearch:mem_mb=16
+  # ============================================================================
+  # Alignment Processing Rules
+  # ============================================================================
+  - filter_alignment:runtime=30
+  - filter_alignment:mem_mb=8
+  - merge_database_alignments:runtime=60
+  - merge_database_alignments:mem_mb=16
+  # ============================================================================
+  # Reporting Rules
+  # ============================================================================
+  - collect_statistics:runtime=30
+  - collect_statistics:mem_mb=4
+  - generate_report:runtime=60
+  - generate_report:mem_mb=8
+  # ============================================================================
+  # Sequence Logo Generation Rules
+  # ============================================================================
+  - generate_logo_seed:runtime=10
+  - generate_logo_seed:mem_mb=2
+  - generate_logo_iter1:runtime=10
+  - generate_logo_iter1:mem_mb=2
+  - generate_logo_iter2:runtime=10
+  - generate_logo_iter2:mem_mb=2
+  - generate_logo_final:runtime=10
+  - generate_logo_final:mem_mb=2
+
+# =============================================================================
+# Cluster-specific notes
+# =============================================================================
+# NOTE: Nested YAML config sections cannot be passed via snakemake profiles
+# due to command-line escaping issues with the LSF executor. Instead, set
+# local paths directly in workflow/config/config-prokaryotic.yaml.
