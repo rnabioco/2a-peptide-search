@@ -14,13 +14,16 @@ Workflow:
 
 
 rule download_phage_genomes:
-    """Download phage genome databases."""
+    """Download phage genome databases (generic rule for URL-based downloads)."""
     output:
         genomes=DATA_DIR + "/phage/{db}/genomes.fasta.gz",
     params:
         url=lambda w: config["phage_databases"][w.db]["url"],
     log:
         LOGS_DIR + "/download/phage_{db}.log",
+    wildcard_constraints:
+        # Exclude databases with specific rules (local files, tarballs, special handling)
+        db="(?!inphared|imgvr|rvdb|tara|malaspina).*",
     shell:
         """
         mkdir -p data/phage/{wildcards.db}
@@ -90,6 +93,87 @@ rule download_inphared:
         """
 
 
+rule download_rvdb:
+    """Download RVDB (Reference Viral Database) nucleotide sequences."""
+    output:
+        genomes=DATA_DIR + "/phage/rvdb/genomes.fasta.gz",
+    params:
+        url=config["phage_databases"]["rvdb"]["url"],
+    log:
+        LOGS_DIR + "/download/phage_rvdb.log",
+    shell:
+        """
+        mkdir -p $(dirname "{output.genomes}")
+        wget -c -o "{log}" "{params.url}" -O "{output.genomes}"
+        """
+
+
+rule extract_tara_genomes:
+    """Extract and concatenate Tara Oceans viral assemblies."""
+    input:
+        tarball=config["phage_databases"]["tara"]["local_path"],
+    output:
+        genomes=DATA_DIR + "/phage/tara/genomes.fasta.gz",
+    log:
+        LOGS_DIR + "/download/phage_tara.log",
+    shell:
+        """
+        set -e
+        OUTDIR=$(dirname "{output.genomes}")
+        TMPDIR="${{OUTDIR}}/tmp_extract_$$"
+        mkdir -p "$TMPDIR"
+
+        echo "Extracting tarball contents..." > "{log}"
+        tar -tzf "{input.tarball}" | head -20 >> "{log}"
+
+        # Extract all files to temp directory
+        tar -xzf "{input.tarball}" -C "$TMPDIR" 2>> "{log}"
+
+        # Concatenate all FASTA files (.fasta, .fa, .fna)
+        echo "Concatenating FASTA files..." >> "{log}"
+        find "$TMPDIR" -type f \( -name "*.fasta" -o -name "*.fa" -o -name "*.fna" \) \
+            -exec cat {{}} \; | gzip > "{output.genomes}"
+
+        # Clean up temp directory
+        rm -rf "$TMPDIR"
+
+        echo "Extracted $(zcat "{output.genomes}" | grep -c '^>' || echo 0) sequences" >> "{log}"
+        """
+
+
+rule extract_malaspina_genomes:
+    """Extract and concatenate Malaspina viral assemblies."""
+    input:
+        tarball=config["phage_databases"]["malaspina"]["local_path"],
+    output:
+        genomes=DATA_DIR + "/phage/malaspina/genomes.fasta.gz",
+    log:
+        LOGS_DIR + "/download/phage_malaspina.log",
+    shell:
+        """
+        set -e
+        OUTDIR=$(dirname "{output.genomes}")
+        TMPDIR="${{OUTDIR}}/tmp_extract_$$"
+        mkdir -p "$TMPDIR"
+
+        echo "Extracting tarball contents..." > "{log}"
+        tar -tzf "{input.tarball}" | head -20 >> "{log}"
+
+        # Extract all files to temp directory
+        tar -xzf "{input.tarball}" -C "$TMPDIR" 2>> "{log}"
+
+        # Concatenate all FASTA files (.fasta, .fa, .fna)
+        echo "Concatenating FASTA files..." >> "{log}"
+        find "$TMPDIR" -type f \( -name "*.fasta" -o -name "*.fa" -o -name "*.fna" \) \
+            -exec cat {{}} \; | gzip > "{output.genomes}"
+
+        # Clean up temp directory
+        rm -rf "$TMPDIR"
+
+        echo "Extracted $(zcat "{output.genomes}" | grep -c '^>' || echo 0) sequences" >> "{log}"
+        """
+
+
 # ============================================================================
 # ORF Prediction
 # ============================================================================
@@ -100,9 +184,12 @@ rule split_phage_genomes:
     input:
         genomes=DATA_DIR + "/phage/{db}/genomes.fasta.gz",
     output:
-        chunks=expand(
-            DATA_DIR + "/phage/{{db}}/chunks/chunk_{chunk}.fasta",
-            chunk=range(1, 101),  # 100 chunks
+        # Mark chunks as temp - deleted after ORF prediction completes
+        chunks=temp(
+            expand(
+                DATA_DIR + "/phage/{{db}}/chunks/chunk_{chunk}.fasta",
+                chunk=range(1, 101),  # 100 chunks
+            )
         ),
     params:
         seqs_per_chunk=1000,
@@ -119,9 +206,10 @@ rule predict_orfs_prodigal:
     input:
         chunk=DATA_DIR + "/phage/{db}/chunks/chunk_{chunk}.fasta",
     output:
-        proteins=RESULTS_DIR + "/phage/{db}/orfs/chunk_{chunk}.faa",
-        genes=RESULTS_DIR + "/phage/{db}/orfs/chunk_{chunk}.fna",
-        gff=RESULTS_DIR + "/phage/{db}/orfs/chunk_{chunk}.gff",
+        # Mark individual chunk outputs as temp - deleted after merge
+        proteins=temp(RESULTS_DIR + "/phage/{db}/orfs/chunk_{chunk}.faa"),
+        genes=temp(RESULTS_DIR + "/phage/{db}/orfs/chunk_{chunk}.fna"),
+        gff=temp(RESULTS_DIR + "/phage/{db}/orfs/chunk_{chunk}.gff"),
     log:
         LOGS_DIR + "/phage/prodigal_{db}_chunk_{chunk}.log",
     conda:
@@ -143,7 +231,7 @@ rule predict_orfs_prodigal:
 
 
 rule merge_predicted_orfs:
-    """Merge predicted ORFs from all chunks."""
+    """Merge predicted ORFs from all chunks into final gzipped file."""
     input:
         proteins=expand(
             RESULTS_DIR + "/phage/{{db}}/orfs/chunk_{chunk}.faa", chunk=range(1, 101)
@@ -156,6 +244,9 @@ rule merge_predicted_orfs:
         """
         cat {input.proteins} | gzip > {output.merged}
         echo "Merged $(zcat {output.merged} | grep -c '^>') ORFs" > {log}
+
+        # Clean up empty chunk directories
+        rmdir $(dirname {input.proteins[0]}) 2>/dev/null || true
         """
 
 

@@ -131,3 +131,11 @@ set-resources:
     runtime: 10
     mem_mb: 2000
     cpus_per_task: 1
+
+# =============================================================================
+# Cluster-specific notes
+# =============================================================================
+# NOTE: Nested YAML config sections cannot be passed via snakemake profiles
+# due to command-line escaping issues with the SLURM executor. Instead, set
+# local paths directly in workflow/config/config-prokaryotic.yaml or use
+# the --config flag with properly quoted values.

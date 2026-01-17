@@ -57,6 +57,10 @@ def get_prokaryotic_database_file(wildcards):
     if wildcards.database in ["inphared_proteins", "millardlab_proteins"]:
         return DATA_DIR + f"/prokaryotic/{wildcards.database}.fasta.gz"
 
+    # Gut Phage Database (CyVerse/iVirus)
+    if wildcards.database == "gpd":
+        return DATA_DIR + "/prokaryotic/gpd.fasta.gz"
+
     # MGnify uses main pipeline download
     if wildcards.database == "mgnify":
         return f"{DATA_DIR}/mgnify/mgnify_proteins.fasta.gz"

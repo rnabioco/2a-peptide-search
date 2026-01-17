@@ -67,6 +67,7 @@ include: "rules/report.smk"
 include: "rules/prokaryotic_download.smk"
 include: "rules/prokaryotic_orf.smk"
 include: "rules/prokaryotic.smk"
+include: "rules/phage_orfs.smk"
 include: "rules/logos.smk"
 
 

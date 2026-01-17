@@ -17,7 +17,7 @@ prokaryotic_databases:
     description: "MGnify metagenomic protein database (use main pipeline download)"
 
   imgvr:
-    local_path: "/scratch/alpine/jhesselberth@xsede.org/db/IMGVR_all_proteins-high_confidence.faa.gz"
+    local_path: "data/ref/imgvr/IMGVR_all_proteins-high_confidence.faa.gz"
     description: "IMG/VR phage protein database (local copy)"
 
   ncbi_viral_refseq:
@@ -28,6 +28,11 @@ prokaryotic_databases:
   uniprot_viruses:
     url: "https://rest.uniprot.org/uniprotkb/stream?compressed=true&format=fasta&query=%28taxonomy_id%3A10239%29"
     description: "UniProt viral proteins (via REST API)"
+
+  gpd:
+    proteome_url: "https://data.cyverse.org/dav-anon/iplant/home/shared/iVirus/Gut_Phage_Database/GPD_proteome.faa"
+    metadata_url: "https://data.cyverse.org/dav-anon/iplant/home/shared/iVirus/Gut_Phage_Database/GutMetagenomes_metadata.csv"
+    description: "Gut Phage Database - human gut phage proteins (iVirus/CyVerse)"
 
   inphared_proteins:
     # ORF-predicted proteins from INPHARED phage genomes
@@ -41,7 +46,7 @@ prokaryotic_databases:
     url: "http://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/Pfam-A.hmm.gz"
     description: "Pfam domain database"
 
-# Phage genome databases
+# Phage genome databases (nucleotide - require ORF prediction)
 phage_databases:
   inphared:
     # INPHARED releases monthly updates with date-prefixed filenames
@@ -50,11 +55,22 @@ phage_databases:
     metadata_url: "https://millardlab-inphared.s3.climb.ac.uk/14Apr2025_data.tsv.gz"
     description: "INPHARED curated phage database (Apr 2025 release)"
 
+  rvdb:
+    url: "https://rvdb.dbi.udel.edu/download/U-RVDBv30.0.fasta.gz"
+    description: "Reference Viral Database v30.0 - unclustered viral nucleotide sequences"
+
+  tara:
+    local_path: "data/ref/gov/Tara_assemblies.tar.gz"
+    description: "Tara Oceans viral assemblies (GOV2)"
+
+  malaspina:
+    local_path: "data/ref/gov/Malaspina_assemblies.tar.gz"
+    description: "Malaspina expedition viral assemblies (GOV2)"
+
   imgvr:
     # IMG/VR requires web login - download manually and specify local path
     # Download from: https://img.jgi.doe.gov/vr/
-    # Set local_path to your downloaded file location
-    local_path: /scratch/alpine/jhesselberth@xsede.org/db/IMGVR_all_proteins-high_confidence.faa.gz
+    local_path: "data/ref/imgvr/IMGVR_all_nucleotides.fna.gz"
     url: "https://img.jgi.doe.gov/vr/IMGVR_all_nucleotides.fna.gz"  # Fallback (requires login)
     description: "IMG/VR phage and virus database (requires manual download)"
 
@@ -69,14 +85,16 @@ prokaryotic_databases_to_search:
   - ncbi_viral_refseq     # NCBI viral proteins (1 file as of 2025)
   - uniprot_viruses       # UniProt viral proteins (moderate size)
   - inphared_proteins     # INPHARED ORF-predicted proteins
-  # - millardlab_proteins # DISABLED - source URL no longer available
-  # - mgnify              # MGnify metagenomic proteins (VERY large, ~300M proteins, enable for comprehensive search)
+  - gpd                   # Gut Phage Database (~140k phage proteins)
+  - mgnify                # MGnify metagenomic proteins (VERY large, ~300M proteins, enable for comprehensive search)
 
 # Which phage databases to use for ORF prediction
 phage_databases_to_use:
   - inphared
-  - imgvr  # Very large, enable for comprehensive search
-  # - millardlab  # DISABLED - URL no longer available
+  - rvdb                  # RVDB viral nucleotide sequences
+  - tara                  # Tara Oceans viral assemblies (GOV2)
+  - malaspina             # Malaspina viral assemblies (GOV2)
+  - imgvr                 # Very large, enable for comprehensive search
 
 # Prokaryotic analysis parameters
 prokaryotic:

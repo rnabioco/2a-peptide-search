@@ -115,6 +115,28 @@ rule download_inphared_genomes:
         """
 
 
+rule download_gpd:
+    """Download Gut Phage Database proteome from iVirus/CyVerse."""
+    output:
+        fasta=DATA_DIR + "/prokaryotic/gpd.fasta.gz",
+        metadata=DATA_DIR + "/prokaryotic/gpd_metadata.csv",
+    params:
+        proteome_url=config["prokaryotic_databases"]["gpd"]["proteome_url"],
+        metadata_url=config["prokaryotic_databases"]["gpd"]["metadata_url"],
+    log:
+        LOGS_DIR + "/download/gpd.log",
+    shell:
+        """
+        mkdir -p $(dirname "{output.fasta}")
+
+        # Download proteome (uncompressed source, gzip on save)
+        wget -c -o "{log}" "{params.proteome_url}" -O - | gzip > "{output.fasta}"
+
+        # Download metadata
+        wget -c -a "{log}" "{params.metadata_url}" -O "{output.metadata}"
+        """
+
+
 rule download_pfam_database:
     """Download and decompress Pfam-A HMM database."""
     output:
