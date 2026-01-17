@@ -63,12 +63,19 @@ include: "rules/search.smk"
 include: "rules/report.smk"
 include: "rules/prokaryotic.smk"
 include: "rules/logos.smk"
+include: "rules/domains.smk"
+include: "rules/validation.smk"
 
 
 # Default target: generate full report
 rule all:
     input:
         RESULTS_DIR + "/reports/2A-peptide-analysis.html",
+        expand(
+            RESULTS_DIR + "/reports/domain-analysis-{peptide_class}.html",
+            peptide_class=["class-1", "class-2"],
+        ),
+        RESULTS_DIR + "/reports/validation-report.html",
     default_target: True
 
 
@@ -120,6 +127,21 @@ rule iter2:
 rule prokaryotic_discovery:
     input:
         RESULTS_DIR + "/prokaryotic/reports/prokaryotic_discovery.html",
+
+
+# Literature validation only
+rule validate:
+    input:
+        RESULTS_DIR + "/reports/validation-report.html",
+
+
+# Domain analysis only
+rule domain_analysis:
+    input:
+        expand(
+            RESULTS_DIR + "/reports/domain-analysis-{peptide_class}.html",
+            peptide_class=["class-1", "class-2"],
+        ),
 
 
 # Workflow for each iteration

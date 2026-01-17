@@ -1,0 +1,205 @@
+---
+title: "2A Peptide Model Validation Report"
+author: "2A Peptide Search Pipeline"
+format:
+  html:
+    code-fold: true
+    code-summary: "Show the code"
+    embed-resources: true
+params:
+  results_dir: "scratch/results"
+editor: visual
+editor_options:
+  chunk_output_type: console
+---
+
+## Model Validation Against Literature
+
+This report evaluates the sensitivity of the trained 2A peptide HMM models
+against a curated set of published 2A peptide sequences with known activity
+measurements.
+
+```{r}
+#| label: setup
+#| message: false
+library(tidyverse)
+library(DT)
+library(cowplot)
+library(glue)
+library(scales)
+
+results_dir <- params$results_dir
+comparison_file <- file.path(results_dir, "validation", "literature_comparison.tsv")
+```
+
+## Load Comparison Data
+
+```{r}
+#| label: load_data
+comparison_tbl <- read_tsv(comparison_file, show_col_types = FALSE) |>
+  mutate(
+    activity_numeric = case_when(
+      activity == "Yes" ~ 100,
+      activity == "N/A" ~ NA_real_,
+      str_detect(activity, "%") ~ as.numeric(str_remove(activity, "%")),
+      .default = NA_real_
+    ),
+    class_original = case_when(
+      class_original == "A" ~ "Class 1 (A)",
+      class_original == "B" ~ "Class 2 (B)",
+      .default = class_original
+    )
+  )
+
+n_total <- nrow(comparison_tbl)
+n_hits <- sum(comparison_tbl$classification != "no-hit")
+```
+
+## Overall Detection Summary
+
+Of **`r scales::comma(n_total)`** literature 2A sequences, the models detected
+**`r scales::comma(n_hits)`** (**`r round(100*n_hits/n_total, 1)`%**).
+
+```{r}
+#| label: detection_summary
+classification_counts <- comparison_tbl |>
+  count(classification, sort = TRUE)
+
+ggplot(classification_counts, aes(x = reorder(classification, n), y = n, fill = classification)) +
+  geom_col() +
+  coord_flip() +
+  theme_cowplot() +
+  theme(legend.position = "none") +
+  labs(
+    x = "Classification",
+    y = "Number of sequences",
+    title = "HMM Model Detection Results"
+  ) +
+  scale_fill_brewer(palette = "Set2")
+```
+
+## Detection by Original Class
+
+Comparison of HMM classification against the original class annotations from
+the literature.
+
+```{r}
+#| label: class_comparison
+class_comparison <- comparison_tbl |>
+  mutate(
+    hmm_class = case_when(
+      str_detect(classification, "class-1") ~ "HMM Class 1",
+      str_detect(classification, "class-2") ~ "HMM Class 2",
+      .default = "Not Detected"
+    )
+  ) |>
+  count(class_original, hmm_class) |>
+  pivot_wider(names_from = hmm_class, values_from = n, values_fill = 0)
+
+knitr::kable(class_comparison, caption = "Literature class vs HMM classification")
+```
+
+## Detection by Source
+
+```{r}
+#| label: detection_by_source
+source_detection <- comparison_tbl |>
+  mutate(detected = classification != "no-hit") |>
+  group_by(source) |>
+  summarize(
+    total = n(),
+    detected = sum(detected),
+    pct_detected = 100 * detected / total,
+    .groups = "drop"
+  ) |>
+  arrange(desc(pct_detected))
+
+ggplot(source_detection, aes(x = reorder(source, pct_detected), y = pct_detected, fill = source)) +
+  geom_col() +
+  geom_text(aes(label = glue("{detected}/{total}")), hjust = -0.1, size = 3) +
+  coord_flip() +
+  ylim(0, 110) +
+  theme_cowplot() +
+  theme(legend.position = "none") +
+  labs(
+    x = "Source",
+    y = "Detection rate (%)",
+    title = "Detection Rate by Source Type"
+  )
+```
+
+## Activity Analysis
+
+For sequences with measured activity, we can examine whether the HMM models
+preferentially detect sequences with higher 2A activity.
+
+```{r}
+#| label: activity_analysis
+activity_tbl <- comparison_tbl |>
+  filter(!is.na(activity_numeric)) |>
+  mutate(detected = classification != "no-hit")
+
+if (nrow(activity_tbl) > 10) {
+  ggplot(activity_tbl, aes(x = detected, y = activity_numeric, fill = detected)) +
+    geom_boxplot() +
+    geom_jitter(width = 0.2, alpha = 0.5) +
+    theme_cowplot() +
+    theme(legend.position = "none") +
+    labs(
+      x = "Detected by HMM",
+      y = "Activity (%)",
+      title = "Activity Distribution by Detection Status"
+    ) +
+    scale_fill_brewer(palette = "Set1")
+} else {
+  message("Insufficient activity data for analysis")
+}
+```
+
+## Missed Sequences
+
+Sequences that were not detected by either model may represent:
+- Novel 2A variants outside the current model scope
+- Sequences with very low activity (false positives in literature)
+- Edge cases requiring model refinement
+
+```{r}
+#| label: missed_sequences
+missed_tbl <- comparison_tbl |>
+  filter(classification == "no-hit") |>
+  select(name, sequence, source, class_original, activity)
+
+if (nrow(missed_tbl) > 0) {
+  DT::datatable(
+    missed_tbl,
+    caption = "Sequences not detected by HMM models",
+    filter = 'top',
+    options = list(pageLength = 25, scrollX = TRUE)
+  )
+} else {
+  message("All sequences were detected!")
+}
+```
+
+## Detailed Results Table
+
+```{r}
+#| label: full_table
+DT::datatable(
+  comparison_tbl |>
+    select(name, sequence, source, class_original, activity,
+           hmm_class1_hit, hmm_class1_score,
+           hmm_class2_hit, hmm_class2_score,
+           classification),
+  caption = "Complete validation results",
+  filter = 'top',
+  options = list(pageLength = 25, scrollX = TRUE)
+)
+```
+
+## Session Info
+
+```{r}
+#| label: session_info
+sessionInfo()
+```

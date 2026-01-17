@@ -106,3 +106,17 @@ prokaryotic:
   clustering_coverage: 0.8
   min_cluster_size: 5
   min_conservation: 0.5
+
+# InterProScan domain annotation (optional)
+# InterProScan is a heavyweight dependency (~70GB)
+# Set enabled: true only if InterProScan is installed
+interproscan:
+  enabled: false  # Set to true if InterProScan is installed
+  path: null      # Path to interproscan.sh, or null to use $PATH
+  threads: 16
+  analyses:       # Which InterPro member databases to use
+    - Pfam
+    - PANTHER
+    - Gene3D
+    - CDD
+    - SMART

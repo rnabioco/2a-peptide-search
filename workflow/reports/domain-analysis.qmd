@@ -1,0 +1,282 @@
+---
+title: "2A Peptide Domain Co-occurrence Analysis"
+author: "2A Peptide Search Pipeline"
+format:
+  html:
+    code-fold: true
+    code-summary: "Show the code"
+    embed-resources: true
+params:
+  class: "class-1"
+  interproscan_file: null
+  domains_file: null
+  results_dir: "scratch/results"
+editor: visual
+editor_options:
+  chunk_output_type: console
+---
+
+## Domain Analysis for 2A-`r params$class`
+
+This report analyzes the domain organization of proteins containing 2A peptides,
+examining which protein domains commonly flank 2A peptide sequences.
+
+```{r}
+#| label: setup
+#| message: false
+library(tidyverse)
+library(janitor)
+library(DT)
+library(cowplot)
+library(glue)
+
+# Set up paths based on parameters
+results_dir <- params$results_dir
+peptide_class <- params$class
+
+# Construct file paths
+interproscan_file <- params$interproscan_file
+if (is.null(interproscan_file)) {
+  interproscan_file <- file.path(results_dir, "domains", paste0("interproscan.", peptide_class, ".tsv.gz"))
+}
+
+domains_file <- params$domains_file
+if (is.null(domains_file)) {
+  domains_file <- file.path(results_dir, "domains", paste0("2a_domains.", peptide_class, ".tsv"))
+}
+```
+
+## Data Loading
+
+```{r}
+#| label: load_data
+#| message: false
+
+# InterProScan column names
+ipr_colnames <- c(
+  'protein_acc', 'seq_md5', 'seq_len', 'sig_db', 'sig_acc',
+  'sig_desc', 'start_loc', 'stop_loc', 'score', 'status',
+  'date', 'ipr_annot_acc', 'ipr_annot_desc'
+)
+
+# Load InterProScan results if available
+has_interproscan <- file.exists(interproscan_file)
+
+if (has_interproscan) {
+  iprscan_tbl <- read_tsv(
+    interproscan_file,
+    col_names = ipr_colnames,
+    show_col_types = FALSE
+  ) |>
+    select(-c(seq_md5, status, date)) |>
+    rename(
+      dom_evalue = score,
+      query_start = start_loc,
+      query_end = stop_loc
+    ) |>
+    mutate(dom_evalue = as.numeric(dom_evalue)) |>
+    mutate(
+      seq_db = case_when(
+        str_detect(protein_acc, "^tr") ~ "uniprot",
+        str_detect(protein_acc, "^sp") ~ "uniprot",
+        str_detect(protein_acc, "^MGY") ~ "mgnify",
+        str_detect(protein_acc, "^UPI") ~ "uniparc",
+        .default = "unknown"
+      )
+    ) |>
+    mutate(
+      seq_db = as_factor(seq_db),
+      sig_db = as_factor(sig_db)
+    )
+
+  message(glue("Loaded {nrow(iprscan_tbl)} InterProScan annotations"))
+} else {
+  message("InterProScan results not available - skipping external domain analysis")
+  iprscan_tbl <- tibble()
+}
+
+# Load 2A domain hits
+twoa_domains_tbl <- read_tsv(
+  domains_file,
+  show_col_types = FALSE
+) |>
+  janitor::clean_names() |>
+  filter(dom_evalue <= 0.01) |>
+  mutate(
+    seq_db = case_when(
+      str_detect(protein_acc, "^tr") ~ "uniprot",
+      str_detect(protein_acc, "^sp") ~ "uniprot",
+      str_detect(protein_acc, "^MGY") ~ "mgnify",
+      str_detect(protein_acc, "^UPI") ~ "uniparc",
+      .default = "unknown"
+    )
+  ) |>
+  mutate(
+    seq_db = as_factor(seq_db),
+    sig_db = as_factor(sig_db)
+  )
+
+message(glue("Loaded {nrow(twoa_domains_tbl)} 2A domain hits"))
+```
+
+```{r}
+#| label: combine_domains
+#| eval: !expr has_interproscan
+
+# Combine all domain annotations
+if (has_interproscan) {
+  # Extract InterPro accessions as separate entries
+  ipr_db_tbl <- iprscan_tbl |>
+    select(
+      protein_acc, sig_acc = ipr_annot_acc, sig_desc = ipr_annot_desc,
+      query_start, query_end, dom_evalue, seq_db
+    ) |>
+    filter(sig_acc != '-', !is.na(sig_acc)) |>
+    mutate(sig_db = 'InterPro')
+
+  domains_tbl <- bind_rows(
+    iprscan_tbl |> select(protein_acc, sig_db, sig_acc, sig_desc, query_start, query_end, dom_evalue, seq_db),
+    twoa_domains_tbl |> select(protein_acc, sig_db, sig_acc, sig_desc, query_start, query_end, dom_evalue, seq_db),
+    ipr_db_tbl
+  ) |>
+    arrange(protein_acc, query_start) |>
+    unique()
+} else {
+  domains_tbl <- twoa_domains_tbl |>
+    select(protein_acc, sig_db, sig_acc, sig_desc, query_start, query_end, dom_evalue, seq_db) |>
+    arrange(protein_acc, query_start)
+}
+
+# Clean up UniProt IDs (remove tr|XXX| prefix)
+domains_tbl <- domains_tbl |>
+  mutate(
+    protein_acc = case_when(
+      str_detect(protein_acc, "^(tr|sp)\\|") ~ str_extract(protein_acc, "(?<=\\|)[^|]+(?=\\|)"),
+      .default = protein_acc
+    )
+  )
+```
+
+## Domain Counts per Protein
+
+```{r}
+#| label: domain_counts
+domain_cnts <- domains_tbl |>
+  filter(sig_db %in% c('InterPro', 'Hmmer3-custom', 'Pfam') | is.na(dom_evalue)) |>
+  count(protein_acc, seq_db, sort = TRUE, name = 'n_dom')
+
+protein_domain_cnts <- domain_cnts |>
+  mutate(n_dom = as_factor(n_dom)) |>
+  count(n_dom)
+
+ggplot(protein_domain_cnts, aes(x = n_dom, y = n)) +
+  geom_col(fill = 'steelblue') +
+  theme_cowplot() +
+  labs(
+    x = "Number of annotated domains",
+    y = "Number of proteins",
+    title = glue("Domain annotations per protein (2A-{peptide_class})"),
+    subtitle = glue("Total proteins = {scales::comma(nrow(domain_cnts))}")
+  )
+```
+
+## Domain Neighbors
+
+The following analysis identifies which domains commonly flank 2A peptides on the
+N-terminal and C-terminal sides.
+
+```{r}
+#| label: domain_neighbors
+domains_filt_tbl <- domains_tbl |>
+  filter(sig_db %in% c('InterPro', 'Hmmer3-custom', 'Pfam') | is.na(dom_evalue))
+
+domain_org <- domains_filt_tbl |>
+  arrange(protein_acc, query_start) |>
+  mutate(
+    nterm = lag(sig_acc),
+    nterm_dist = query_start - lag(query_end),
+    cterm = lead(sig_acc),
+    cterm_dist = lead(query_start) - query_end,
+    .by = protein_acc
+  )
+
+twoa_neighbors <- domain_org |>
+  filter(str_detect(sig_acc, "2A-class")) |>
+  select(protein_acc, seq_db, nterm, sig_acc, cterm)
+
+neighbor_counts <- twoa_neighbors |>
+  count(seq_db, nterm, sig_acc, cterm, sort = TRUE)
+
+DT::datatable(
+  neighbor_counts,
+  caption = glue("Domain neighbors for 2A-{peptide_class} peptides"),
+  filter = 'top',
+  options = list(pageLength = 25)
+)
+```
+
+## Most Common N-terminal Domains
+
+```{r}
+#| label: nterm_domains
+nterm_counts <- twoa_neighbors |>
+  filter(!is.na(nterm)) |>
+  count(nterm, sort = TRUE) |>
+  head(20)
+
+ggplot(nterm_counts, aes(x = reorder(nterm, n), y = n)) +
+  geom_col(fill = 'darkgreen') +
+  coord_flip() +
+  theme_cowplot() +
+  labs(
+    x = "N-terminal domain",
+    y = "Count",
+    title = glue("Top 20 N-terminal domains (2A-{peptide_class})")
+  )
+```
+
+## Most Common C-terminal Domains
+
+```{r}
+#| label: cterm_domains
+cterm_counts <- twoa_neighbors |>
+  filter(!is.na(cterm)) |>
+  count(cterm, sort = TRUE) |>
+  head(20)
+
+ggplot(cterm_counts, aes(x = reorder(cterm, n), y = n)) +
+  geom_col(fill = 'darkred') +
+  coord_flip() +
+  theme_cowplot() +
+  labs(
+    x = "C-terminal domain",
+    y = "Count",
+    title = glue("Top 20 C-terminal domains (2A-{peptide_class})")
+  )
+```
+
+## Database Distribution
+
+```{r}
+#| label: db_distribution
+db_counts <- twoa_neighbors |>
+  count(seq_db, sort = TRUE)
+
+ggplot(db_counts, aes(x = reorder(seq_db, n), y = n, fill = seq_db)) +
+  geom_col() +
+  coord_flip() +
+  theme_cowplot() +
+  theme(legend.position = 'none') +
+  labs(
+    x = "Database",
+    y = "Number of 2A peptides",
+    title = glue("2A-{peptide_class} hits by database")
+  )
+```
+
+## Session Info
+
+```{r}
+#| label: session_info
+sessionInfo()
+```
