@@ -12,17 +12,17 @@ from Bio.SeqRecord import SeqRecord
 
 @click.command()
 @click.option('--cluster-tsv', required=True, help='MMseqs2 cluster TSV')
-@click.option('--interdomain', required=True, help='Inter-domain GP motifs TSV')
+@click.option('--motifs', required=True, help='GP motifs TSV (all or inter-domain)')
 @click.option('--clusters-out', required=True, help='Output clusters TSV')
 @click.option('--representatives-out', required=True, help='Output representatives FASTA')
-def main(cluster_tsv, interdomain, clusters_out, representatives_out):
+def main(cluster_tsv, motifs, clusters_out, representatives_out):
     """Parse MMseqs2 clustering and assign cluster IDs."""
-    
+
     click.echo("Loading clustering results...")
     cluster_df = pd.read_csv(cluster_tsv, sep='\t', names=['representative', 'member'])
-    
+
     click.echo("Loading GP motifs...")
-    motifs_df = pd.read_csv(interdomain, sep='\t', compression='gzip')
+    motifs_df = pd.read_csv(motifs, sep='\t', compression='gzip')
     
     # Create sequence ID mapping
     motifs_df['seq_id'] = (motifs_df['protein_id'] + '_GP' + 
