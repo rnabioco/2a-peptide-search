@@ -6,7 +6,7 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="dcterms.date" content="2026-01-17">
+<meta name="dcterms.date" content="2026-01-18">
 
 <title>GP Motif Analysis – 2A Peptide Discovery</title>
 <style>
@@ -244,6 +244,12 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
+  <a href="../prokaryotic/arrest-motifs.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Arrest Motif Analysis</span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
   <a href="../prokaryotic/stalling-peptides.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Known Stalling Peptides</span></a>
   </div>
@@ -278,8 +284,11 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   <li><a href="#clustering-results" id="toc-clustering-results" class="nav-link" data-scroll-target="#clustering-results">Clustering Results</a>
   <ul class="collapse">
-  <li><a href="#cluster-statistics" id="toc-cluster-statistics" class="nav-link" data-scroll-target="#cluster-statistics">Cluster Statistics</a></li>
-  <li><a href="#conservation-logos" id="toc-conservation-logos" class="nav-link" data-scroll-target="#conservation-logos">Conservation Logos</a></li>
+  <li><a href="#summary-statistics" id="toc-summary-statistics" class="nav-link" data-scroll-target="#summary-statistics">Summary Statistics</a></li>
+  <li><a href="#cluster-size-distribution" id="toc-cluster-size-distribution" class="nav-link" data-scroll-target="#cluster-size-distribution">Cluster Size Distribution</a></li>
+  <li><a href="#top-clusters" id="toc-top-clusters" class="nav-link" data-scroll-target="#top-clusters">Top Clusters</a></li>
+  <li><a href="#duplication-analysis" id="toc-duplication-analysis" class="nav-link" data-scroll-target="#duplication-analysis">Duplication Analysis</a></li>
+  <li><a href="#cluster-size-breakdown" id="toc-cluster-size-breakdown" class="nav-link" data-scroll-target="#cluster-size-breakdown">Cluster Size Breakdown</a></li>
   </ul></li>
   <li><a href="#downstream-analysis" id="toc-downstream-analysis" class="nav-link" data-scroll-target="#downstream-analysis">Downstream Analysis</a>
   <ul class="collapse">
@@ -312,7 +321,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">January 17, 2026</p>
+      <p class="date">January 18, 2026</p>
     </div>
   </div>
   
@@ -491,61 +500,178 @@ Figure&nbsp;1: GP motif domain contexts
 </section>
 <section id="clustering-results" class="level2">
 <h2 class="anchored" data-anchor-id="clustering-results">Clustering Results</h2>
-<section id="cluster-statistics" class="level3">
-<h3 class="anchored" data-anchor-id="cluster-statistics">Cluster Statistics</h3>
-<div class="callout callout-style-default callout-note callout-titled">
-<div class="callout-header d-flex align-content-center">
-<div class="callout-icon-container">
-<i class="callout-icon"></i>
+<p>GP motif sequences were clustered using MMseqs2 at 70% sequence identity to identify conserved families.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(scales)</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>cluster_file <span class="ot">&lt;-</span> here<span class="sc">::</span><span class="fu">here</span>(<span class="st">"results/prokaryotic/gp_analysis/bacteria/gp_clusters.tsv.gz"</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (<span class="fu">file.exists</span>(cluster_file)) {</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  clusters_df <span class="ot">&lt;-</span> <span class="fu">read_tsv</span>(cluster_file, <span class="at">show_col_types =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  data_available <span class="ot">&lt;-</span> <span class="cn">TRUE</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>} <span class="cf">else</span> {</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>  data_available <span class="ot">&lt;-</span> <span class="cn">FALSE</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">message</span>(<span class="st">"Cluster data not found at "</span>, cluster_file)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 </div>
-<div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Placeholder
+<section id="summary-statistics" class="level3">
+<h3 class="anchored" data-anchor-id="summary-statistics">Summary Statistics</h3>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (data_available) {</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>  n_total_motifs <span class="ot">&lt;-</span> <span class="fu">nrow</span>(clusters_df)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>  n_unique_seqs <span class="ot">&lt;-</span> <span class="fu">n_distinct</span>(clusters_df<span class="sc">$</span>context_sequence)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>  n_clusters <span class="ot">&lt;-</span> <span class="fu">n_distinct</span>(clusters_df<span class="sc">$</span>cluster_id)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>  duplication_ratio <span class="ot">&lt;-</span> n_total_motifs <span class="sc">/</span> n_unique_seqs</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>  cluster_stats <span class="ot">&lt;-</span> clusters_df <span class="sc">|&gt;</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(cluster_id) <span class="sc">|&gt;</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">total_motifs =</span> <span class="fu">n</span>(),</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">unique_seqs =</span> <span class="fu">n_distinct</span>(context_sequence),</span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a>  n_singletons <span class="ot">&lt;-</span> <span class="fu">sum</span>(cluster_stats<span class="sc">$</span>unique_seqs <span class="sc">==</span> <span class="dv">1</span>)</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a>  pct_singletons <span class="ot">&lt;-</span> <span class="dv">100</span> <span class="sc">*</span> n_singletons <span class="sc">/</span> n_clusters</span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">tibble</span>(</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a>    <span class="at">Metric =</span> <span class="fu">c</span>(</span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Total GP motifs"</span>,</span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Unique sequences"</span>,</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Total clusters"</span>,</span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Singleton clusters"</span>,</span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Duplication ratio"</span>,</span>
+<span id="cb4-25"><a href="#cb4-25" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Largest cluster (unique)"</span>,</span>
+<span id="cb4-26"><a href="#cb4-26" aria-hidden="true" tabindex="-1"></a>      <span class="st">"Largest cluster (total)"</span></span>
+<span id="cb4-27"><a href="#cb4-27" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb4-28"><a href="#cb4-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">Value =</span> <span class="fu">c</span>(</span>
+<span id="cb4-29"><a href="#cb4-29" aria-hidden="true" tabindex="-1"></a>      <span class="fu">comma</span>(n_total_motifs),</span>
+<span id="cb4-30"><a href="#cb4-30" aria-hidden="true" tabindex="-1"></a>      <span class="fu">comma</span>(n_unique_seqs),</span>
+<span id="cb4-31"><a href="#cb4-31" aria-hidden="true" tabindex="-1"></a>      <span class="fu">comma</span>(n_clusters),</span>
+<span id="cb4-32"><a href="#cb4-32" aria-hidden="true" tabindex="-1"></a>      <span class="fu">paste0</span>(<span class="fu">comma</span>(n_singletons), <span class="st">" ("</span>, <span class="fu">round</span>(pct_singletons, <span class="dv">1</span>), <span class="st">"%)"</span>),</span>
+<span id="cb4-33"><a href="#cb4-33" aria-hidden="true" tabindex="-1"></a>      <span class="fu">paste0</span>(<span class="fu">round</span>(duplication_ratio, <span class="dv">2</span>), <span class="st">"x"</span>),</span>
+<span id="cb4-34"><a href="#cb4-34" aria-hidden="true" tabindex="-1"></a>      <span class="fu">comma</span>(<span class="fu">max</span>(cluster_stats<span class="sc">$</span>unique_seqs)),</span>
+<span id="cb4-35"><a href="#cb4-35" aria-hidden="true" tabindex="-1"></a>      <span class="fu">comma</span>(<span class="fu">max</span>(cluster_stats<span class="sc">$</span>total_motifs))</span>
+<span id="cb4-36"><a href="#cb4-36" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb4-37"><a href="#cb4-37" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb4-38"><a href="#cb4-38" aria-hidden="true" tabindex="-1"></a>    knitr<span class="sc">::</span><span class="fu">kable</span>()</span>
+<span id="cb4-39"><a href="#cb4-39" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
 </div>
-</div>
-<div class="callout-body-container callout-body">
-<p>Clustering results will be populated after pipeline execution.</p>
-</div>
-</div>
-<p>Expected clusters:</p>
-<table class="caption-top table">
-<thead>
-<tr class="header">
-<th>Cluster</th>
-<th>Size</th>
-<th>Motif</th>
-<th>Taxonomy</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td>C1</td>
-<td>~500</td>
-<td>RAGP</td>
-<td>Proteobacteria</td>
-</tr>
-<tr class="even">
-<td>C2</td>
-<td>~200</td>
-<td>RAPG</td>
-<td>Firmicutes</td>
-</tr>
-<tr class="odd">
-<td>C3</td>
-<td>~100</td>
-<td>xAGP</td>
-<td>Mixed</td>
-</tr>
-</tbody>
-</table>
 </section>
-<section id="conservation-logos" class="level3">
-<h3 class="anchored" data-anchor-id="conservation-logos">Conservation Logos</h3>
-<p>Per-cluster conservation logos will reveal:</p>
-<ul>
-<li>Cluster-specific upstream patterns</li>
-<li>Taxonomic signature residues</li>
-<li>Functional groupings</li>
-</ul>
+<section id="cluster-size-distribution" class="level3">
+<h3 class="anchored" data-anchor-id="cluster-size-distribution">Cluster Size Distribution</h3>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (data_available) {</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  plot_data <span class="ot">&lt;-</span> cluster_stats <span class="sc">|&gt;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_longer</span>(</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>      <span class="at">cols =</span> <span class="fu">c</span>(unique_seqs, total_motifs),</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>      <span class="at">names_to =</span> <span class="st">"count_type"</span>,</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>      <span class="at">values_to =</span> <span class="st">"count"</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">count_type =</span> <span class="fu">recode</span>(count_type,</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">unique_seqs =</span> <span class="st">"Unique Sequences"</span>,</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>      <span class="at">total_motifs =</span> <span class="st">"Total Motifs"</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>    ))</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(plot_data, <span class="fu">aes</span>(<span class="at">x =</span> count, <span class="at">fill =</span> count_type)) <span class="sc">+</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_histogram</span>(<span class="at">bins =</span> <span class="dv">50</span>, <span class="at">alpha =</span> <span class="fl">0.7</span>) <span class="sc">+</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_x_log10</span>(<span class="at">labels =</span> comma) <span class="sc">+</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_y_log10</span>(<span class="at">labels =</span> comma) <span class="sc">+</span></span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">facet_wrap</span>(<span class="sc">~</span>count_type, <span class="at">ncol =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(</span>
+<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a>      <span class="at">x =</span> <span class="st">"Cluster Size"</span>,</span>
+<span id="cb5-20"><a href="#cb5-20" aria-hidden="true" tabindex="-1"></a>      <span class="at">y =</span> <span class="st">"Number of Clusters (log scale)"</span></span>
+<span id="cb5-21"><a href="#cb5-21" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb5-22"><a href="#cb5-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb5-23"><a href="#cb5-23" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme</span>(<span class="at">legend.position =</span> <span class="st">"none"</span>)</span>
+<span id="cb5-24"><a href="#cb5-24" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</section>
+<section id="top-clusters" class="level3">
+<h3 class="anchored" data-anchor-id="top-clusters">Top Clusters</h3>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (data_available) {</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>  cluster_stats <span class="sc">|&gt;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">slice_max</span>(unique_seqs, <span class="at">n =</span> <span class="dv">15</span>) <span class="sc">|&gt;</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">duplication =</span> <span class="fu">round</span>(total_motifs <span class="sc">/</span> unique_seqs, <span class="dv">2</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename</span>(</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">Cluster ID</span><span class="st">`</span> <span class="ot">=</span> cluster_id,</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">Unique Seqs</span><span class="st">`</span> <span class="ot">=</span> unique_seqs,</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">Total Motifs</span><span class="st">`</span> <span class="ot">=</span> total_motifs,</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>      <span class="at">Duplication =</span> duplication</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>    knitr<span class="sc">::</span><span class="fu">kable</span>()</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</section>
+<section id="duplication-analysis" class="level3">
+<h3 class="anchored" data-anchor-id="duplication-analysis">Duplication Analysis</h3>
+<p>The relationship between unique sequences and total motifs reveals how duplicated each cluster is.</p>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (data_available) {</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>  multi_clusters <span class="ot">&lt;-</span> cluster_stats <span class="sc">|&gt;</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(unique_seqs <span class="sc">&gt;</span> <span class="dv">1</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(multi_clusters, <span class="fu">aes</span>(<span class="at">x =</span> unique_seqs, <span class="at">y =</span> total_motifs)) <span class="sc">+</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_abline</span>(<span class="at">slope =</span> <span class="dv">1</span>, <span class="at">intercept =</span> <span class="dv">0</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">color =</span> <span class="st">"gray50"</span>) <span class="sc">+</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="fl">0.3</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_x_log10</span>(<span class="at">labels =</span> comma) <span class="sc">+</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_y_log10</span>(<span class="at">labels =</span> comma) <span class="sc">+</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>      <span class="at">x =</span> <span class="st">"Unique Sequences per Cluster"</span>,</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">y =</span> <span class="st">"Total Motifs per Cluster"</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">+</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>()</span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
+</section>
+<section id="cluster-size-breakdown" class="level3">
+<h3 class="anchored" data-anchor-id="cluster-size-breakdown">Cluster Size Breakdown</h3>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> (data_available) {</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  cluster_stats <span class="sc">|&gt;</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">size_category =</span> <span class="fu">case_when</span>(</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>      unique_seqs <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">"1 (singleton)"</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>      unique_seqs <span class="sc">&lt;=</span> <span class="dv">5</span> <span class="sc">~</span> <span class="st">"2-5"</span>,</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>      unique_seqs <span class="sc">&lt;=</span> <span class="dv">10</span> <span class="sc">~</span> <span class="st">"6-10"</span>,</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>      unique_seqs <span class="sc">&lt;=</span> <span class="dv">50</span> <span class="sc">~</span> <span class="st">"11-50"</span>,</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>      unique_seqs <span class="sc">&lt;=</span> <span class="dv">100</span> <span class="sc">~</span> <span class="st">"51-100"</span>,</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>      <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">"&gt;100"</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    )) <span class="sc">|&gt;</span></span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">size_category =</span> <span class="fu">factor</span>(size_category,</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>      <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"1 (singleton)"</span>, <span class="st">"2-5"</span>, <span class="st">"6-10"</span>, <span class="st">"11-50"</span>, <span class="st">"51-100"</span>, <span class="st">"&gt;100"</span>)</span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    )) <span class="sc">|&gt;</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">group_by</span>(size_category) <span class="sc">|&gt;</span></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">summarise</span>(</span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>      <span class="at">Clusters =</span> <span class="fu">n</span>(),</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">Unique Seqs</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sum</span>(unique_seqs),</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>      <span class="st">`</span><span class="at">Total Motifs</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">sum</span>(total_motifs),</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>      <span class="at">.groups =</span> <span class="st">"drop"</span></span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="st">`</span><span class="at">% Clusters</span><span class="st">`</span> <span class="ot">=</span> <span class="fu">round</span>(<span class="dv">100</span> <span class="sc">*</span> Clusters <span class="sc">/</span> n_clusters, <span class="dv">1</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>    <span class="fu">rename</span>(<span class="st">`</span><span class="at">Size Category</span><span class="st">`</span> <span class="ot">=</span> size_category) <span class="sc">|&gt;</span></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>    knitr<span class="sc">::</span><span class="fu">kable</span>()</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+</div>
 </section>
 </section>
 <section id="downstream-analysis" class="level2">

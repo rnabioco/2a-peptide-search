@@ -26,7 +26,7 @@
     "href": "index.html#pipeline-overview",
     "title": "2A Peptide Discovery",
     "section": "Pipeline Overview",
-    "text": "Pipeline Overview\n\n\n\n\n\n\nflowchart LR\n    subgraph inputs[\" \"]\n        direction TB\n        Seeds[\"🧬 Seed Alignments&lt;br/&gt;&lt;small&gt;Curated 2A sequences&lt;/small&gt;\"]\n        style Seeds fill:#e1f5fe\n    end\n\n    subgraph databases[\" \"]\n        direction TB\n        UniProt[(UniProt)]\n        RefProt[(RefProt)]\n        UniParc[(UniParc)]\n        MGnify[(MGnify)]\n        IMGVR[(IMG/VR)]\n        style UniProt fill:#fff3e0\n        style RefProt fill:#fff3e0\n        style UniParc fill:#fff3e0\n        style MGnify fill:#fff3e0\n        style IMGVR fill:#fff3e0\n    end\n\n    subgraph iteration1[\"Iteration 1\"]\n        direction TB\n        HMM1[\"hmmbuild&lt;br/&gt;&lt;small&gt;Seed HMMs&lt;/small&gt;\"]\n        Search1[\"hmmsearch&lt;br/&gt;&lt;small&gt;All databases&lt;/small&gt;\"]\n        Filter1[\"Filter&lt;br/&gt;&lt;small&gt;E-value, length&lt;/small&gt;\"]\n        style HMM1 fill:#e8f5e9\n        style Search1 fill:#e8f5e9\n        style Filter1 fill:#e8f5e9\n    end\n\n    subgraph iteration2[\"Iteration 2\"]\n        direction TB\n        HMM2[\"hmmbuild&lt;br/&gt;&lt;small&gt;Refined HMMs&lt;/small&gt;\"]\n        Search2[\"hmmsearch&lt;br/&gt;&lt;small&gt;Expanded search&lt;/small&gt;\"]\n        Curate[\"Auto-curate&lt;br/&gt;&lt;small&gt;Motif validation&lt;/small&gt;\"]\n        style HMM2 fill:#fce4ec\n        style Search2 fill:#fce4ec\n        style Curate fill:#fce4ec\n    end\n\n    subgraph outputs[\"Outputs\"]\n        direction TB\n        FinalHMM[\"📊 Final Models&lt;br/&gt;&lt;small&gt;Class 1 & 2 HMMs&lt;/small&gt;\"]\n        Logos[\"🎨 Sequence Logos\"]\n        Report[\"📝 Analysis Report\"]\n        style FinalHMM fill:#f3e5f5\n        style Logos fill:#f3e5f5\n        style Report fill:#f3e5f5\n    end\n\n    Seeds --&gt; HMM1\n    HMM1 --&gt; Search1\n    databases --&gt; Search1\n    Search1 --&gt; Filter1\n    Filter1 --&gt; HMM2\n    HMM2 --&gt; Search2\n    databases --&gt; Search2\n    Search2 --&gt; Curate\n    Curate --&gt; FinalHMM\n    FinalHMM --&gt; Logos\n    FinalHMM --&gt; Report\n\n\n\n\nFigure 1: Complete workflow for 2A peptide and ribosomal stalling peptide discovery",
+    "text": "Pipeline Overview\n\n\n\n\n\n\nflowchart TB\n    subgraph inputs[\" \"]\n        direction TB\n        Seeds[\"🧬 Seed Alignments&lt;br/&gt;&lt;small&gt;Curated 2A sequences&lt;/small&gt;\"]\n        style Seeds fill:#e1f5fe\n    end\n\n    subgraph databases[\" \"]\n        direction TB\n        UniProt[(UniProt)]\n        RefProt[(RefProt)]\n        UniParc[(UniParc)]\n        MGnify[(MGnify)]\n        IMGVR[(IMG/VR)]\n        style UniProt fill:#fff3e0\n        style RefProt fill:#fff3e0\n        style UniParc fill:#fff3e0\n        style MGnify fill:#fff3e0\n        style IMGVR fill:#fff3e0\n    end\n\n    subgraph iteration1[\"Iteration 1\"]\n        direction TB\n        HMM1[\"hmmbuild&lt;br/&gt;&lt;small&gt;Seed HMMs&lt;/small&gt;\"]\n        Search1[\"hmmsearch&lt;br/&gt;&lt;small&gt;All databases&lt;/small&gt;\"]\n        Filter1[\"Filter&lt;br/&gt;&lt;small&gt;E-value, length&lt;/small&gt;\"]\n        style HMM1 fill:#e8f5e9\n        style Search1 fill:#e8f5e9\n        style Filter1 fill:#e8f5e9\n    end\n\n    subgraph iteration2[\"Iteration 2\"]\n        direction TB\n        HMM2[\"hmmbuild&lt;br/&gt;&lt;small&gt;Refined HMMs&lt;/small&gt;\"]\n        Search2[\"hmmsearch&lt;br/&gt;&lt;small&gt;Expanded search&lt;/small&gt;\"]\n        Curate[\"Auto-curate&lt;br/&gt;&lt;small&gt;Motif validation&lt;/small&gt;\"]\n        style HMM2 fill:#fce4ec\n        style Search2 fill:#fce4ec\n        style Curate fill:#fce4ec\n    end\n\n    subgraph outputs[\"Outputs\"]\n        direction TB\n        FinalHMM[\"📊 Final Models&lt;br/&gt;&lt;small&gt;Class 1 & 2 HMMs&lt;/small&gt;\"]\n        Logos[\"🎨 Sequence Logos\"]\n        Report[\"📝 Analysis Report\"]\n        style FinalHMM fill:#f3e5f5\n        style Logos fill:#f3e5f5\n        style Report fill:#f3e5f5\n    end\n\n    Seeds --&gt; HMM1\n    HMM1 --&gt; Search1\n    databases --&gt; Search1\n    Search1 --&gt; Filter1\n    Filter1 --&gt; HMM2\n    HMM2 --&gt; Search2\n    databases --&gt; Search2\n    Search2 --&gt; Curate\n    Curate --&gt; FinalHMM\n    FinalHMM --&gt; Logos\n    FinalHMM --&gt; Report\n\n\n\n\nFigure 1: Complete workflow for 2A peptide and ribosomal stalling peptide discovery",
     "crumbs": [
       "Overview",
       "2A Peptide Discovery"
@@ -352,91 +352,102 @@
     ]
   },
   {
-    "objectID": "eukaryotic/seed-search.html",
-    "href": "eukaryotic/seed-search.html",
-    "title": "Seed Search Results",
+    "objectID": "eukaryotic/sequence-logos.html",
+    "href": "eukaryotic/sequence-logos.html",
+    "title": "Sequence Logos",
     "section": "",
-    "text": "This page summarizes the initial HMM search results using seed models built from curated 2A peptide alignments.",
+    "text": "Sequence logos visualize the conservation pattern at each position in the aligned 2A peptides. Height indicates information content (conservation), and letter size shows relative amino acid frequency.",
     "crumbs": [
       "Eukaryotic 2A Peptides",
-      "Seed Search Results"
+      "Sequence Logos"
     ]
   },
   {
-    "objectID": "eukaryotic/seed-search.html#overview",
-    "href": "eukaryotic/seed-search.html#overview",
-    "title": "Seed Search Results",
+    "objectID": "eukaryotic/sequence-logos.html#overview",
+    "href": "eukaryotic/sequence-logos.html#overview",
+    "title": "Sequence Logos",
     "section": "",
-    "text": "This page summarizes the initial HMM search results using seed models built from curated 2A peptide alignments.",
+    "text": "Sequence logos visualize the conservation pattern at each position in the aligned 2A peptides. Height indicates information content (conservation), and letter size shows relative amino acid frequency.",
     "crumbs": [
       "Eukaryotic 2A Peptides",
-      "Seed Search Results"
+      "Sequence Logos"
     ]
   },
   {
-    "objectID": "eukaryotic/seed-search.html#seed-alignments",
-    "href": "eukaryotic/seed-search.html#seed-alignments",
-    "title": "Seed Search Results",
-    "section": "Seed Alignments",
-    "text": "Seed Alignments\nThe seed alignments contain known, experimentally validated 2A peptides:\n\n\n\nClass\nPeptides\nSource\n\n\n\n\nClass 1\nT2A, E2A, P2A\nPicornaviruses\n\n\nClass 2\nF2A variants\nAphthoviruses",
+    "objectID": "eukaryotic/sequence-logos.html#class-1-sequence-logo",
+    "href": "eukaryotic/sequence-logos.html#class-1-sequence-logo",
+    "title": "Sequence Logos",
+    "section": "Class 1 Sequence Logo",
+    "text": "Class 1 Sequence Logo\n\n\n\n\n\n\nFigure 1: Class 1 2A peptide sequence logo showing conserved GDVE central motif and NPGP C-terminal motif\n\n\n\n\nExpected Conservation Pattern\nPosition:  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18\nConsensus: L  L  x  x  x  x  G  D  V  E  x  x  x  x  N  P  G  P\n                          ^^^^^^^               ^^^^^^^^^^\n                          Central               C-terminal\nKey positions: - Positions 7-10: GDVE central motif - Positions 15-18: NPGP C-terminal motif",
     "crumbs": [
       "Eukaryotic 2A Peptides",
-      "Seed Search Results"
+      "Sequence Logos"
     ]
   },
   {
-    "objectID": "eukaryotic/seed-search.html#search-statistics",
-    "href": "eukaryotic/seed-search.html#search-statistics",
-    "title": "Seed Search Results",
-    "section": "Search Statistics",
-    "text": "Search Statistics\n\n\n\nTable 1: HMM search statistics by database\n\n\n\nCode\nlibrary(tidyverse)\n\n# Load search statistics (when available)\nresults_dir &lt;- Sys.getenv(\"RESULTS_DIR\", \"../../scratch/results\")\n\n# Example statistics table\nstats &lt;- tibble(\n    Database = c('UniProt', 'RefProt', 'UniParc', 'MGnify'),\n    `Class 1 Hits` = c(45, 128, 892, 3421),\n    `Class 2 Hits` = c(23, 67, 445, 1893),\n    `E-value &lt; 1e-10` = c(68, 195, 1337, 5314)\n)\n\nstats",
+    "objectID": "eukaryotic/sequence-logos.html#class-2-sequence-logo",
+    "href": "eukaryotic/sequence-logos.html#class-2-sequence-logo",
+    "title": "Sequence Logos",
+    "section": "Class 2 Sequence Logo",
+    "text": "Class 2 Sequence Logo\n\n\n\n\n\n\nFigure 2: Class 2 2A peptide sequence logo showing conserved N-terminal tryptophan, EEGIE central motif, and PNPGP C-terminal motif\n\n\n\n\nExpected Conservation Pattern\nPosition:  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19\nConsensus: W  x  x  x  x  E  E  G  I  E  x  x  x  P  N  P  G  P  x\n           ^              ^^^^^^^^^^^        ^^^^^^^^^^^^^^\n           N-terminal     Central            C-terminal\nKey positions: - Position 1: Invariant tryptophan (W) - Positions 6-10: EEGIE central motif - Positions 14-18: PNPGP C-terminal motif",
     "crumbs": [
       "Eukaryotic 2A Peptides",
-      "Seed Search Results"
+      "Sequence Logos"
     ]
   },
   {
-    "objectID": "eukaryotic/seed-search.html#hit-distribution",
-    "href": "eukaryotic/seed-search.html#hit-distribution",
-    "title": "Seed Search Results",
-    "section": "Hit Distribution",
-    "text": "Hit Distribution\n\nBy Database\n\n\n\n\n\n\nNotePlaceholder\n\n\n\nActual search results will be displayed here once the pipeline has been run.\n\n\n\n\nBy E-value\n\n\nCode\nlibrary(ggplot2)\n\n# Example E-value distribution\nevalues &lt;- rexp(1000, rate = 1e8)\ndf &lt;- tibble(evalue = evalues)\n\nggplot(df, aes(x = evalue)) +\n    geom_histogram(bins = 50) +\n    scale_x_log10() +\n    labs(x = \"E-value\", y = \"Count\") +\n    theme_minimal()",
+    "objectID": "eukaryotic/sequence-logos.html#generating-logos",
+    "href": "eukaryotic/sequence-logos.html#generating-logos",
+    "title": "Sequence Logos",
+    "section": "Generating Logos",
+    "text": "Generating Logos\n\nUsing ggseqlogo (R)\n#| label: fig-example-logo\n#| fig-cap: \"Example sequence logo generation\"\n#| eval: false\n\nlibrary(ggseqlogo)\nlibrary(tidyverse)\n\n# Read sequences from alignment\nsequences &lt;- c(\n    \"EGRGSLLTCGDVEENPGP\",\n    \"ATNFSLLKQAGDVEENPGP\",\n    \"QCTNYALLKLAGDVESNPGP\"\n)\n\n# Generate logo\nggseqlogo(sequences, method = \"prob\") +\n    labs(title = \"2A Peptide Class 1\") +\n    theme_logo()\n\n\nUsing WebLogo (CLI)\nweblogo -f alignment.fasta -o logo.png \\\n    -F png -s large \\\n    -c chemistry \\\n    --title \"2A Peptide Class 1\"",
     "crumbs": [
       "Eukaryotic 2A Peptides",
-      "Seed Search Results"
+      "Sequence Logos"
     ]
   },
   {
-    "objectID": "eukaryotic/seed-search.html#quality-metrics",
-    "href": "eukaryotic/seed-search.html#quality-metrics",
-    "title": "Seed Search Results",
-    "section": "Quality Metrics",
-    "text": "Quality Metrics\n\nAlignment Length Distribution\nExpected alignment lengths: - Class 1: 18-22 residues - Class 2: 20-24 residues\n\n\nConservation Scores\nKey conserved positions in seed alignments: - Position -1 (G): &gt;95% conserved - Position 0 (P): 100% conserved - Position -4 (N/P): &gt;90% conserved",
+    "objectID": "eukaryotic/sequence-logos.html#interpretation-guide",
+    "href": "eukaryotic/sequence-logos.html#interpretation-guide",
+    "title": "Sequence Logos",
+    "section": "Interpretation Guide",
+    "text": "Interpretation Guide\n\n\n\nFeature\nMeaning\n\n\n\n\nTall letters\nHighly conserved position\n\n\nShort letters\nVariable position\n\n\nStack height\nInformation content (bits)\n\n\nLetter order\nFrequency (top = most common)",
     "crumbs": [
       "Eukaryotic 2A Peptides",
-      "Seed Search Results"
+      "Sequence Logos"
     ]
   },
   {
-    "objectID": "eukaryotic/seed-search.html#filtering-summary",
-    "href": "eukaryotic/seed-search.html#filtering-summary",
-    "title": "Seed Search Results",
-    "section": "Filtering Summary",
-    "text": "Filtering Summary\n\n\n\nFilter\nSequences Removed\n\n\n\n\nE-value &gt; 1e-5\nTBD\n\n\nLength &lt; 15\nTBD\n\n\nGap % &gt; 50%\nTBD\n\n\nMissing PGP motif\nTBD",
+    "objectID": "eukaryotic/sequence-logos.html#conservation-by-iteration",
+    "href": "eukaryotic/sequence-logos.html#conservation-by-iteration",
+    "title": "Sequence Logos",
+    "section": "Conservation by Iteration",
+    "text": "Conservation by Iteration\nTrack how conservation patterns change through iterative refinement:\n\n\n\nIteration\nSequences\nAvg. Conservation\n\n\n\n\nSeed\n~10\nHigh\n\n\nIter 1\n~100\nMedium\n\n\nIter 2\n~500\nLower (more diversity)\n\n\nFinal (curated)\n~200\nMedium-High",
     "crumbs": [
       "Eukaryotic 2A Peptides",
-      "Seed Search Results"
+      "Sequence Logos"
     ]
   },
   {
-    "objectID": "eukaryotic/seed-search.html#next-steps",
-    "href": "eukaryotic/seed-search.html#next-steps",
-    "title": "Seed Search Results",
-    "section": "Next Steps",
-    "text": "Next Steps\n\nReview filtered alignments\nBuild refined models from high-confidence hits\nPerform iteration 2 searches\nGenerate sequence logos",
+    "objectID": "eukaryotic/sequence-logos.html#position-specific-features",
+    "href": "eukaryotic/sequence-logos.html#position-specific-features",
+    "title": "Sequence Logos",
+    "section": "Position-Specific Features",
+    "text": "Position-Specific Features\n\nCritical Residues\n\n\n\nPosition\nResidue\nFunction\nTolerance\n\n\n\n\n-1\nG\nCleavage site\nNone\n\n\n0\nP\nCleavage site\nNone\n\n\n-2\nG\nPositioning\nLow\n\n\n-3\nP/N\nEfficiency\nMedium\n\n\n\n\n\nVariable Regions\n\nPositions 2-6: Allow diversity\nPositions 11-14: Linker region\nTolerate substitutions without losing function",
     "crumbs": [
       "Eukaryotic 2A Peptides",
-      "Seed Search Results"
+      "Sequence Logos"
+    ]
+  },
+  {
+    "objectID": "eukaryotic/sequence-logos.html#downloads",
+    "href": "eukaryotic/sequence-logos.html#downloads",
+    "title": "Sequence Logos",
+    "section": "Downloads",
+    "text": "Downloads\nOnce generated, logos will be available at:\n\nresults/logos/seed/2A-class-1.png\nresults/logos/seed/2A-class-2.png\nresults/logos/final/2A-class-1.png\nresults/logos/final/2A-class-2.png",
+    "crumbs": [
+      "Eukaryotic 2A Peptides",
+      "Sequence Logos"
     ]
   },
   {
@@ -539,102 +550,201 @@
     ]
   },
   {
-    "objectID": "eukaryotic/sequence-logos.html",
-    "href": "eukaryotic/sequence-logos.html",
-    "title": "Sequence Logos",
+    "objectID": "eukaryotic/seed-search.html",
+    "href": "eukaryotic/seed-search.html",
+    "title": "Seed Search Results",
     "section": "",
-    "text": "Sequence logos visualize the conservation pattern at each position in the aligned 2A peptides. Height indicates information content (conservation), and letter size shows relative amino acid frequency.",
+    "text": "This page summarizes the initial HMM search results using seed models built from curated 2A peptide alignments.",
     "crumbs": [
       "Eukaryotic 2A Peptides",
-      "Sequence Logos"
+      "Seed Search Results"
     ]
   },
   {
-    "objectID": "eukaryotic/sequence-logos.html#overview",
-    "href": "eukaryotic/sequence-logos.html#overview",
-    "title": "Sequence Logos",
+    "objectID": "eukaryotic/seed-search.html#overview",
+    "href": "eukaryotic/seed-search.html#overview",
+    "title": "Seed Search Results",
     "section": "",
-    "text": "Sequence logos visualize the conservation pattern at each position in the aligned 2A peptides. Height indicates information content (conservation), and letter size shows relative amino acid frequency.",
+    "text": "This page summarizes the initial HMM search results using seed models built from curated 2A peptide alignments.",
     "crumbs": [
       "Eukaryotic 2A Peptides",
-      "Sequence Logos"
+      "Seed Search Results"
     ]
   },
   {
-    "objectID": "eukaryotic/sequence-logos.html#class-1-sequence-logo",
-    "href": "eukaryotic/sequence-logos.html#class-1-sequence-logo",
-    "title": "Sequence Logos",
-    "section": "Class 1 Sequence Logo",
-    "text": "Class 1 Sequence Logo\n\n\n\n\n\n\nNotePlaceholder\n\n\n\nSequence logos will be generated from the final curated alignments using Skylign or similar tools.\n\n\n\nExpected Conservation Pattern\nPosition:  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18\nConsensus: L  L  x  x  x  x  G  D  V  E  x  x  x  x  N  P  G  P\n                          ^^^^^^^               ^^^^^^^^^^\n                          Central               C-terminal\nKey positions: - Positions 7-10: GDVE central motif - Positions 15-18: NPGP C-terminal motif",
+    "objectID": "eukaryotic/seed-search.html#seed-alignments",
+    "href": "eukaryotic/seed-search.html#seed-alignments",
+    "title": "Seed Search Results",
+    "section": "Seed Alignments",
+    "text": "Seed Alignments\nThe seed alignments contain known, experimentally validated 2A peptides:\n\n\n\nClass\nPeptides\nSource\n\n\n\n\nClass 1\nT2A, E2A, P2A\nPicornaviruses\n\n\nClass 2\nF2A variants\nAphthoviruses",
     "crumbs": [
       "Eukaryotic 2A Peptides",
-      "Sequence Logos"
+      "Seed Search Results"
     ]
   },
   {
-    "objectID": "eukaryotic/sequence-logos.html#class-2-sequence-logo",
-    "href": "eukaryotic/sequence-logos.html#class-2-sequence-logo",
-    "title": "Sequence Logos",
-    "section": "Class 2 Sequence Logo",
-    "text": "Class 2 Sequence Logo\n\nExpected Conservation Pattern\nPosition:  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19\nConsensus: W  x  x  x  x  E  E  G  I  E  x  x  x  P  N  P  G  P  x\n           ^              ^^^^^^^^^^^        ^^^^^^^^^^^^^^\n           N-terminal     Central            C-terminal\nKey positions: - Position 1: Invariant tryptophan (W) - Positions 6-10: EEGIE central motif - Positions 14-18: PNPGP C-terminal motif",
+    "objectID": "eukaryotic/seed-search.html#search-statistics",
+    "href": "eukaryotic/seed-search.html#search-statistics",
+    "title": "Seed Search Results",
+    "section": "Search Statistics",
+    "text": "Search Statistics\n\n\n\nTable 1: HMM search statistics by database\n\n\n\nCode\nlibrary(tidyverse)\n\n# Load search statistics (when available)\nresults_dir &lt;- Sys.getenv(\"RESULTS_DIR\", \"../../scratch/results\")\n\n# Example statistics table\nstats &lt;- tibble(\n    Database = c('UniProt', 'RefProt', 'UniParc', 'MGnify'),\n    `Class 1 Hits` = c(45, 128, 892, 3421),\n    `Class 2 Hits` = c(23, 67, 445, 1893),\n    `E-value &lt; 1e-10` = c(68, 195, 1337, 5314)\n)\n\nstats",
     "crumbs": [
       "Eukaryotic 2A Peptides",
-      "Sequence Logos"
+      "Seed Search Results"
     ]
   },
   {
-    "objectID": "eukaryotic/sequence-logos.html#generating-logos",
-    "href": "eukaryotic/sequence-logos.html#generating-logos",
-    "title": "Sequence Logos",
-    "section": "Generating Logos",
-    "text": "Generating Logos\n\nUsing ggseqlogo (R)\n#| label: fig-example-logo\n#| fig-cap: \"Example sequence logo generation\"\n#| eval: false\n\nlibrary(ggseqlogo)\nlibrary(tidyverse)\n\n# Read sequences from alignment\nsequences &lt;- c(\n    \"EGRGSLLTCGDVEENPGP\",\n    \"ATNFSLLKQAGDVEENPGP\",\n    \"QCTNYALLKLAGDVESNPGP\"\n)\n\n# Generate logo\nggseqlogo(sequences, method = \"prob\") +\n    labs(title = \"2A Peptide Class 1\") +\n    theme_logo()\n\n\nUsing WebLogo (CLI)\nweblogo -f alignment.fasta -o logo.png \\\n    -F png -s large \\\n    -c chemistry \\\n    --title \"2A Peptide Class 1\"",
+    "objectID": "eukaryotic/seed-search.html#hit-distribution",
+    "href": "eukaryotic/seed-search.html#hit-distribution",
+    "title": "Seed Search Results",
+    "section": "Hit Distribution",
+    "text": "Hit Distribution\n\nBy Database\n\n\n\n\n\n\nNotePlaceholder\n\n\n\nActual search results will be displayed here once the pipeline has been run.\n\n\n\n\nBy E-value\n\n\nCode\nlibrary(ggplot2)\n\n# Example E-value distribution\nevalues &lt;- rexp(1000, rate = 1e8)\ndf &lt;- tibble(evalue = evalues)\n\nggplot(df, aes(x = evalue)) +\n    geom_histogram(bins = 50) +\n    scale_x_log10() +\n    labs(x = \"E-value\", y = \"Count\") +\n    theme_minimal()",
     "crumbs": [
       "Eukaryotic 2A Peptides",
-      "Sequence Logos"
+      "Seed Search Results"
     ]
   },
   {
-    "objectID": "eukaryotic/sequence-logos.html#interpretation-guide",
-    "href": "eukaryotic/sequence-logos.html#interpretation-guide",
-    "title": "Sequence Logos",
-    "section": "Interpretation Guide",
-    "text": "Interpretation Guide\n\n\n\nFeature\nMeaning\n\n\n\n\nTall letters\nHighly conserved position\n\n\nShort letters\nVariable position\n\n\nStack height\nInformation content (bits)\n\n\nLetter order\nFrequency (top = most common)",
+    "objectID": "eukaryotic/seed-search.html#quality-metrics",
+    "href": "eukaryotic/seed-search.html#quality-metrics",
+    "title": "Seed Search Results",
+    "section": "Quality Metrics",
+    "text": "Quality Metrics\n\nAlignment Length Distribution\nExpected alignment lengths: - Class 1: 18-22 residues - Class 2: 20-24 residues\n\n\nConservation Scores\nKey conserved positions in seed alignments: - Position -1 (G): &gt;95% conserved - Position 0 (P): 100% conserved - Position -4 (N/P): &gt;90% conserved",
     "crumbs": [
       "Eukaryotic 2A Peptides",
-      "Sequence Logos"
+      "Seed Search Results"
     ]
   },
   {
-    "objectID": "eukaryotic/sequence-logos.html#conservation-by-iteration",
-    "href": "eukaryotic/sequence-logos.html#conservation-by-iteration",
-    "title": "Sequence Logos",
-    "section": "Conservation by Iteration",
-    "text": "Conservation by Iteration\nTrack how conservation patterns change through iterative refinement:\n\n\n\nIteration\nSequences\nAvg. Conservation\n\n\n\n\nSeed\n~10\nHigh\n\n\nIter 1\n~100\nMedium\n\n\nIter 2\n~500\nLower (more diversity)\n\n\nFinal (curated)\n~200\nMedium-High",
+    "objectID": "eukaryotic/seed-search.html#filtering-summary",
+    "href": "eukaryotic/seed-search.html#filtering-summary",
+    "title": "Seed Search Results",
+    "section": "Filtering Summary",
+    "text": "Filtering Summary\n\n\n\nFilter\nSequences Removed\n\n\n\n\nE-value &gt; 1e-5\nTBD\n\n\nLength &lt; 15\nTBD\n\n\nGap % &gt; 50%\nTBD\n\n\nMissing PGP motif\nTBD",
     "crumbs": [
       "Eukaryotic 2A Peptides",
-      "Sequence Logos"
+      "Seed Search Results"
     ]
   },
   {
-    "objectID": "eukaryotic/sequence-logos.html#position-specific-features",
-    "href": "eukaryotic/sequence-logos.html#position-specific-features",
-    "title": "Sequence Logos",
-    "section": "Position-Specific Features",
-    "text": "Position-Specific Features\n\nCritical Residues\n\n\n\nPosition\nResidue\nFunction\nTolerance\n\n\n\n\n-1\nG\nCleavage site\nNone\n\n\n0\nP\nCleavage site\nNone\n\n\n-2\nG\nPositioning\nLow\n\n\n-3\nP/N\nEfficiency\nMedium\n\n\n\n\n\nVariable Regions\n\nPositions 2-6: Allow diversity\nPositions 11-14: Linker region\nTolerate substitutions without losing function",
+    "objectID": "eukaryotic/seed-search.html#next-steps",
+    "href": "eukaryotic/seed-search.html#next-steps",
+    "title": "Seed Search Results",
+    "section": "Next Steps",
+    "text": "Next Steps\n\nReview filtered alignments\nBuild refined models from high-confidence hits\nPerform iteration 2 searches\nGenerate sequence logos",
     "crumbs": [
       "Eukaryotic 2A Peptides",
-      "Sequence Logos"
+      "Seed Search Results"
     ]
   },
   {
-    "objectID": "eukaryotic/sequence-logos.html#downloads",
-    "href": "eukaryotic/sequence-logos.html#downloads",
-    "title": "Sequence Logos",
-    "section": "Downloads",
-    "text": "Downloads\nOnce generated, logos will be available at:\n\nresults/logos/seed/2A-class-1.png\nresults/logos/seed/2A-class-2.png\nresults/logos/final/2A-class-1.png\nresults/logos/final/2A-class-2.png",
+    "objectID": "prokaryotic/arrest-motifs.html",
+    "href": "prokaryotic/arrest-motifs.html",
+    "title": "Arrest Motif Analysis",
+    "section": "",
+    "text": "Arrest peptides are short sequences that cause ribosomes to stall during translation. Unlike 2A peptides that cause ribosomal skipping, arrest peptides physically pause the ribosome, often regulating downstream gene expression. This analysis examines the distribution of C-terminal arrest motifs across prokaryotic and viral proteomes.\n\n\nEight arrest motif patterns were searched based on known stalling sequences:\n\n\n\nMotif\nPattern\nKnown Examples\n\n\n\n\nRAGP\nR-A-G-P\nSecM (E. coli)\n\n\nRAPG\nR-A-P-G\nVemP-like\n\n\nQAPP\nQ-A-P-P\naaeB, ydhK\n\n\nQGPP\nQ-G-P-P\ntcyC\n\n\nHAPP\nH-A-P-P\n-\n\n\nHGPP\nH-G-P-P\nyaaX\n\n\nRAPP\nR-A-P-P\nyhfW\n\n\nRPPP\nR-P-P-P\n-",
     "crumbs": [
-      "Eukaryotic 2A Peptides",
-      "Sequence Logos"
+      "Prokaryotic Discovery",
+      "Arrest Motif Analysis"
+    ]
+  },
+  {
+    "objectID": "prokaryotic/arrest-motifs.html#overview",
+    "href": "prokaryotic/arrest-motifs.html#overview",
+    "title": "Arrest Motif Analysis",
+    "section": "",
+    "text": "Arrest peptides are short sequences that cause ribosomes to stall during translation. Unlike 2A peptides that cause ribosomal skipping, arrest peptides physically pause the ribosome, often regulating downstream gene expression. This analysis examines the distribution of C-terminal arrest motifs across prokaryotic and viral proteomes.\n\n\nEight arrest motif patterns were searched based on known stalling sequences:\n\n\n\nMotif\nPattern\nKnown Examples\n\n\n\n\nRAGP\nR-A-G-P\nSecM (E. coli)\n\n\nRAPG\nR-A-P-G\nVemP-like\n\n\nQAPP\nQ-A-P-P\naaeB, ydhK\n\n\nQGPP\nQ-G-P-P\ntcyC\n\n\nHAPP\nH-A-P-P\n-\n\n\nHGPP\nH-G-P-P\nyaaX\n\n\nRAPP\nR-A-P-P\nyhfW\n\n\nRPPP\nR-P-P-P\n-",
+    "crumbs": [
+      "Prokaryotic Discovery",
+      "Arrest Motif Analysis"
+    ]
+  },
+  {
+    "objectID": "prokaryotic/arrest-motifs.html#methods",
+    "href": "prokaryotic/arrest-motifs.html#methods",
+    "title": "Arrest Motif Analysis",
+    "section": "Methods",
+    "text": "Methods\n\nExtraction Parameters\nparameters:\n  upstream_residues: 40    # Context upstream of motif\n  max_c_term_distance: 50  # Maximum distance from C-terminus\n  min_sequence_length: 45  # Minimum protein length\n\n\nAnalysis Pipeline\n\nExtraction: C-terminal motifs extracted from proteomes\nClustering: MMseqs2 clustering at 70% identity to reduce redundancy\nAlignment: Multiple sequence alignment per cluster\nHMM Building: Profile HMMs built from alignments\nCross-database Search: Host HMMs searched against viral databases",
+    "crumbs": [
+      "Prokaryotic Discovery",
+      "Arrest Motif Analysis"
+    ]
+  },
+  {
+    "objectID": "prokaryotic/arrest-motifs.html#distribution-analysis",
+    "href": "prokaryotic/arrest-motifs.html#distribution-analysis",
+    "title": "Arrest Motif Analysis",
+    "section": "Distribution Analysis",
+    "text": "Distribution Analysis\n\nMotifs by Database\n\n\nMotif Type Distribution\n\n\nSummary Statistics",
+    "crumbs": [
+      "Prokaryotic Discovery",
+      "Arrest Motif Analysis"
+    ]
+  },
+  {
+    "objectID": "prokaryotic/arrest-motifs.html#host-vs-phage-comparison",
+    "href": "prokaryotic/arrest-motifs.html#host-vs-phage-comparison",
+    "title": "Arrest Motif Analysis",
+    "section": "Host vs Phage Comparison",
+    "text": "Host vs Phage Comparison\n\n\n\n\n\n\nImportantKey Finding: 23x Enrichment in Phage\n\n\n\nArrest motifs are 23 times more abundant in phage/viral proteomes compared to host (bacterial/archaeal) proteomes. This striking enrichment suggests phage may encode ribosome-manipulating peptides to hijack host translation.\n\n\n\nEnrichment by Motif Type\n\n\nEnrichment Table\n\n\nTop Enriched Motifs\nThe three most enriched motifs in phage:\n\nQAPP (96x enrichment): The most dramatically enriched, with 7,509 instances in phage vs 78 in hosts\nRAPP (68x enrichment): 2,111 phage instances vs 30 in hosts\nRPPP (47x enrichment): 1,864 phage instances vs 39 in hosts",
+    "crumbs": [
+      "Prokaryotic Discovery",
+      "Arrest Motif Analysis"
+    ]
+  },
+  {
+    "objectID": "prokaryotic/arrest-motifs.html#motif-heatmap",
+    "href": "prokaryotic/arrest-motifs.html#motif-heatmap",
+    "title": "Arrest Motif Analysis",
+    "section": "Motif Heatmap",
+    "text": "Motif Heatmap",
+    "crumbs": [
+      "Prokaryotic Discovery",
+      "Arrest Motif Analysis"
+    ]
+  },
+  {
+    "objectID": "prokaryotic/arrest-motifs.html#validation-against-known-arrest-peptides",
+    "href": "prokaryotic/arrest-motifs.html#validation-against-known-arrest-peptides",
+    "title": "Arrest Motif Analysis",
+    "section": "Validation Against Known Arrest Peptides",
+    "text": "Validation Against Known Arrest Peptides\nThe arrest motif HMMs were validated by searching for known stalling peptides characterized in the literature.\n\nValidation Results\n\n\nKnown Peptides Recovered\n\n\nNotable Recoveries\n\nSecM (RAGP): The canonical SecA-regulated stalling peptide from E. coli was correctly identified\nyaaX (HGPP): Strong hit with E-value 1.3e-17\nyhfW (RAPP): E-value 1.3e-11\ntcyC (QGPP): B. subtilis cysteine transporter subunit",
+    "crumbs": [
+      "Prokaryotic Discovery",
+      "Arrest Motif Analysis"
+    ]
+  },
+  {
+    "objectID": "prokaryotic/arrest-motifs.html#biological-implications",
+    "href": "prokaryotic/arrest-motifs.html#biological-implications",
+    "title": "Arrest Motif Analysis",
+    "section": "Biological Implications",
+    "text": "Biological Implications\n\nWhy Are Arrest Motifs Enriched in Phage?\nSeveral hypotheses could explain the 23x enrichment of arrest motifs in phage proteomes:\n\nTranslation Regulation: Phage may use arrest peptides to coordinate temporal gene expression during infection\nHost Ribosome Manipulation: Arrest peptides could stall host ribosomes on phage mRNAs, giving phage transcripts priority access to translation machinery\nAnti-Defense Mechanism: Ribosome stalling may help phage evade host defense systems that target actively translating foreign mRNAs\nLysis Timing: Controlled ribosome stalling could help coordinate the timing of host cell lysis\n\n\n\nMotif-Specific Patterns\nThe differential enrichment across motif types suggests functional specialization:\n\nQAPP/RAPP/RPPP (highest enrichment): May represent phage-specific regulatory elements\nRAPG/RAGP (lower enrichment): Closer to cellular stoichiometry, possibly shared functions",
+    "crumbs": [
+      "Prokaryotic Discovery",
+      "Arrest Motif Analysis"
+    ]
+  },
+  {
+    "objectID": "prokaryotic/arrest-motifs.html#output-files",
+    "href": "prokaryotic/arrest-motifs.html#output-files",
+    "title": "Arrest Motif Analysis",
+    "section": "Output Files",
+    "text": "Output Files\nresults/prokaryotic/\n├── analysis/\n│   ├── arrest_distribution_matrix.tsv    # Motif counts per database\n│   ├── host_phage_comparison.tsv         # Enrichment analysis\n│   └── arrest_distribution_summary.txt   # Summary statistics\n│\n├── arrest_analysis/{database}/\n│   ├── arrest_motifs.tsv.gz              # All extracted motifs\n│   ├── arrest_sequences.fasta.gz         # Motif sequences\n│   ├── motif_summary.tsv                 # Per-motif statistics\n│   ├── arrest_motifs.hmm                 # Profile HMMs\n│   └── known_peptide_validation.tsv      # Validation results\n│\n└── arrest_analysis/refined/\n    └── arrest_motifs.hmm                 # Refined HMMs from cross-search",
+    "crumbs": [
+      "Prokaryotic Discovery",
+      "Arrest Motif Analysis"
+    ]
+  },
+  {
+    "objectID": "prokaryotic/arrest-motifs.html#methods-summary",
+    "href": "prokaryotic/arrest-motifs.html#methods-summary",
+    "title": "Arrest Motif Analysis",
+    "section": "Methods Summary",
+    "text": "Methods Summary\n\nDatabases Searched\n\n\n\nDatabase\nType\nMotifs Found\n\n\n\n\nuniprot_viruses\nPhage/Viral\n14,750\n\n\nncbi_viral_refseq\nPhage/Viral\n1,344\n\n\nbacteria\nHost\n628\n\n\narchaea\nHost\n66\n\n\nTotal\n\n16,788\n\n\n\n\n\nAnalysis Parameters\n\nMotif patterns: 8 C-terminal arrest sequences (RAGP, RAPG, QAPP, QGPP, HAPP, HGPP, RAPP, RPPP)\nUpstream context: 40 residues\nC-terminal distance: Maximum 50 residues from protein end\nClustering: 70% sequence identity (MMseqs2)\nAlignment: MAFFT\nHMM construction: HMMER3 hmmbuild",
+    "crumbs": [
+      "Prokaryotic Discovery",
+      "Arrest Motif Analysis"
     ]
   },
   {
@@ -697,7 +807,7 @@
     "href": "prokaryotic/gp-motifs.html#clustering-results",
     "title": "GP Motif Analysis",
     "section": "Clustering Results",
-    "text": "Clustering Results\n\nCluster Statistics\n\n\n\n\n\n\nNotePlaceholder\n\n\n\nClustering results will be populated after pipeline execution.\n\n\nExpected clusters:\n\n\n\nCluster\nSize\nMotif\nTaxonomy\n\n\n\n\nC1\n~500\nRAGP\nProteobacteria\n\n\nC2\n~200\nRAPG\nFirmicutes\n\n\nC3\n~100\nxAGP\nMixed\n\n\n\n\n\nConservation Logos\nPer-cluster conservation logos will reveal:\n\nCluster-specific upstream patterns\nTaxonomic signature residues\nFunctional groupings",
+    "text": "Clustering Results\nGP motif sequences were clustered using MMseqs2 at 70% sequence identity to identify conserved families.\n\n\nCode\nlibrary(tidyverse)\nlibrary(scales)\n\ncluster_file &lt;- here::here(\"results/prokaryotic/gp_analysis/bacteria/gp_clusters.tsv.gz\")\n\nif (file.exists(cluster_file)) {\n  clusters_df &lt;- read_tsv(cluster_file, show_col_types = FALSE)\n  data_available &lt;- TRUE\n} else {\n  data_available &lt;- FALSE\n  message(\"Cluster data not found at \", cluster_file)\n}\n\n\n\nSummary Statistics\n\n\nCode\nif (data_available) {\n  n_total_motifs &lt;- nrow(clusters_df)\n  n_unique_seqs &lt;- n_distinct(clusters_df$context_sequence)\n  n_clusters &lt;- n_distinct(clusters_df$cluster_id)\n  duplication_ratio &lt;- n_total_motifs / n_unique_seqs\n\n  cluster_stats &lt;- clusters_df |&gt;\n    group_by(cluster_id) |&gt;\n    summarise(\n      total_motifs = n(),\n      unique_seqs = n_distinct(context_sequence),\n      .groups = \"drop\"\n    )\n\n  n_singletons &lt;- sum(cluster_stats$unique_seqs == 1)\n  pct_singletons &lt;- 100 * n_singletons / n_clusters\n\n  tibble(\n    Metric = c(\n      \"Total GP motifs\",\n      \"Unique sequences\",\n      \"Total clusters\",\n      \"Singleton clusters\",\n      \"Duplication ratio\",\n      \"Largest cluster (unique)\",\n      \"Largest cluster (total)\"\n    ),\n    Value = c(\n      comma(n_total_motifs),\n      comma(n_unique_seqs),\n      comma(n_clusters),\n      paste0(comma(n_singletons), \" (\", round(pct_singletons, 1), \"%)\"),\n      paste0(round(duplication_ratio, 2), \"x\"),\n      comma(max(cluster_stats$unique_seqs)),\n      comma(max(cluster_stats$total_motifs))\n    )\n  ) |&gt;\n    knitr::kable()\n}\n\n\n\n\nCluster Size Distribution\n\n\nCode\nif (data_available) {\n  plot_data &lt;- cluster_stats |&gt;\n    pivot_longer(\n      cols = c(unique_seqs, total_motifs),\n      names_to = \"count_type\",\n      values_to = \"count\"\n    ) |&gt;\n    mutate(count_type = recode(count_type,\n      unique_seqs = \"Unique Sequences\",\n      total_motifs = \"Total Motifs\"\n    ))\n\n  ggplot(plot_data, aes(x = count, fill = count_type)) +\n    geom_histogram(bins = 50, alpha = 0.7) +\n    scale_x_log10(labels = comma) +\n    scale_y_log10(labels = comma) +\n    facet_wrap(~count_type, ncol = 2) +\n    labs(\n      x = \"Cluster Size\",\n      y = \"Number of Clusters (log scale)\"\n    ) +\n    theme_minimal() +\n    theme(legend.position = \"none\")\n}\n\n\n\n\nTop Clusters\n\n\nCode\nif (data_available) {\n  cluster_stats |&gt;\n    slice_max(unique_seqs, n = 15) |&gt;\n    mutate(duplication = round(total_motifs / unique_seqs, 2)) |&gt;\n    rename(\n      `Cluster ID` = cluster_id,\n      `Unique Seqs` = unique_seqs,\n      `Total Motifs` = total_motifs,\n      Duplication = duplication\n    ) |&gt;\n    knitr::kable()\n}\n\n\n\n\nDuplication Analysis\nThe relationship between unique sequences and total motifs reveals how duplicated each cluster is.\n\n\nCode\nif (data_available) {\n  multi_clusters &lt;- cluster_stats |&gt;\n    filter(unique_seqs &gt; 1)\n\n  ggplot(multi_clusters, aes(x = unique_seqs, y = total_motifs)) +\n    geom_abline(slope = 1, intercept = 0, linetype = \"dashed\", color = \"gray50\") +\n    geom_point(alpha = 0.3, size = 1) +\n    scale_x_log10(labels = comma) +\n    scale_y_log10(labels = comma) +\n    labs(\n      x = \"Unique Sequences per Cluster\",\n      y = \"Total Motifs per Cluster\"\n    ) +\n    theme_minimal()\n}\n\n\n\n\nCluster Size Breakdown\n\n\nCode\nif (data_available) {\n  cluster_stats |&gt;\n    mutate(size_category = case_when(\n      unique_seqs == 1 ~ \"1 (singleton)\",\n      unique_seqs &lt;= 5 ~ \"2-5\",\n      unique_seqs &lt;= 10 ~ \"6-10\",\n      unique_seqs &lt;= 50 ~ \"11-50\",\n      unique_seqs &lt;= 100 ~ \"51-100\",\n      TRUE ~ \"&gt;100\"\n    )) |&gt;\n    mutate(size_category = factor(size_category,\n      levels = c(\"1 (singleton)\", \"2-5\", \"6-10\", \"11-50\", \"51-100\", \"&gt;100\")\n    )) |&gt;\n    group_by(size_category) |&gt;\n    summarise(\n      Clusters = n(),\n      `Unique Seqs` = sum(unique_seqs),\n      `Total Motifs` = sum(total_motifs),\n      .groups = \"drop\"\n    ) |&gt;\n    mutate(`% Clusters` = round(100 * Clusters / n_clusters, 1)) |&gt;\n    rename(`Size Category` = size_category) |&gt;\n    knitr::kable()\n}",
     "crumbs": [
       "Prokaryotic Discovery",
       "GP Motif Analysis"

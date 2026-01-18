@@ -2,7 +2,7 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://rnabioco.github.io/2a-peptide-search/index.html</loc>
-    <lastmod>2026-01-17T17:47:44.000Z</lastmod>
+    <lastmod>2026-01-17T22:29:12.000Z</lastmod>
   </url>
   <url>
     <loc>https://rnabioco.github.io/2a-peptide-search/methods/pipeline.html</loc>
@@ -17,20 +17,24 @@
     <lastmod>2026-01-17T17:47:44.000Z</lastmod>
   </url>
   <url>
-    <loc>https://rnabioco.github.io/2a-peptide-search/eukaryotic/seed-search.html</loc>
-    <lastmod>2026-01-17T17:47:44.000Z</lastmod>
+    <loc>https://rnabioco.github.io/2a-peptide-search/eukaryotic/sequence-logos.html</loc>
+    <lastmod>2026-01-17T22:47:17.000Z</lastmod>
   </url>
   <url>
     <loc>https://rnabioco.github.io/2a-peptide-search/eukaryotic/class-comparison.html</loc>
     <lastmod>2026-01-17T17:47:44.000Z</lastmod>
   </url>
   <url>
-    <loc>https://rnabioco.github.io/2a-peptide-search/eukaryotic/sequence-logos.html</loc>
+    <loc>https://rnabioco.github.io/2a-peptide-search/eukaryotic/seed-search.html</loc>
     <lastmod>2026-01-17T17:47:44.000Z</lastmod>
   </url>
   <url>
+    <loc>https://rnabioco.github.io/2a-peptide-search/prokaryotic/arrest-motifs.html</loc>
+    <lastmod>2026-01-18T13:23:57.000Z</lastmod>
+  </url>
+  <url>
     <loc>https://rnabioco.github.io/2a-peptide-search/prokaryotic/gp-motifs.html</loc>
-    <lastmod>2026-01-17T17:47:44.000Z</lastmod>
+    <lastmod>2026-01-18T02:02:05.000Z</lastmod>
   </url>
   <url>
     <loc>https://rnabioco.github.io/2a-peptide-search/methods/databases.html</loc>

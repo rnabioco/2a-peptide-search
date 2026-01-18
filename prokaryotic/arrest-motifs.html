@@ -8,7 +8,7 @@
 
 <meta name="dcterms.date" content="2026-01-18">
 
-<title>Pipeline Architecture – 2A Peptide Discovery</title>
+<title>Arrest Motif Analysis – 2A Peptide Discovery</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -104,10 +104,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     "search-label": "Search"
   }
 }</script>
-<meta name="mermaid-theme" content="neutral">
-<script src="../site_libs/quarto-diagram/mermaid.min.js"></script>
-<script src="../site_libs/quarto-diagram/mermaid-init.js"></script>
-<link href="../site_libs/quarto-diagram/mermaid.css" rel="stylesheet">
 
 
 </head>
@@ -121,7 +117,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
         <i class="bi bi-layout-text-sidebar-reverse"></i>
       </button>
-        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../methods/pipeline.html">Methods</a></li><li class="breadcrumb-item"><a href="../methods/pipeline.html">Pipeline Architecture</a></li></ol></nav>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../prokaryotic/discovery.html">Prokaryotic Discovery</a></li><li class="breadcrumb-item"><a href="../prokaryotic/arrest-motifs.html">Arrest Motif Analysis</a></li></ol></nav>
         <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
         </a>
       <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
@@ -174,7 +170,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../methods/pipeline.html" class="sidebar-item-text sidebar-link active">
+  <a href="../methods/pipeline.html" class="sidebar-item-text sidebar-link">
  <span class="menu-text">Pipeline Architecture</span></a>
   </div>
 </li>
@@ -244,7 +240,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </li>
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="../prokaryotic/arrest-motifs.html" class="sidebar-item-text sidebar-link">
+  <a href="../prokaryotic/arrest-motifs.html" class="sidebar-item-text sidebar-link active">
  <span class="menu-text">Arrest Motif Analysis</span></a>
   </div>
 </li>
@@ -266,30 +262,55 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <h2 id="toc-title">On this page</h2>
    
   <ul>
-  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a></li>
-  <li><a href="#workflow-structure" id="toc-workflow-structure" class="nav-link" data-scroll-target="#workflow-structure">Workflow Structure</a></li>
-  <li><a href="#directory-structure" id="toc-directory-structure" class="nav-link" data-scroll-target="#directory-structure">Directory Structure</a></li>
-  <li><a href="#key-rules" id="toc-key-rules" class="nav-link" data-scroll-target="#key-rules">Key Rules</a>
+  <li><a href="#overview" id="toc-overview" class="nav-link active" data-scroll-target="#overview">Overview</a>
   <ul class="collapse">
-  <li><a href="#seed-model-building" id="toc-seed-model-building" class="nav-link" data-scroll-target="#seed-model-building">Seed Model Building</a></li>
-  <li><a href="#hmm-search" id="toc-hmm-search" class="nav-link" data-scroll-target="#hmm-search">HMM Search</a></li>
-  <li><a href="#auto-curation" id="toc-auto-curation" class="nav-link" data-scroll-target="#auto-curation">Auto-Curation</a></li>
+  <li><a href="#motif-patterns-analyzed" id="toc-motif-patterns-analyzed" class="nav-link" data-scroll-target="#motif-patterns-analyzed">Motif Patterns Analyzed</a></li>
   </ul></li>
-  <li><a href="#cluster-execution" id="toc-cluster-execution" class="nav-link" data-scroll-target="#cluster-execution">Cluster Execution</a>
+  <li><a href="#methods" id="toc-methods" class="nav-link" data-scroll-target="#methods">Methods</a>
   <ul class="collapse">
-  <li><a href="#resource-configuration" id="toc-resource-configuration" class="nav-link" data-scroll-target="#resource-configuration">Resource Configuration</a></li>
+  <li><a href="#extraction-parameters" id="toc-extraction-parameters" class="nav-link" data-scroll-target="#extraction-parameters">Extraction Parameters</a></li>
+  <li><a href="#analysis-pipeline" id="toc-analysis-pipeline" class="nav-link" data-scroll-target="#analysis-pipeline">Analysis Pipeline</a></li>
   </ul></li>
-  <li><a href="#environment-management" id="toc-environment-management" class="nav-link" data-scroll-target="#environment-management">Environment Management</a></li>
+  <li><a href="#distribution-analysis" id="toc-distribution-analysis" class="nav-link" data-scroll-target="#distribution-analysis">Distribution Analysis</a>
+  <ul class="collapse">
+  <li><a href="#motifs-by-database" id="toc-motifs-by-database" class="nav-link" data-scroll-target="#motifs-by-database">Motifs by Database</a></li>
+  <li><a href="#motif-type-distribution" id="toc-motif-type-distribution" class="nav-link" data-scroll-target="#motif-type-distribution">Motif Type Distribution</a></li>
+  <li><a href="#summary-statistics" id="toc-summary-statistics" class="nav-link" data-scroll-target="#summary-statistics">Summary Statistics</a></li>
+  </ul></li>
+  <li><a href="#host-vs-phage-comparison" id="toc-host-vs-phage-comparison" class="nav-link" data-scroll-target="#host-vs-phage-comparison">Host vs Phage Comparison</a>
+  <ul class="collapse">
+  <li><a href="#enrichment-by-motif-type" id="toc-enrichment-by-motif-type" class="nav-link" data-scroll-target="#enrichment-by-motif-type">Enrichment by Motif Type</a></li>
+  <li><a href="#enrichment-table" id="toc-enrichment-table" class="nav-link" data-scroll-target="#enrichment-table">Enrichment Table</a></li>
+  <li><a href="#top-enriched-motifs" id="toc-top-enriched-motifs" class="nav-link" data-scroll-target="#top-enriched-motifs">Top Enriched Motifs</a></li>
+  </ul></li>
+  <li><a href="#motif-heatmap" id="toc-motif-heatmap" class="nav-link" data-scroll-target="#motif-heatmap">Motif Heatmap</a></li>
+  <li><a href="#validation-against-known-arrest-peptides" id="toc-validation-against-known-arrest-peptides" class="nav-link" data-scroll-target="#validation-against-known-arrest-peptides">Validation Against Known Arrest Peptides</a>
+  <ul class="collapse">
+  <li><a href="#validation-results" id="toc-validation-results" class="nav-link" data-scroll-target="#validation-results">Validation Results</a></li>
+  <li><a href="#known-peptides-recovered" id="toc-known-peptides-recovered" class="nav-link" data-scroll-target="#known-peptides-recovered">Known Peptides Recovered</a></li>
+  <li><a href="#notable-recoveries" id="toc-notable-recoveries" class="nav-link" data-scroll-target="#notable-recoveries">Notable Recoveries</a></li>
+  </ul></li>
+  <li><a href="#biological-implications" id="toc-biological-implications" class="nav-link" data-scroll-target="#biological-implications">Biological Implications</a>
+  <ul class="collapse">
+  <li><a href="#why-are-arrest-motifs-enriched-in-phage" id="toc-why-are-arrest-motifs-enriched-in-phage" class="nav-link" data-scroll-target="#why-are-arrest-motifs-enriched-in-phage">Why Are Arrest Motifs Enriched in Phage?</a></li>
+  <li><a href="#motif-specific-patterns" id="toc-motif-specific-patterns" class="nav-link" data-scroll-target="#motif-specific-patterns">Motif-Specific Patterns</a></li>
+  </ul></li>
+  <li><a href="#output-files" id="toc-output-files" class="nav-link" data-scroll-target="#output-files">Output Files</a></li>
+  <li><a href="#methods-summary" id="toc-methods-summary" class="nav-link" data-scroll-target="#methods-summary">Methods Summary</a>
+  <ul class="collapse">
+  <li><a href="#databases-searched" id="toc-databases-searched" class="nav-link" data-scroll-target="#databases-searched">Databases Searched</a></li>
+  <li><a href="#analysis-parameters" id="toc-analysis-parameters" class="nav-link" data-scroll-target="#analysis-parameters">Analysis Parameters</a></li>
+  </ul></li>
   </ul>
 </nav>
     </div>
 <!-- main -->
 <main class="content" id="quarto-document-content">
 
-<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../methods/pipeline.html">Methods</a></li><li class="breadcrumb-item"><a href="../methods/pipeline.html">Pipeline Architecture</a></li></ol></nav>
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../prokaryotic/discovery.html">Prokaryotic Discovery</a></li><li class="breadcrumb-item"><a href="../prokaryotic/arrest-motifs.html">Arrest Motif Analysis</a></li></ol></nav>
 <div class="quarto-title">
-<h1 class="title">Pipeline Architecture</h1>
-<p class="subtitle lead">Snakemake workflow for 2A peptide discovery</p>
+<h1 class="title">Arrest Motif Analysis</h1>
+<p class="subtitle lead">C-terminal arrest motifs in prokaryotic and viral proteomes</p>
 </div>
 
 
@@ -314,178 +335,241 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="overview" class="level2">
 <h2 class="anchored" data-anchor-id="overview">Overview</h2>
-<p>The analysis pipeline is implemented in <a href="https://snakemake.github.io/">Snakemake</a>, providing reproducible and scalable execution on both local workstations and HPC clusters.</p>
+<p>Arrest peptides are short sequences that cause ribosomes to stall during translation. Unlike 2A peptides that cause ribosomal skipping, arrest peptides physically pause the ribosome, often regulating downstream gene expression. This analysis examines the distribution of C-terminal arrest motifs across prokaryotic and viral proteomes.</p>
+<section id="motif-patterns-analyzed" class="level3">
+<h3 class="anchored" data-anchor-id="motif-patterns-analyzed">Motif Patterns Analyzed</h3>
+<p>Eight arrest motif patterns were searched based on known stalling sequences:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Motif</th>
+<th>Pattern</th>
+<th>Known Examples</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>RAGP</td>
+<td>R-A-G-P</td>
+<td>SecM (E. coli)</td>
+</tr>
+<tr class="even">
+<td>RAPG</td>
+<td>R-A-P-G</td>
+<td>VemP-like</td>
+</tr>
+<tr class="odd">
+<td>QAPP</td>
+<td>Q-A-P-P</td>
+<td>aaeB, ydhK</td>
+</tr>
+<tr class="even">
+<td>QGPP</td>
+<td>Q-G-P-P</td>
+<td>tcyC</td>
+</tr>
+<tr class="odd">
+<td>HAPP</td>
+<td>H-A-P-P</td>
+<td>-</td>
+</tr>
+<tr class="even">
+<td>HGPP</td>
+<td>H-G-P-P</td>
+<td>yaaX</td>
+</tr>
+<tr class="odd">
+<td>RAPP</td>
+<td>R-A-P-P</td>
+<td>yhfW</td>
+</tr>
+<tr class="even">
+<td>RPPP</td>
+<td>R-P-P-P</td>
+<td>-</td>
+</tr>
+</tbody>
+</table>
 </section>
-<section id="workflow-structure" class="level2">
-<h2 class="anchored" data-anchor-id="workflow-structure">Workflow Structure</h2>
-<div class="cell" data-layout-align="default">
-<div class="cell-output-display">
-<div id="fig-pipeline" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-pipeline-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div>
-<pre class="mermaid mermaid-js" data-label="fig-pipeline">flowchart TB
-    subgraph Download
-        D1[download_uniprot]
-        D2[download_reference_proteomes]
-        D3[download_uniparc]
-        D4[download_mgnify]
-    end
-
-    subgraph "Seed Phase"
-        S1[build_seed_models]
-        S2[hmmsearch seed]
-        S3[filter_alignment]
-        S4[merge_alignments]
-    end
-
-    subgraph "Refinement"
-        R1[build_refined_model]
-        R2[hmmsearch iter1]
-        R3[filter iter1]
-        R4[auto_curate_alignment]
-    end
-
-    subgraph "Final"
-        F1[build_final_models]
-        F2[generate_logos]
-        F3[generate_report]
-    end
-
-    D1 --&gt; S2
-    D2 --&gt; S2
-    S1 --&gt; S2
-    S2 --&gt; S3
-    S3 --&gt; S4
-    S4 --&gt; R1
-    R1 --&gt; R2
-    R2 --&gt; R3
-    R3 --&gt; R4
-    R4 --&gt; F1
-    F1 --&gt; F2
-    F1 --&gt; F3
-</pre>
+</section>
+<section id="methods" class="level2">
+<h2 class="anchored" data-anchor-id="methods">Methods</h2>
+<section id="extraction-parameters" class="level3">
+<h3 class="anchored" data-anchor-id="extraction-parameters">Extraction Parameters</h3>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">parameters</span><span class="kw">:</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">upstream_residues</span><span class="kw">:</span><span class="at"> </span><span class="dv">40</span><span class="co">    # Context upstream of motif</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">max_c_term_distance</span><span class="kw">:</span><span class="at"> </span><span class="dv">50</span><span class="co">  # Maximum distance from C-terminus</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">min_sequence_length</span><span class="kw">:</span><span class="at"> </span><span class="dv">45</span><span class="co">  # Minimum protein length</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</section>
+<section id="analysis-pipeline" class="level3">
+<h3 class="anchored" data-anchor-id="analysis-pipeline">Analysis Pipeline</h3>
+<ol type="1">
+<li><strong>Extraction</strong>: C-terminal motifs extracted from proteomes</li>
+<li><strong>Clustering</strong>: MMseqs2 clustering at 70% identity to reduce redundancy</li>
+<li><strong>Alignment</strong>: Multiple sequence alignment per cluster</li>
+<li><strong>HMM Building</strong>: Profile HMMs built from alignments</li>
+<li><strong>Cross-database Search</strong>: Host HMMs searched against viral databases</li>
+</ol>
+</section>
+</section>
+<section id="distribution-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="distribution-analysis">Distribution Analysis</h2>
+<section id="motifs-by-database" class="level3">
+<h3 class="anchored" data-anchor-id="motifs-by-database">Motifs by Database</h3>
+</section>
+<section id="motif-type-distribution" class="level3">
+<h3 class="anchored" data-anchor-id="motif-type-distribution">Motif Type Distribution</h3>
+</section>
+<section id="summary-statistics" class="level3">
+<h3 class="anchored" data-anchor-id="summary-statistics">Summary Statistics</h3>
+</section>
+</section>
+<section id="host-vs-phage-comparison" class="level2">
+<h2 class="anchored" data-anchor-id="host-vs-phage-comparison">Host vs Phage Comparison</h2>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Important</span>Key Finding: 23x Enrichment in Phage
 </div>
 </div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-pipeline-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;1: Snakemake pipeline DAG overview
-</figcaption>
-</figure>
+<div class="callout-body-container callout-body">
+<p>Arrest motifs are <strong>23 times more abundant</strong> in phage/viral proteomes compared to host (bacterial/archaeal) proteomes. This striking enrichment suggests phage may encode ribosome-manipulating peptides to hijack host translation.</p>
 </div>
 </div>
-</div>
+<section id="enrichment-by-motif-type" class="level3">
+<h3 class="anchored" data-anchor-id="enrichment-by-motif-type">Enrichment by Motif Type</h3>
 </section>
-<section id="directory-structure" class="level2">
-<h2 class="anchored" data-anchor-id="directory-structure">Directory Structure</h2>
-<pre><code>workflow/
-├── Snakefile              # Main pipeline orchestration
-├── config/
-│   ├── config.yaml        # Main configuration
-│   └── config-prokaryotic.yaml  # Prokaryotic-specific settings
-├── rules/
-│   ├── download.smk       # Database downloads
-│   ├── search.smk         # HMM searches
-│   ├── refine.smk         # Model refinement
-│   ├── prokaryotic.smk    # Prokaryotic discovery
-│   └── report.smk         # Report generation
-└── scripts/
-    ├── filter_alignment.py
-    ├── auto_curate_alignment.py
-    ├── sanitize_fasta.py
-    └── utils/
-        └── logging_config.py</code></pre>
+<section id="enrichment-table" class="level3">
+<h3 class="anchored" data-anchor-id="enrichment-table">Enrichment Table</h3>
 </section>
-<section id="key-rules" class="level2">
-<h2 class="anchored" data-anchor-id="key-rules">Key Rules</h2>
-<section id="seed-model-building" class="level3">
-<h3 class="anchored" data-anchor-id="seed-model-building">Seed Model Building</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>rule build_seed_models:</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">input</span>:</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>        alignment<span class="op">=</span><span class="st">"resources/seed-alignments/2A-</span><span class="sc">{peptide_class}</span><span class="st">.sto.gz"</span></span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    output:</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>        hmm<span class="op">=</span>RESULTS_DIR <span class="op">+</span> <span class="st">"/models/seed/2A-</span><span class="sc">{peptide_class}</span><span class="st">.hmm"</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    shell:</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>        <span class="co">"hmmbuild -n {params.name} {output.hmm} {input.alignment}"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</section>
-<section id="hmm-search" class="level3">
-<h3 class="anchored" data-anchor-id="hmm-search">HMM Search</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>rule hmmsearch:</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">input</span>:</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        hmm<span class="op">=</span>get_model_path,</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        db<span class="op">=</span>get_database_file</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    output:</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>        hmmsearch<span class="op">=</span>SCRATCH_DIR <span class="op">+</span> <span class="st">"/searches/</span><span class="sc">{database}</span><span class="st">/</span><span class="sc">{iteration}</span><span class="st">/2A-</span><span class="sc">{peptide_class}</span><span class="st">.hmmsearch.gz"</span>,</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>        tblout<span class="op">=</span>SCRATCH_DIR <span class="op">+</span> <span class="st">"/searches/</span><span class="sc">{database}</span><span class="st">/</span><span class="sc">{iteration}</span><span class="st">/2A-</span><span class="sc">{peptide_class}</span><span class="st">.tblout.gz"</span>,</span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>        alignment<span class="op">=</span>SCRATCH_DIR <span class="op">+</span> <span class="st">"/searches/</span><span class="sc">{database}</span><span class="st">/</span><span class="sc">{iteration}</span><span class="st">/2A-</span><span class="sc">{peptide_class}</span><span class="st">.sto.gz"</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    threads: <span class="dv">12</span></span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    shell:</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>        <span class="co">"""</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co">        hmmsearch --cpu {threads} </span><span class="op">\</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co">            --tblout &gt;(gzip &gt; {output.tblout}) </span><span class="op">\</span></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co">            -A &gt;(gzip &gt; {output.alignment}) </span><span class="op">\</span></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="co">            {input.hmm} {input.db} | gzip &gt; {output.hmmsearch}</span></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="co">        """</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</section>
-<section id="auto-curation" class="level3">
-<h3 class="anchored" data-anchor-id="auto-curation">Auto-Curation</h3>
-<p>The pipeline includes automated alignment curation to replace manual review:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>rule auto_curate_alignment:</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">input</span>:</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        alignment<span class="op">=</span>SCRATCH_DIR <span class="op">+</span> <span class="st">"/alignments/iter2/2A-</span><span class="sc">{peptide_class}</span><span class="st">.merged.sto"</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    output:</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>        curated<span class="op">=</span>RESULTS_DIR <span class="op">+</span> <span class="st">"/alignments/final/2A-</span><span class="sc">{peptide_class}</span><span class="st">.auto-curated.sto"</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    shell:</span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>        <span class="co">"""</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co">        python workflow/scripts/auto_curate_alignment.py </span><span class="op">\</span></span>
-<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co">            {input.alignment} {output.curated} </span><span class="op">\</span></span>
-<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a><span class="co">            --evalue {params.evalue} </span><span class="op">\</span></span>
-<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co">            --min-length 15 </span><span class="op">\</span></span>
-<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="co">            --max-gap-pct 0.5 </span><span class="op">\</span></span>
-<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a><span class="co">            --require-motif</span></span>
-<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co">        """</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="top-enriched-motifs" class="level3">
+<h3 class="anchored" data-anchor-id="top-enriched-motifs">Top Enriched Motifs</h3>
+<p>The three most enriched motifs in phage:</p>
+<ol type="1">
+<li><strong>QAPP</strong> (96x enrichment): The most dramatically enriched, with 7,509 instances in phage vs 78 in hosts</li>
+<li><strong>RAPP</strong> (68x enrichment): 2,111 phage instances vs 30 in hosts</li>
+<li><strong>RPPP</strong> (47x enrichment): 1,864 phage instances vs 39 in hosts</li>
+</ol>
 </section>
 </section>
-<section id="cluster-execution" class="level2">
-<h2 class="anchored" data-anchor-id="cluster-execution">Cluster Execution</h2>
-<p>For SLURM clusters:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Submit orchestrator job</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="ex">sbatch</span> submit-slurm.sh</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Or run directly with profile</span></span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pixi</span> run snakemake <span class="at">--profile</span> cluster/slurm</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<section id="resource-configuration" class="level3">
-<h3 class="anchored" data-anchor-id="resource-configuration">Resource Configuration</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb6"><pre class="sourceCode yaml code-with-copy"><code class="sourceCode yaml"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># cluster/slurm/config.yaml</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">default-resources</span><span class="kw">:</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">slurm_partition</span><span class="kw">:</span><span class="at"> amilan</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">runtime</span><span class="kw">:</span><span class="at"> </span><span class="dv">120</span></span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">mem_mb</span><span class="kw">:</span><span class="at"> </span><span class="dv">8000</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">cpus_per_task</span><span class="kw">:</span><span class="at"> </span><span class="dv">4</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="fu">set-resources</span><span class="kw">:</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="at">  </span><span class="fu">hmmsearch</span><span class="kw">:</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">runtime</span><span class="kw">:</span><span class="at"> </span><span class="dv">1440</span><span class="co">  # 24 hours for large databases</span></span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">mem_mb</span><span class="kw">:</span><span class="at"> </span><span class="dv">16000</span></span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="at">    </span><span class="fu">cpus_per_task</span><span class="kw">:</span><span class="at"> </span><span class="dv">12</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<section id="motif-heatmap" class="level2">
+<h2 class="anchored" data-anchor-id="motif-heatmap">Motif Heatmap</h2>
 </section>
+<section id="validation-against-known-arrest-peptides" class="level2">
+<h2 class="anchored" data-anchor-id="validation-against-known-arrest-peptides">Validation Against Known Arrest Peptides</h2>
+<p>The arrest motif HMMs were validated by searching for known stalling peptides characterized in the literature.</p>
+<section id="validation-results" class="level3">
+<h3 class="anchored" data-anchor-id="validation-results">Validation Results</h3>
 </section>
-<section id="environment-management" class="level2">
-<h2 class="anchored" data-anchor-id="environment-management">Environment Management</h2>
-<p>All dependencies are managed via <a href="https://pixi.sh/">Pixi</a>:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Install dependencies</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="ex">pixi</span> install</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Run pipeline</span></span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="ex">pixi</span> run snakemake <span class="at">--cores</span> 12</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>Key dependencies:</p>
+<section id="known-peptides-recovered" class="level3">
+<h3 class="anchored" data-anchor-id="known-peptides-recovered">Known Peptides Recovered</h3>
+</section>
+<section id="notable-recoveries" class="level3">
+<h3 class="anchored" data-anchor-id="notable-recoveries">Notable Recoveries</h3>
 <ul>
-<li><strong>HMMER 3.4</strong>: Profile HMM searches</li>
-<li><strong>Easel</strong>: Alignment manipulation</li>
-<li><strong>Biopython</strong>: Sequence parsing</li>
-<li><strong>Snakemake 8</strong>: Workflow management</li>
+<li><strong>SecM</strong> (RAGP): The canonical SecA-regulated stalling peptide from <em>E. coli</em> was correctly identified</li>
+<li><strong>yaaX</strong> (HGPP): Strong hit with E-value 1.3e-17</li>
+<li><strong>yhfW</strong> (RAPP): E-value 1.3e-11</li>
+<li><strong>tcyC</strong> (QGPP): <em>B. subtilis</em> cysteine transporter subunit</li>
+</ul>
+</section>
+</section>
+<section id="biological-implications" class="level2">
+<h2 class="anchored" data-anchor-id="biological-implications">Biological Implications</h2>
+<section id="why-are-arrest-motifs-enriched-in-phage" class="level3">
+<h3 class="anchored" data-anchor-id="why-are-arrest-motifs-enriched-in-phage">Why Are Arrest Motifs Enriched in Phage?</h3>
+<p>Several hypotheses could explain the 23x enrichment of arrest motifs in phage proteomes:</p>
+<ol type="1">
+<li><p><strong>Translation Regulation</strong>: Phage may use arrest peptides to coordinate temporal gene expression during infection</p></li>
+<li><p><strong>Host Ribosome Manipulation</strong>: Arrest peptides could stall host ribosomes on phage mRNAs, giving phage transcripts priority access to translation machinery</p></li>
+<li><p><strong>Anti-Defense Mechanism</strong>: Ribosome stalling may help phage evade host defense systems that target actively translating foreign mRNAs</p></li>
+<li><p><strong>Lysis Timing</strong>: Controlled ribosome stalling could help coordinate the timing of host cell lysis</p></li>
+</ol>
+</section>
+<section id="motif-specific-patterns" class="level3">
+<h3 class="anchored" data-anchor-id="motif-specific-patterns">Motif-Specific Patterns</h3>
+<p>The differential enrichment across motif types suggests functional specialization:</p>
+<ul>
+<li><strong>QAPP/RAPP/RPPP</strong> (highest enrichment): May represent phage-specific regulatory elements</li>
+<li><strong>RAPG/RAGP</strong> (lower enrichment): Closer to cellular stoichiometry, possibly shared functions</li>
+</ul>
+</section>
+</section>
+<section id="output-files" class="level2">
+<h2 class="anchored" data-anchor-id="output-files">Output Files</h2>
+<pre><code>results/prokaryotic/
+├── analysis/
+│   ├── arrest_distribution_matrix.tsv    # Motif counts per database
+│   ├── host_phage_comparison.tsv         # Enrichment analysis
+│   └── arrest_distribution_summary.txt   # Summary statistics
+│
+├── arrest_analysis/{database}/
+│   ├── arrest_motifs.tsv.gz              # All extracted motifs
+│   ├── arrest_sequences.fasta.gz         # Motif sequences
+│   ├── motif_summary.tsv                 # Per-motif statistics
+│   ├── arrest_motifs.hmm                 # Profile HMMs
+│   └── known_peptide_validation.tsv      # Validation results
+│
+└── arrest_analysis/refined/
+    └── arrest_motifs.hmm                 # Refined HMMs from cross-search</code></pre>
+</section>
+<section id="methods-summary" class="level2">
+<h2 class="anchored" data-anchor-id="methods-summary">Methods Summary</h2>
+<section id="databases-searched" class="level3">
+<h3 class="anchored" data-anchor-id="databases-searched">Databases Searched</h3>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Database</th>
+<th>Type</th>
+<th>Motifs Found</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>uniprot_viruses</td>
+<td>Phage/Viral</td>
+<td>14,750</td>
+</tr>
+<tr class="even">
+<td>ncbi_viral_refseq</td>
+<td>Phage/Viral</td>
+<td>1,344</td>
+</tr>
+<tr class="odd">
+<td>bacteria</td>
+<td>Host</td>
+<td>628</td>
+</tr>
+<tr class="even">
+<td>archaea</td>
+<td>Host</td>
+<td>66</td>
+</tr>
+<tr class="odd">
+<td><strong>Total</strong></td>
+<td></td>
+<td><strong>16,788</strong></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="analysis-parameters" class="level3">
+<h3 class="anchored" data-anchor-id="analysis-parameters">Analysis Parameters</h3>
+<ul>
+<li><strong>Motif patterns</strong>: 8 C-terminal arrest sequences (RAGP, RAPG, QAPP, QGPP, HAPP, HGPP, RAPP, RPPP)</li>
+<li><strong>Upstream context</strong>: 40 residues</li>
+<li><strong>C-terminal distance</strong>: Maximum 50 residues from protein end</li>
+<li><strong>Clustering</strong>: 70% sequence identity (MMseqs2)</li>
+<li><strong>Alignment</strong>: MAFFT</li>
+<li><strong>HMM construction</strong>: HMMER3 hmmbuild</li>
 </ul>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->
