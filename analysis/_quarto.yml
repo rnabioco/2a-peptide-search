@@ -29,6 +29,7 @@ website:
         contents:
           - prokaryotic/discovery.qmd
           - prokaryotic/gp-motifs.qmd
+          - prokaryotic/arrest-motifs.qmd
           - prokaryotic/stalling-peptides.qmd
 
 format:

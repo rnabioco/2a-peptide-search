@@ -1,0 +1,411 @@
+---
+title: "Arrest Motif Analysis"
+subtitle: "C-terminal arrest motifs in prokaryotic and viral proteomes"
+date: today
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+## Overview
+
+Arrest peptides are short sequences that cause ribosomes to stall during translation. Unlike 2A peptides that cause ribosomal skipping, arrest peptides physically pause the ribosome, often regulating downstream gene expression. This analysis examines the distribution of C-terminal arrest motifs across prokaryotic and viral proteomes.
+
+### Motif Patterns Analyzed
+
+Eight arrest motif patterns were searched based on known stalling sequences:
+
+| Motif | Pattern | Known Examples |
+|-------|---------|----------------|
+| RAGP | R-A-G-P | SecM (E. coli) |
+| RAPG | R-A-P-G | VemP-like |
+| QAPP | Q-A-P-P | aaeB, ydhK |
+| QGPP | Q-G-P-P | tcyC |
+| HAPP | H-A-P-P | - |
+| HGPP | H-G-P-P | yaaX |
+| RAPP | R-A-P-P | yhfW |
+| RPPP | R-P-P-P | - |
+
+## Methods
+
+### Extraction Parameters
+
+```yaml
+parameters:
+  upstream_residues: 40    # Context upstream of motif
+  max_c_term_distance: 50  # Maximum distance from C-terminus
+  min_sequence_length: 45  # Minimum protein length
+```
+
+### Analysis Pipeline
+
+1. **Extraction**: C-terminal motifs extracted from proteomes
+2. **Clustering**: MMseqs2 clustering at 70% identity to reduce redundancy
+3. **Alignment**: Multiple sequence alignment per cluster
+4. **HMM Building**: Profile HMMs built from alignments
+5. **Cross-database Search**: Host HMMs searched against viral databases
+
+## Distribution Analysis
+
+```{r}
+#| label: setup
+#| code-fold: true
+
+library(tidyverse)
+library(scales)
+
+# Load distribution matrix
+matrix_file <- here::here("results/prokaryotic/analysis/arrest_distribution_matrix.tsv")
+
+if (file.exists(matrix_file)) {
+  dist_matrix <- read_tsv(matrix_file, show_col_types = FALSE)
+  data_available <- TRUE
+} else {
+  data_available <- FALSE
+  message("Distribution matrix not found at ", matrix_file)
+}
+```
+
+### Motifs by Database
+
+```{r}
+#| label: fig-motifs-by-database
+#| fig-cap: "Distribution of arrest motifs across databases"
+#| code-fold: true
+#| fig-width: 10
+#| fig-height: 5
+
+if (data_available) {
+  # Reshape to long format
+  dist_long <- dist_matrix |>
+    select(-total) |>
+    pivot_longer(
+      cols = -motif_type,
+      names_to = "database",
+      values_to = "count"
+    ) |>
+    mutate(
+      database = factor(database, levels = c("archaea", "bacteria", "ncbi_viral_refseq", "uniprot_viruses")),
+      database_type = if_else(database %in% c("archaea", "bacteria"), "Host", "Phage/Viral")
+    )
+
+  # Total by database
+  db_totals <- dist_long |>
+    group_by(database, database_type) |>
+    summarise(total = sum(count), .groups = "drop")
+
+  ggplot(db_totals, aes(x = reorder(database, -total), y = total, fill = database_type)) +
+    geom_col(alpha = 0.8) +
+    geom_text(aes(label = comma(total)), vjust = -0.3, size = 3.5) +
+    scale_y_continuous(labels = comma, expand = expansion(mult = c(0, 0.15))) +
+    scale_fill_manual(values = c("Host" = "#4477AA", "Phage/Viral" = "#CC6677")) +
+    labs(
+      x = "Database",
+      y = "Number of Motifs",
+      fill = "Type"
+    ) +
+    theme_minimal() +
+    theme(
+      axis.text.x = element_text(angle = 45, hjust = 1),
+      legend.position = "top"
+    )
+}
+```
+
+### Motif Type Distribution
+
+```{r}
+#| label: fig-motif-types-stacked
+#| fig-cap: "Stacked bar chart of motif types by database"
+#| code-fold: true
+#| fig-width: 10
+#| fig-height: 6
+
+if (data_available) {
+  ggplot(dist_long, aes(x = reorder(database, -count), y = count, fill = motif_type)) +
+    geom_col(alpha = 0.9) +
+    scale_y_continuous(labels = comma) +
+    scale_fill_brewer(palette = "Set2") +
+    labs(
+      x = "Database",
+      y = "Number of Motifs",
+      fill = "Motif Type"
+    ) +
+    theme_minimal() +
+    theme(
+      axis.text.x = element_text(angle = 45, hjust = 1),
+      legend.position = "right"
+    )
+}
+```
+
+### Summary Statistics
+
+```{r}
+#| label: distribution-summary
+#| code-fold: true
+
+if (data_available) {
+  # Summary table
+  total_by_db <- dist_long |>
+    group_by(database) |>
+    summarise(
+      Total = sum(count),
+      `Motif Types` = n_distinct(motif_type[count > 0]),
+      .groups = "drop"
+    )
+
+  total_by_db |>
+    rename(Database = database) |>
+    mutate(Total = comma(Total)) |>
+    knitr::kable()
+}
+```
+
+## Host vs Phage Comparison
+
+::: {.callout-important}
+## Key Finding: 23x Enrichment in Phage
+
+Arrest motifs are **23 times more abundant** in phage/viral proteomes compared to host (bacterial/archaeal) proteomes. This striking enrichment suggests phage may encode ribosome-manipulating peptides to hijack host translation.
+:::
+
+```{r}
+#| label: load-comparison
+#| code-fold: true
+
+comparison_file <- here::here("results/prokaryotic/analysis/host_phage_comparison.tsv")
+
+if (file.exists(comparison_file)) {
+  comparison_df <- read_tsv(comparison_file, show_col_types = FALSE)
+  comparison_available <- TRUE
+} else {
+  comparison_available <- FALSE
+}
+```
+
+### Enrichment by Motif Type
+
+```{r}
+#| label: fig-enrichment-plot
+#| fig-cap: "Log2 fold change of motif abundance (phage vs host). All motifs are enriched in phage."
+#| code-fold: true
+#| fig-width: 8
+#| fig-height: 5
+
+if (comparison_available) {
+  ggplot(comparison_df, aes(x = reorder(motif_type, -log2_phage_vs_host), y = log2_phage_vs_host)) +
+    geom_col(aes(fill = log2_phage_vs_host), alpha = 0.8) +
+    geom_hline(yintercept = 0, linetype = "dashed", color = "gray40") +
+    geom_text(aes(label = sprintf("%.1f", log2_phage_vs_host)),
+              vjust = -0.3, size = 3.5) +
+    scale_fill_gradient2(low = "#4477AA", mid = "#DDDDDD", high = "#CC6677",
+                         midpoint = 3, guide = "none") +
+    labs(
+      x = "Motif Type",
+      y = "Log2 Fold Change (Phage / Host)",
+      title = "All arrest motifs enriched in phage proteomes"
+    ) +
+    theme_minimal() +
+    theme(axis.text.x = element_text(size = 11, face = "bold"))
+}
+```
+
+### Enrichment Table
+
+```{r}
+#| label: enrichment-table
+#| code-fold: true
+
+if (comparison_available) {
+  comparison_df |>
+    mutate(
+      `Fold Change` = round(2^log2_phage_vs_host, 1),
+      `Phage Fraction` = scales::percent(phage_fraction, accuracy = 0.1)
+    ) |>
+    select(
+      `Motif Type` = motif_type,
+      Host = host,
+      Phage = phage,
+      Total = total,
+      `Phage Fraction`,
+      `Log2 FC` = log2_phage_vs_host,
+      `Fold Change`
+    ) |>
+    mutate(
+      Host = comma(Host),
+      Phage = comma(Phage),
+      Total = comma(Total),
+      `Log2 FC` = round(`Log2 FC`, 2)
+    ) |>
+    arrange(desc(`Log2 FC`)) |>
+    knitr::kable()
+}
+```
+
+### Top Enriched Motifs
+
+The three most enriched motifs in phage:
+
+1. **QAPP** (96x enrichment): The most dramatically enriched, with 7,509 instances in phage vs 78 in hosts
+2. **RAPP** (68x enrichment): 2,111 phage instances vs 30 in hosts
+3. **RPPP** (47x enrichment): 1,864 phage instances vs 39 in hosts
+
+## Motif Heatmap
+
+```{r}
+#| label: fig-motif-heatmap
+#| fig-cap: "Heatmap of motif distribution across databases (log10 scale)"
+#| code-fold: true
+#| fig-width: 8
+#| fig-height: 6
+
+if (data_available) {
+  heatmap_data <- dist_long |>
+    mutate(log_count = log10(count + 1))
+
+  ggplot(heatmap_data, aes(x = database, y = reorder(motif_type, -count), fill = log_count)) +
+    geom_tile(color = "white", linewidth = 0.5) +
+    geom_text(aes(label = comma(count)), size = 3) +
+    scale_fill_gradient(low = "white", high = "#CC6677",
+                        name = "Log10(count+1)") +
+    labs(
+      x = "Database",
+      y = "Motif Type"
+    ) +
+    theme_minimal() +
+    theme(
+      axis.text.x = element_text(angle = 45, hjust = 1),
+      panel.grid = element_blank()
+    )
+}
+```
+
+## Validation Against Known Arrest Peptides
+
+The arrest motif HMMs were validated by searching for known stalling peptides characterized in the literature.
+
+```{r}
+#| label: load-validation
+#| code-fold: true
+
+validation_file <- here::here("results/prokaryotic/arrest_analysis/bacteria/known_peptide_validation.tsv")
+
+if (file.exists(validation_file)) {
+  validation_df <- read_tsv(validation_file, show_col_types = FALSE)
+  validation_available <- TRUE
+} else {
+  validation_available <- FALSE
+}
+```
+
+### Validation Results
+
+```{r}
+#| label: validation-summary
+#| code-fold: true
+
+if (validation_available) {
+  n_total_hits <- nrow(validation_df)
+  n_correct <- sum(validation_df$motif_match)
+
+  cat(sprintf("Total HMM hits to known peptides: %d\n", n_total_hits))
+  cat(sprintf("Correct motif assignments: %d (%.1f%%)\n", n_correct, 100 * n_correct / n_total_hits))
+}
+```
+
+### Known Peptides Recovered
+
+```{r}
+#| label: validation-table
+#| code-fold: true
+
+if (validation_available) {
+  validation_df |>
+    filter(motif_match) |>
+    select(
+      Gene = gene,
+      Organism = organism,
+      `Known Motif` = known_motif_type,
+      `HMM Match` = hmm_name,
+      `E-value` = evalue,
+      Score = score
+    ) |>
+    mutate(
+      Organism = str_replace(Organism, "_", " "),
+      Organism = str_replace(Organism, "subsp. subtilis 168", "168")
+    ) |>
+    arrange(`E-value`) |>
+    knitr::kable()
+}
+```
+
+### Notable Recoveries
+
+- **SecM** (RAGP): The canonical SecA-regulated stalling peptide from *E. coli* was correctly identified
+- **yaaX** (HGPP): Strong hit with E-value 1.3e-17
+- **yhfW** (RAPP): E-value 1.3e-11
+- **tcyC** (QGPP): *B. subtilis* cysteine transporter subunit
+
+## Biological Implications
+
+### Why Are Arrest Motifs Enriched in Phage?
+
+Several hypotheses could explain the 23x enrichment of arrest motifs in phage proteomes:
+
+1. **Translation Regulation**: Phage may use arrest peptides to coordinate temporal gene expression during infection
+
+2. **Host Ribosome Manipulation**: Arrest peptides could stall host ribosomes on phage mRNAs, giving phage transcripts priority access to translation machinery
+
+3. **Anti-Defense Mechanism**: Ribosome stalling may help phage evade host defense systems that target actively translating foreign mRNAs
+
+4. **Lysis Timing**: Controlled ribosome stalling could help coordinate the timing of host cell lysis
+
+### Motif-Specific Patterns
+
+The differential enrichment across motif types suggests functional specialization:
+
+- **QAPP/RAPP/RPPP** (highest enrichment): May represent phage-specific regulatory elements
+- **RAPG/RAGP** (lower enrichment): Closer to cellular stoichiometry, possibly shared functions
+
+## Output Files
+
+```
+results/prokaryotic/
+├── analysis/
+│   ├── arrest_distribution_matrix.tsv    # Motif counts per database
+│   ├── host_phage_comparison.tsv         # Enrichment analysis
+│   └── arrest_distribution_summary.txt   # Summary statistics
+│
+├── arrest_analysis/{database}/
+│   ├── arrest_motifs.tsv.gz              # All extracted motifs
+│   ├── arrest_sequences.fasta.gz         # Motif sequences
+│   ├── motif_summary.tsv                 # Per-motif statistics
+│   ├── arrest_motifs.hmm                 # Profile HMMs
+│   └── known_peptide_validation.tsv      # Validation results
+│
+└── arrest_analysis/refined/
+    └── arrest_motifs.hmm                 # Refined HMMs from cross-search
+```
+
+## Methods Summary
+
+### Databases Searched
+
+| Database | Type | Motifs Found |
+|----------|------|-------------|
+| uniprot_viruses | Phage/Viral | 14,750 |
+| ncbi_viral_refseq | Phage/Viral | 1,344 |
+| bacteria | Host | 628 |
+| archaea | Host | 66 |
+| **Total** | | **16,788** |
+
+### Analysis Parameters
+
+- **Motif patterns**: 8 C-terminal arrest sequences (RAGP, RAPG, QAPP, QGPP, HAPP, HGPP, RAPP, RPPP)
+- **Upstream context**: 40 residues
+- **C-terminal distance**: Maximum 50 residues from protein end
+- **Clustering**: 70% sequence identity (MMseqs2)
+- **Alignment**: MAFFT
+- **HMM construction**: HMMER3 hmmbuild
