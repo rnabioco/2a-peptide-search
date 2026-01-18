@@ -271,11 +271,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <ul class="collapse">
   <li><a href="#expected-conservation-pattern-1" id="toc-expected-conservation-pattern-1" class="nav-link" data-scroll-target="#expected-conservation-pattern-1">Expected Conservation Pattern</a></li>
   </ul></li>
-  <li><a href="#generating-logos" id="toc-generating-logos" class="nav-link" data-scroll-target="#generating-logos">Generating Logos</a>
-  <ul class="collapse">
-  <li><a href="#using-ggseqlogo-r" id="toc-using-ggseqlogo-r" class="nav-link" data-scroll-target="#using-ggseqlogo-r">Using ggseqlogo (R)</a></li>
-  <li><a href="#using-weblogo-cli" id="toc-using-weblogo-cli" class="nav-link" data-scroll-target="#using-weblogo-cli">Using WebLogo (CLI)</a></li>
-  </ul></li>
   <li><a href="#interpretation-guide" id="toc-interpretation-guide" class="nav-link" data-scroll-target="#interpretation-guide">Interpretation Guide</a></li>
   <li><a href="#conservation-by-iteration" id="toc-conservation-by-iteration" class="nav-link" data-scroll-target="#conservation-by-iteration">Conservation by Iteration</a></li>
   <li><a href="#position-specific-features" id="toc-position-specific-features" class="nav-link" data-scroll-target="#position-specific-features">Position-Specific Features</a>
@@ -283,7 +278,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#critical-residues" id="toc-critical-residues" class="nav-link" data-scroll-target="#critical-residues">Critical Residues</a></li>
   <li><a href="#variable-regions" id="toc-variable-regions" class="nav-link" data-scroll-target="#variable-regions">Variable Regions</a></li>
   </ul></li>
-  <li><a href="#downloads" id="toc-downloads" class="nav-link" data-scroll-target="#downloads">Downloads</a></li>
   </ul>
 </nav>
     </div>
@@ -318,19 +312,52 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 
 <section id="overview" class="level2">
 <h2 class="anchored" data-anchor-id="overview">Overview</h2>
-<p>Sequence logos visualize the conservation pattern at each position in the aligned 2A peptides. Height indicates information content (conservation), and letter size shows relative amino acid frequency.</p>
+<p>Sequence logos visualize the conservation pattern at each position in aligned 2A peptides. Height indicates information content (conservation), and letter size shows relative amino acid frequency.</p>
 </section>
 <section id="class-1-sequence-logo" class="level2">
 <h2 class="anchored" data-anchor-id="class-1-sequence-logo">Class 1 Sequence Logo</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>class1_seqs <span class="ot">&lt;-</span> <span class="fu">read_stockholm_sequences</span>(class1_path)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">message</span>(<span class="fu">sprintf</span>(<span class="st">"Loaded %d Class 1 sequences"</span>, <span class="fu">length</span>(class1_seqs)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loaded 35265 Class 1 sequences</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggseqlogo</span>(class1_seqs, <span class="at">method =</span> <span class="st">"prob"</span>) <span class="sc">+</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Class 1 2A Peptide"</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Position"</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Probability"</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_logo</span>() <span class="sc">+</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">14</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">10</span>)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Warning: `aes_string()` was deprecated in ggplot2 3.0.0.
+ℹ Please use tidy evaluation idioms with `aes()`.
+ℹ See also `vignette("ggplot2-in-packages")` for more information.
+ℹ The deprecated feature was likely used in the ggseqlogo package.
+  Please report the issue at &lt;https://github.com/omarwagih/ggseqlogo/issues&gt;.</code></pre>
+</div>
+<div class="cell-output-display">
 <div id="fig-class1-logo" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-class1-logo-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="../../img/class-1.trimmed.logo.png" class="img-fluid figure-img">
+<img src="sequence-logos_files/figure-html/fig-class1-logo-1.png" class="img-fluid figure-img" width="960">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-class1-logo-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;1: Class 1 2A peptide sequence logo showing conserved GDVE central motif and NPGP C-terminal motif
 </figcaption>
 </figure>
+</div>
+</div>
 </div>
 <section id="expected-conservation-pattern" class="level3">
 <h3 class="anchored" data-anchor-id="expected-conservation-pattern">Expected Conservation Pattern</h3>
@@ -343,15 +370,41 @@ Consensus: L  L  x  x  x  x  G  D  V  E  x  x  x  x  N  P  G  P
 </section>
 <section id="class-2-sequence-logo" class="level2">
 <h2 class="anchored" data-anchor-id="class-2-sequence-logo">Class 2 Sequence Logo</h2>
+<div class="cell">
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>class2_seqs <span class="ot">&lt;-</span> <span class="fu">read_stockholm_sequences</span>(class2_path)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="fu">message</span>(<span class="fu">sprintf</span>(<span class="st">"Loaded %d Class 2 sequences"</span>, <span class="fu">length</span>(class2_seqs)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output cell-output-stderr">
+<pre><code>Loaded 709 Class 2 sequences</code></pre>
+</div>
+<details class="code-fold">
+<summary>Code</summary>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">ggseqlogo</span>(class2_seqs, <span class="at">method =</span> <span class="st">"prob"</span>) <span class="sc">+</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">"Class 2 2A Peptide"</span>,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">"Position"</span>,</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">"Probability"</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_logo</span>() <span class="sc">+</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="at">plot.title =</span> <span class="fu">element_text</span>(<span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">size =</span> <span class="dv">14</span>, <span class="at">face =</span> <span class="st">"bold"</span>),</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>    <span class="at">axis.title =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">10</span>)</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>  )</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</details>
+<div class="cell-output-display">
 <div id="fig-class2-logo" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-class2-logo-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<img src="../../img/class-2.trimmed.logo.png" class="img-fluid figure-img">
+<img src="sequence-logos_files/figure-html/fig-class2-logo-1.png" class="img-fluid figure-img" width="960">
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-class2-logo-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;2: Class 2 2A peptide sequence logo showing conserved N-terminal tryptophan, EEGIE central motif, and PNPGP C-terminal motif
 </figcaption>
 </figure>
+</div>
+</div>
 </div>
 <section id="expected-conservation-pattern-1" class="level3">
 <h3 class="anchored" data-anchor-id="expected-conservation-pattern-1">Expected Conservation Pattern</h3>
@@ -360,37 +413,6 @@ Consensus: W  x  x  x  x  E  E  G  I  E  x  x  x  P  N  P  G  P  x
            ^              ^^^^^^^^^^^        ^^^^^^^^^^^^^^
            N-terminal     Central            C-terminal</code></pre>
 <p><strong>Key positions:</strong> - Position 1: Invariant tryptophan (W) - Positions 6-10: EEGIE central motif - Positions 14-18: PNPGP C-terminal motif</p>
-</section>
-</section>
-<section id="generating-logos" class="level2">
-<h2 class="anchored" data-anchor-id="generating-logos">Generating Logos</h2>
-<section id="using-ggseqlogo-r" class="level3">
-<h3 class="anchored" data-anchor-id="using-ggseqlogo-r">Using ggseqlogo (R)</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">#| label: fig-example-logo</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| fig-cap: "Example sequence logo generation"</span></span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">#| eval: false</span></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggseqlogo)</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co"># Read sequences from alignment</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>sequences <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">"EGRGSLLTCGDVEENPGP"</span>,</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">"ATNFSLLKQAGDVEENPGP"</span>,</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">"QCTNYALLKLAGDVESNPGP"</span></span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="co"># Generate logo</span></span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="fu">ggseqlogo</span>(sequences, <span class="at">method =</span> <span class="st">"prob"</span>) <span class="sc">+</span></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"2A Peptide Class 1"</span>) <span class="sc">+</span></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_logo</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</section>
-<section id="using-weblogo-cli" class="level3">
-<h3 class="anchored" data-anchor-id="using-weblogo-cli">Using WebLogo (CLI)</h3>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">weblogo</span> <span class="at">-f</span> alignment.fasta <span class="at">-o</span> logo.png <span class="dt">\</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">-F</span> png <span class="at">-s</span> large <span class="dt">\</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">-c</span> chemistry <span class="dt">\</span></span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">--title</span> <span class="st">"2A Peptide Class 1"</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </section>
 </section>
 <section id="interpretation-guide" class="level2">
@@ -505,19 +527,9 @@ Consensus: W  x  x  x  x  E  E  G  I  E  x  x  x  P  N  P  G  P  x
 <li>Positions 11-14: Linker region</li>
 <li>Tolerate substitutions without losing function</li>
 </ul>
-</section>
-</section>
-<section id="downloads" class="level2">
-<h2 class="anchored" data-anchor-id="downloads">Downloads</h2>
-<p>Once generated, logos will be available at:</p>
-<ul>
-<li><code>results/logos/seed/2A-class-1.png</code></li>
-<li><code>results/logos/seed/2A-class-2.png</code></li>
-<li><code>results/logos/final/2A-class-1.png</code></li>
-<li><code>results/logos/final/2A-class-2.png</code></li>
-</ul>
 
 
+</section>
 </section>
 
 </main> <!-- /main -->

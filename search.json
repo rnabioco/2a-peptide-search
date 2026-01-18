@@ -356,7 +356,7 @@
     "href": "eukaryotic/sequence-logos.html",
     "title": "Sequence Logos",
     "section": "",
-    "text": "Sequence logos visualize the conservation pattern at each position in the aligned 2A peptides. Height indicates information content (conservation), and letter size shows relative amino acid frequency.",
+    "text": "Sequence logos visualize the conservation pattern at each position in aligned 2A peptides. Height indicates information content (conservation), and letter size shows relative amino acid frequency.",
     "crumbs": [
       "Eukaryotic 2A Peptides",
       "Sequence Logos"
@@ -367,7 +367,7 @@
     "href": "eukaryotic/sequence-logos.html#overview",
     "title": "Sequence Logos",
     "section": "",
-    "text": "Sequence logos visualize the conservation pattern at each position in the aligned 2A peptides. Height indicates information content (conservation), and letter size shows relative amino acid frequency.",
+    "text": "Sequence logos visualize the conservation pattern at each position in aligned 2A peptides. Height indicates information content (conservation), and letter size shows relative amino acid frequency.",
     "crumbs": [
       "Eukaryotic 2A Peptides",
       "Sequence Logos"
@@ -378,7 +378,7 @@
     "href": "eukaryotic/sequence-logos.html#class-1-sequence-logo",
     "title": "Sequence Logos",
     "section": "Class 1 Sequence Logo",
-    "text": "Class 1 Sequence Logo\n\n\n\n\n\n\nFigure 1: Class 1 2A peptide sequence logo showing conserved GDVE central motif and NPGP C-terminal motif\n\n\n\n\nExpected Conservation Pattern\nPosition:  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18\nConsensus: L  L  x  x  x  x  G  D  V  E  x  x  x  x  N  P  G  P\n                          ^^^^^^^               ^^^^^^^^^^\n                          Central               C-terminal\nKey positions: - Positions 7-10: GDVE central motif - Positions 15-18: NPGP C-terminal motif",
+    "text": "Class 1 Sequence Logo\n\n\nCode\nclass1_seqs &lt;- read_stockholm_sequences(class1_path)\nmessage(sprintf(\"Loaded %d Class 1 sequences\", length(class1_seqs)))\n\n\nLoaded 35265 Class 1 sequences\n\n\nCode\nggseqlogo(class1_seqs, method = \"prob\") +\n  labs(\n    title = \"Class 1 2A Peptide\",\n    x = \"Position\",\n    y = \"Probability\"\n  ) +\n  theme_logo() +\n  theme(\n    plot.title = element_text(hjust = 0.5, size = 14, face = \"bold\"),\n    axis.title = element_text(size = 10)\n  )\n\n\nWarning: `aes_string()` was deprecated in ggplot2 3.0.0.\nℹ Please use tidy evaluation idioms with `aes()`.\nℹ See also `vignette(\"ggplot2-in-packages\")` for more information.\nℹ The deprecated feature was likely used in the ggseqlogo package.\n  Please report the issue at &lt;https://github.com/omarwagih/ggseqlogo/issues&gt;.\n\n\n\n\n\n\n\n\nFigure 1: Class 1 2A peptide sequence logo showing conserved GDVE central motif and NPGP C-terminal motif\n\n\n\n\n\n\nExpected Conservation Pattern\nPosition:  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18\nConsensus: L  L  x  x  x  x  G  D  V  E  x  x  x  x  N  P  G  P\n                          ^^^^^^^               ^^^^^^^^^^\n                          Central               C-terminal\nKey positions: - Positions 7-10: GDVE central motif - Positions 15-18: NPGP C-terminal motif",
     "crumbs": [
       "Eukaryotic 2A Peptides",
       "Sequence Logos"
@@ -389,18 +389,7 @@
     "href": "eukaryotic/sequence-logos.html#class-2-sequence-logo",
     "title": "Sequence Logos",
     "section": "Class 2 Sequence Logo",
-    "text": "Class 2 Sequence Logo\n\n\n\n\n\n\nFigure 2: Class 2 2A peptide sequence logo showing conserved N-terminal tryptophan, EEGIE central motif, and PNPGP C-terminal motif\n\n\n\n\nExpected Conservation Pattern\nPosition:  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19\nConsensus: W  x  x  x  x  E  E  G  I  E  x  x  x  P  N  P  G  P  x\n           ^              ^^^^^^^^^^^        ^^^^^^^^^^^^^^\n           N-terminal     Central            C-terminal\nKey positions: - Position 1: Invariant tryptophan (W) - Positions 6-10: EEGIE central motif - Positions 14-18: PNPGP C-terminal motif",
-    "crumbs": [
-      "Eukaryotic 2A Peptides",
-      "Sequence Logos"
-    ]
-  },
-  {
-    "objectID": "eukaryotic/sequence-logos.html#generating-logos",
-    "href": "eukaryotic/sequence-logos.html#generating-logos",
-    "title": "Sequence Logos",
-    "section": "Generating Logos",
-    "text": "Generating Logos\n\nUsing ggseqlogo (R)\n#| label: fig-example-logo\n#| fig-cap: \"Example sequence logo generation\"\n#| eval: false\n\nlibrary(ggseqlogo)\nlibrary(tidyverse)\n\n# Read sequences from alignment\nsequences &lt;- c(\n    \"EGRGSLLTCGDVEENPGP\",\n    \"ATNFSLLKQAGDVEENPGP\",\n    \"QCTNYALLKLAGDVESNPGP\"\n)\n\n# Generate logo\nggseqlogo(sequences, method = \"prob\") +\n    labs(title = \"2A Peptide Class 1\") +\n    theme_logo()\n\n\nUsing WebLogo (CLI)\nweblogo -f alignment.fasta -o logo.png \\\n    -F png -s large \\\n    -c chemistry \\\n    --title \"2A Peptide Class 1\"",
+    "text": "Class 2 Sequence Logo\n\n\nCode\nclass2_seqs &lt;- read_stockholm_sequences(class2_path)\nmessage(sprintf(\"Loaded %d Class 2 sequences\", length(class2_seqs)))\n\n\nLoaded 709 Class 2 sequences\n\n\nCode\nggseqlogo(class2_seqs, method = \"prob\") +\n  labs(\n    title = \"Class 2 2A Peptide\",\n    x = \"Position\",\n    y = \"Probability\"\n  ) +\n  theme_logo() +\n  theme(\n    plot.title = element_text(hjust = 0.5, size = 14, face = \"bold\"),\n    axis.title = element_text(size = 10)\n  )\n\n\n\n\n\n\n\n\nFigure 2: Class 2 2A peptide sequence logo showing conserved N-terminal tryptophan, EEGIE central motif, and PNPGP C-terminal motif\n\n\n\n\n\n\nExpected Conservation Pattern\nPosition:  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19\nConsensus: W  x  x  x  x  E  E  G  I  E  x  x  x  P  N  P  G  P  x\n           ^              ^^^^^^^^^^^        ^^^^^^^^^^^^^^\n           N-terminal     Central            C-terminal\nKey positions: - Position 1: Invariant tryptophan (W) - Positions 6-10: EEGIE central motif - Positions 14-18: PNPGP C-terminal motif",
     "crumbs": [
       "Eukaryotic 2A Peptides",
       "Sequence Logos"
@@ -434,17 +423,6 @@
     "title": "Sequence Logos",
     "section": "Position-Specific Features",
     "text": "Position-Specific Features\n\nCritical Residues\n\n\n\nPosition\nResidue\nFunction\nTolerance\n\n\n\n\n-1\nG\nCleavage site\nNone\n\n\n0\nP\nCleavage site\nNone\n\n\n-2\nG\nPositioning\nLow\n\n\n-3\nP/N\nEfficiency\nMedium\n\n\n\n\n\nVariable Regions\n\nPositions 2-6: Allow diversity\nPositions 11-14: Linker region\nTolerate substitutions without losing function",
-    "crumbs": [
-      "Eukaryotic 2A Peptides",
-      "Sequence Logos"
-    ]
-  },
-  {
-    "objectID": "eukaryotic/sequence-logos.html#downloads",
-    "href": "eukaryotic/sequence-logos.html#downloads",
-    "title": "Sequence Logos",
-    "section": "Downloads",
-    "text": "Downloads\nOnce generated, logos will be available at:\n\nresults/logos/seed/2A-class-1.png\nresults/logos/seed/2A-class-2.png\nresults/logos/final/2A-class-1.png\nresults/logos/final/2A-class-2.png",
     "crumbs": [
       "Eukaryotic 2A Peptides",
       "Sequence Logos"
