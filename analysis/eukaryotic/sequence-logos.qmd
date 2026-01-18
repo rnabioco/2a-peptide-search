@@ -4,16 +4,65 @@ subtitle: "Visualization of conserved motifs in 2A peptides"
 date: today
 ---
 
+```{r}
+#| label: setup
+#| include: false
+
+library(ggseqlogo)
+library(ggplot2)
+
+# Helper function to read gzipped Stockholm alignment and extract sequences
+read_stockholm_sequences <- function(sto_path) {
+  # Read gzipped Stockholm file
+  lines <- readLines(gzfile(sto_path))
+
+  # Filter to sequence lines (not comments, not // delimiter, not empty)
+  seq_lines <- lines[!grepl("^#", lines) &
+                     !grepl("^//", lines) &
+                     nchar(trimws(lines)) > 0]
+
+  # Parse sequence lines: "name  sequence"
+  sequences <- sapply(seq_lines, function(line) {
+    parts <- strsplit(trimws(line), "\\s+")[[1]]
+    # Return the sequence part (second element), converting . to - for gaps
+    gsub("\\.", "-", parts[2])
+  }, USE.NAMES = FALSE)
+
+  return(sequences)
+}
+
+# Paths to seed alignments
+class1_path <- "../../resources/seed-alignments/2A-class-1.sto.gz"
+class2_path <- "../../resources/seed-alignments/2A-class-2.sto.gz"
+```
+
 ## Overview
 
-Sequence logos visualize the conservation pattern at each position in the aligned 2A peptides. Height indicates information content (conservation), and letter size shows relative amino acid frequency.
+Sequence logos visualize the conservation pattern at each position in aligned 2A peptides. Height indicates information content (conservation), and letter size shows relative amino acid frequency.
 
 ## Class 1 Sequence Logo
 
-::: {.callout-note}
-## Placeholder
-Sequence logos will be generated from the final curated alignments using Skylign or similar tools.
-:::
+```{r}
+#| label: fig-class1-logo
+#| fig-cap: "Class 1 2A peptide sequence logo showing conserved GDVE central motif and NPGP C-terminal motif"
+#| fig-width: 10
+#| fig-height: 3
+
+class1_seqs <- read_stockholm_sequences(class1_path)
+message(sprintf("Loaded %d Class 1 sequences", length(class1_seqs)))
+
+ggseqlogo(class1_seqs, method = "prob") +
+  labs(
+    title = "Class 1 2A Peptide",
+    x = "Position",
+    y = "Probability"
+  ) +
+  theme_logo() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+    axis.title = element_text(size = 10)
+  )
+```
 
 ### Expected Conservation Pattern
 
@@ -30,6 +79,28 @@ Consensus: L  L  x  x  x  x  G  D  V  E  x  x  x  x  N  P  G  P
 
 ## Class 2 Sequence Logo
 
+```{r}
+#| label: fig-class2-logo
+#| fig-cap: "Class 2 2A peptide sequence logo showing conserved N-terminal tryptophan, EEGIE central motif, and PNPGP C-terminal motif"
+#| fig-width: 10
+#| fig-height: 3
+
+class2_seqs <- read_stockholm_sequences(class2_path)
+message(sprintf("Loaded %d Class 2 sequences", length(class2_seqs)))
+
+ggseqlogo(class2_seqs, method = "prob") +
+  labs(
+    title = "Class 2 2A Peptide",
+    x = "Position",
+    y = "Probability"
+  ) +
+  theme_logo() +
+  theme(
+    plot.title = element_text(hjust = 0.5, size = 14, face = "bold"),
+    axis.title = element_text(size = 10)
+  )
+```
+
 ### Expected Conservation Pattern
 
 ```
@@ -43,40 +114,6 @@ Consensus: W  x  x  x  x  E  E  G  I  E  x  x  x  P  N  P  G  P  x
 - Position 1: Invariant tryptophan (W)
 - Positions 6-10: EEGIE central motif
 - Positions 14-18: PNPGP C-terminal motif
-
-## Generating Logos
-
-### Using ggseqlogo (R)
-
-```r
-#| label: fig-example-logo
-#| fig-cap: "Example sequence logo generation"
-#| eval: false
-
-library(ggseqlogo)
-library(tidyverse)
-
-# Read sequences from alignment
-sequences <- c(
-    "EGRGSLLTCGDVEENPGP",
-    "ATNFSLLKQAGDVEENPGP",
-    "QCTNYALLKLAGDVESNPGP"
-)
-
-# Generate logo
-ggseqlogo(sequences, method = "prob") +
-    labs(title = "2A Peptide Class 1") +
-    theme_logo()
-```
-
-### Using WebLogo (CLI)
-
-```bash
-weblogo -f alignment.fasta -o logo.png \
-    -F png -s large \
-    -c chemistry \
-    --title "2A Peptide Class 1"
-```
 
 ## Interpretation Guide
 
@@ -114,12 +151,3 @@ Track how conservation patterns change through iterative refinement:
 - Positions 2-6: Allow diversity
 - Positions 11-14: Linker region
 - Tolerate substitutions without losing function
-
-## Downloads
-
-Once generated, logos will be available at:
-
-- `results/logos/seed/2A-class-1.png`
-- `results/logos/seed/2A-class-2.png`
-- `results/logos/final/2A-class-1.png`
-- `results/logos/final/2A-class-2.png`
