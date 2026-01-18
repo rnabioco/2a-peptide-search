@@ -49,7 +49,7 @@ def get_model_path(wildcards):
 
 
 rule hmmsearch:
-    """Search protein database with HMM model."""
+    """Search protein database with HMM model (excludes mgnify - handled separately)."""
     input:
         hmm=get_model_path,
         db=get_database_file,
@@ -62,6 +62,8 @@ rule hmmsearch:
         + "/searches/{database}/{iteration}/2A-{peptide_class}.sto.gz",
     log:
         LOGS_DIR + "/hmmsearch/{database}_{iteration}_{peptide_class}.log",
+    wildcard_constraints:
+        database="(?!mgnify).*",  # Exclude mgnify - handled by split rules below
     threads: 12
     resources:
         runtime=1440,  # 24 hours max
@@ -73,6 +75,90 @@ rule hmmsearch:
             -A >(gzip > {output.alignment}) \
             --noali \
             {input.hmm} {input.db} 2> {log} | gzip > {output.hmmsearch}
+        """
+
+
+# =============================================================================
+# MGnify Split-Based Search (for parallel processing of large database)
+# =============================================================================
+
+
+rule hmmsearch_mgnify_split:
+    """Search one MGnify split file with HMM model."""
+    input:
+        hmm=get_model_path,
+        db=DATA_DIR + "/mgnify/splits/mgy_proteins_{split_num}.fa.gz",
+    output:
+        tblout=SCRATCH_DIR
+        + "/searches/mgnify_splits/{iteration}/split_{split_num}/2A-{peptide_class}.tblout.gz",
+        alignment=SCRATCH_DIR
+        + "/searches/mgnify_splits/{iteration}/split_{split_num}/2A-{peptide_class}.sto.gz",
+    log:
+        LOGS_DIR + "/hmmsearch/mgnify_split_{split_num}_{iteration}_{peptide_class}.log",
+    threads: 4
+    resources:
+        runtime=480,  # 8 hours per split
+        mem_mb=8000,
+    shell:
+        """
+        hmmsearch --cpu {threads} \
+            --tblout >(gzip > {output.tblout}) \
+            -A >(gzip > {output.alignment}) \
+            --noali \
+            {input.hmm} {input.db} 2> {log} > /dev/null
+        """
+
+
+rule merge_mgnify_searches:
+    """Merge MGnify split search results into combined output."""
+    input:
+        tblouts=expand(
+            SCRATCH_DIR
+            + "/searches/mgnify_splits/{{iteration}}/split_{split_num}/2A-{{peptide_class}}.tblout.gz",
+            split_num=range(1, config["databases"]["mgnify"]["num_splits"] + 1),
+        ),
+        alignments=expand(
+            SCRATCH_DIR
+            + "/searches/mgnify_splits/{{iteration}}/split_{split_num}/2A-{{peptide_class}}.sto.gz",
+            split_num=range(1, config["databases"]["mgnify"]["num_splits"] + 1),
+        ),
+    output:
+        hmmsearch=SCRATCH_DIR
+        + "/searches/mgnify/{iteration}/2A-{peptide_class}.hmmsearch.gz",
+        tblout=SCRATCH_DIR
+        + "/searches/mgnify/{iteration}/2A-{peptide_class}.tblout.gz",
+        alignment=SCRATCH_DIR
+        + "/searches/mgnify/{iteration}/2A-{peptide_class}.sto.gz",
+    log:
+        LOGS_DIR + "/hmmsearch/mgnify_merge_{iteration}_{peptide_class}.log",
+    resources:
+        runtime=60,
+        mem_mb=16000,
+    shell:
+        """
+        # Merge tblout files (concatenate, keeping single header)
+        (zcat {input.tblouts[0]} | head -3; \
+         for f in {input.tblouts}; do zcat "$f" | tail -n +4; done) | \
+         gzip > {output.tblout} 2> {log}
+
+        # Merge Stockholm alignments using esl-alimerge
+        tmp_list=$(mktemp)
+        trap "rm -f $tmp_list" EXIT
+
+        for aln in {input.alignments}; do
+            # Decompress to temp file for esl-alimerge
+            tmp_aln=$(mktemp --suffix=.sto)
+            zcat "$aln" > "$tmp_aln"
+            echo "$tmp_aln" >> $tmp_list
+        done
+
+        esl-alimerge --list $tmp_list 2>> {log} | gzip > {output.alignment}
+
+        # Clean up temp alignment files
+        while read tmp_aln; do rm -f "$tmp_aln"; done < $tmp_list
+
+        # Create empty hmmsearch output (not needed but keeps file structure consistent)
+        echo "# MGnify search results merged from splits" | gzip > {output.hmmsearch}
         """
 
 

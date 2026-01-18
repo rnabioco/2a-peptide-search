@@ -131,8 +131,8 @@ rule extract_tara_genomes:
 
         # Concatenate all FASTA files (.fasta, .fa, .fna)
         echo "Concatenating FASTA files..." >> "{log}"
-        find "$TMPDIR" -type f \( -name "*.fasta" -o -name "*.fa" -o -name "*.fna" \) \
-            -exec cat {{}} \; | gzip > "{output.genomes}"
+        find "$TMPDIR" -type f \\( -name "*.fasta" -o -name "*.fa" -o -name "*.fna" \\) \
+            -exec cat {{}} \\; | gzip > "{output.genomes}"
 
         # Clean up temp directory
         rm -rf "$TMPDIR"
@@ -164,8 +164,8 @@ rule extract_malaspina_genomes:
 
         # Concatenate all FASTA files (.fasta, .fa, .fna)
         echo "Concatenating FASTA files..." >> "{log}"
-        find "$TMPDIR" -type f \( -name "*.fasta" -o -name "*.fa" -o -name "*.fna" \) \
-            -exec cat {{}} \; | gzip > "{output.genomes}"
+        find "$TMPDIR" -type f \\( -name "*.fasta" -o -name "*.fa" -o -name "*.fna" \\) \
+            -exec cat {{}} \\; | gzip > "{output.genomes}"
 
         # Clean up temp directory
         rm -rf "$TMPDIR"

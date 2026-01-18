@@ -6,6 +6,10 @@
 executor: lsf
 jobs: 100
 latency-wait: 60
+
+# Resource limits for parallel jobs
+resources:
+  - mgnify_download=5
 restart-times: 2
 rerun-incomplete: true
 keep-going: true
@@ -50,6 +54,11 @@ set-resources:
   # ============================================================================
   - hmmsearch:runtime=1440
   - hmmsearch:mem_mb=16
+  # MGnify split-based search (parallel processing)
+  - hmmsearch_mgnify_split:runtime=480
+  - hmmsearch_mgnify_split:mem_mb=8
+  - merge_mgnify_searches:runtime=120
+  - merge_mgnify_searches:mem_mb=16
   # ============================================================================
   # Alignment Processing Rules
   # ============================================================================
@@ -75,6 +84,11 @@ set-resources:
   - generate_logo_iter2:mem_mb=2
   - generate_logo_final:runtime=10
   - generate_logo_final:mem_mb=2
+  # ============================================================================
+  # Prokaryotic ORF Prediction Rules (can be very slow for large databases)
+  # ============================================================================
+  - run_prodigal:runtime=0
+  - run_prodigal:mem_mb=8
 
 # =============================================================================
 # Cluster-specific notes
