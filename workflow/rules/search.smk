@@ -206,15 +206,25 @@ rule merge_database_alignments:
         mem_mb=16000,
     shell:
         """
-        # Create temp file with alignment list
-        tmp_list=$(mktemp)
-        trap "rm -f $tmp_list" EXIT
+        # Count number of input alignments
+        n_files=$(echo {input.alignments} | wc -w)
 
-        # Write alignment paths to temp file
-        for aln in {input.alignments}; do
-            echo "$aln" >> $tmp_list
-        done
+        if [[ "$n_files" -eq 1 ]]; then
+            # Single file - just copy it (esl-alimerge requires RF annotation)
+            cp {input.alignments} {output.merged}
+            echo "Single alignment file, copied directly" > {log}
+        else
+            # Multiple files - merge with esl-alimerge
+            # Create temp file with alignment list
+            tmp_list=$(mktemp)
+            trap "rm -f $tmp_list" EXIT
 
-        # Merge alignments
-        esl-alimerge --list $tmp_list > {output.merged} 2> {log}
+            # Write alignment paths to temp file
+            for aln in {input.alignments}; do
+                echo "$aln" >> $tmp_list
+            done
+
+            # Merge alignments
+            esl-alimerge --list $tmp_list > {output.merged} 2> {log}
+        fi
         """

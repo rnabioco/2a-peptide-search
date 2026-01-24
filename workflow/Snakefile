@@ -71,10 +71,13 @@ include: "rules/phage_orfs.smk"
 include: "rules/logos.smk"
 
 
-# Default target: generate full report
+# Default target: build final models (report disabled - run quarto manually if needed)
 rule all:
     input:
-        RESULTS_DIR + "/reports/2A-peptide-analysis.html",
+        expand(
+            RESULTS_DIR + "/models/final/2A-{peptide_class}.hmm",
+            peptide_class=["class-1", "class-2"],
+        ),
     default_target: True
 
 

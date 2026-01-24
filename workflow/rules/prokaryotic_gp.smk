@@ -246,6 +246,7 @@ rule prepare_clustering_fasta:
 
     Uses ALL GP motifs (not just inter-domain) for comprehensive discovery.
     Domain position info is used as annotation, not a filter.
+    Deduplicates by exact sequence to reduce redundancy from homologs.
     """
     input:
         all_gp=RESULTS_DIR + "/prokaryotic/gp_analysis/{database}/all_gp_motifs.tsv.gz",
@@ -255,10 +256,21 @@ rule prepare_clustering_fasta:
         LOGS_DIR + "/prokaryotic/prepare_clustering_{database}.log",
     shell:
         """
-        # Extract context sequences to FASTA (using all GP motifs)
+        # Extract and deduplicate by sequence
+        # Keep first occurrence of each unique sequence
         zcat "{input.all_gp}" | awk -F'\t' 'NR>1 {{
-            printf ">%s_GP%s_pos%s\\n%s\\n", $1, $4, $5, $6
+            gsub(/\\|/, "_", $1);
+            seq = $6;
+            if (!(seq in seen)) {{
+                seen[seq] = 1;
+                printf ">%s_GP%s_pos%s\\n%s\\n", $1, $4, $5, seq;
+            }}
         }}' > "{output.fasta}" 2> "{log}"
+
+        # Log stats
+        n_total=$(zcat "{input.all_gp}" | tail -n +2 | wc -l)
+        n_unique=$(grep -c "^>" "{output.fasta}")
+        echo "Total motifs: $n_total, Unique sequences: $n_unique" >> "{log}"
         """
 
 
@@ -333,11 +345,33 @@ rule parse_gp_clusters:
         """
 
 
+rule validate_gp_clusters_against_known:
+    """Validate GP clusters against known bacterial stalling peptides using hmmscan."""
+    input:
+        alignments_dir=RESULTS_DIR + "/prokaryotic/gp_analysis/{database}/alignments",
+        known_peptides="resources/stalling-peptides/known_stalling_peptides.fasta",
+    output:
+        validation=RESULTS_DIR + "/prokaryotic/gp_analysis/{database}/known_peptide_validation.tsv",
+        summary=RESULTS_DIR + "/prokaryotic/gp_analysis/{database}/known_peptide_summary.txt",
+    log:
+        LOGS_DIR + "/prokaryotic/validate_known_peptides_{database}.log",
+    shell:
+        """
+        python workflow/scripts/validate_against_known_peptides.py \
+            --known-peptides "{input.known_peptides}" \
+            --alignments-dir "{input.alignments_dir}" \
+            --output "{output.validation}" \
+            --summary "{output.summary}" \
+            > "{log}" 2>&1
+        """
+
+
 checkpoint analyze_cluster_conservation:
     """Analyze conservation patterns within each cluster.
 
     This is a checkpoint because the number of clusters is dynamic.
     Downstream rules use get_cluster_ids_from_logos() to discover outputs.
+    Also saves Stockholm alignments for downstream HMM building.
     """
     input:
         clusters=RESULTS_DIR + "/prokaryotic/gp_analysis/{database}/gp_clusters.tsv.gz",
@@ -345,18 +379,20 @@ checkpoint analyze_cluster_conservation:
     output:
         conservation=RESULTS_DIR + "/prokaryotic/gp_analysis/{database}/cluster_conservation.tsv.gz",
         logos_dir=directory(RESULTS_DIR + "/prokaryotic/gp_analysis/{database}/logos"),
+        alignments_dir=directory(RESULTS_DIR + "/prokaryotic/gp_analysis/{database}/alignments"),
     params:
         min_cluster_size=config["prokaryotic"]["min_cluster_size"],
     log:
         LOGS_DIR + "/prokaryotic/analyze_conservation_{database}.log",
     shell:
         """
-        mkdir -p "{output.logos_dir}"
+        mkdir -p "{output.logos_dir}" "{output.alignments_dir}"
         python workflow/scripts/analyze_gp_conservation.py \
             --clusters "{input.clusters}" \
             --motifs "{input.motifs}" \
             --conservation "{output.conservation}" \
             --logos-dir "{output.logos_dir}" \
+            --alignments-dir "{output.alignments_dir}" \
             --min-cluster-size {params.min_cluster_size} \
             > "{log}" 2>&1
         """

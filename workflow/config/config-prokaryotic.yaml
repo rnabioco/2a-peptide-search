@@ -42,6 +42,14 @@ prokaryotic_databases:
     # ORF-predicted proteins from Millard Lab phage genomes
     description: "Millard Lab phage proteins (Prodigal ORF prediction)"
 
+  tara_proteins:
+    # ORF-predicted proteins from Tara Oceans viral assemblies (GOV2)
+    description: "Tara Oceans phage proteins (Prodigal ORF prediction from GOV2)"
+
+  malaspina_proteins:
+    # ORF-predicted proteins from Malaspina expedition viral assemblies (GOV2)
+    description: "Malaspina phage proteins (Prodigal ORF prediction from GOV2)"
+
   pfam:
     url: "http://ftp.ebi.ac.uk/pub/databases/Pfam/current_release/Pfam-A.hmm.gz"
     description: "Pfam domain database"
@@ -84,13 +92,15 @@ prokaryotic_databases_to_search:
   - imgvr                 # IMG/VR phage proteins (millions, local file)
   - ncbi_viral_refseq     # NCBI viral proteins (1 file as of 2025)
   - uniprot_viruses       # UniProt viral proteins (moderate size)
-  - inphared_proteins     # INPHARED ORF-predicted proteins
+  # - inphared_proteins     # INPHARED ORF-predicted proteins (disabled - requires prodigal)
   - gpd                   # Gut Phage Database (~140k phage proteins)
   - mgnify                # MGnify metagenomic proteins (VERY large, ~300M proteins, enable for comprehensive search)
+  - tara_proteins         # Tara Oceans phage proteins (GOV2 Prodigal predictions)
+  - malaspina_proteins    # Malaspina phage proteins (GOV2 Prodigal predictions)
 
 # Which phage databases to use for ORF prediction
 phage_databases_to_use:
-  - inphared
+  # - inphared              # Disabled for now
   - rvdb                  # RVDB viral nucleotide sequences
   - tara                  # Tara Oceans viral assemblies (GOV2)
   - malaspina             # Malaspina viral assemblies (GOV2)

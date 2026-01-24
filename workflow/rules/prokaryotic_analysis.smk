@@ -55,16 +55,20 @@ rule validate_against_known_peptides:
 
 
 rule compare_approaches:
-    """Compare results from all-GP vs inter-domain-GP approaches."""
+    """Compare results from all-GP vs inter-domain-GP vs arrest-motif approaches."""
     input:
         all_gp_motifs=RESULTS_DIR + "/prokaryotic/gp_analysis/bacteria/all_gp_motifs.tsv.gz",
         interdomain_motifs=RESULTS_DIR
         + "/prokaryotic/gp_analysis/bacteria/interdomain_gp_motifs.tsv.gz",
         clusters=RESULTS_DIR + "/prokaryotic/gp_analysis/bacteria/gp_clusters.tsv.gz",
-        validation=RESULTS_DIR + "/prokaryotic/validation/known_peptide_hits.tsv",
+        gp_validation=RESULTS_DIR + "/prokaryotic/validation/known_peptide_hits.tsv",
         # APPROACH 1: Seed-based searches (merged from all databases)
         seed_comprehensive=RESULTS_DIR
         + "/prokaryotic/seed_search_results/comprehensive_merged.sto.gz",
+        # Arrest motif approach results
+        arrest_motifs=RESULTS_DIR + "/prokaryotic/arrest_analysis/bacteria/arrest_motifs.tsv.gz",
+        arrest_validation=RESULTS_DIR + "/prokaryotic/arrest_analysis/bacteria/known_peptide_validation.tsv",
+        arrest_summary=RESULTS_DIR + "/prokaryotic/arrest_analysis/bacteria/motif_summary.tsv",
     output:
         comparison=RESULTS_DIR + "/prokaryotic/analysis/approach_comparison.tsv",
         plots=directory(RESULTS_DIR + "/prokaryotic/analysis/comparison_plots/"),
@@ -76,7 +80,10 @@ rule compare_approaches:
             --all-gp-motifs "{input.all_gp_motifs}" \
             --interdomain-motifs "{input.interdomain_motifs}" \
             --clusters "{input.clusters}" \
-            --validation "{input.validation}" \
+            --gp-validation "{input.gp_validation}" \
+            --arrest-motifs "{input.arrest_motifs}" \
+            --arrest-validation "{input.arrest_validation}" \
+            --arrest-summary "{input.arrest_summary}" \
             --comparison "{output.comparison}" \
             --plots "{output.plots}" \
             > "{log}" 2>&1
@@ -95,6 +102,10 @@ rule prokaryotic_discovery_report:
         validation=RESULTS_DIR + "/prokaryotic/validation/validation_summary.txt",
         conservation=RESULTS_DIR + "/prokaryotic/gp_analysis/bacteria/cluster_conservation.tsv.gz",
         consensus=RESULTS_DIR + "/prokaryotic/gp_analysis/bacteria/consensus_patterns.tsv",
+        # Arrest motif analysis inputs
+        arrest_motif_summary=RESULTS_DIR + "/prokaryotic/arrest_analysis/bacteria/motif_summary.tsv",
+        arrest_validation=RESULTS_DIR + "/prokaryotic/arrest_analysis/bacteria/known_peptide_validation.tsv",
+        arrest_known_summary=RESULTS_DIR + "/prokaryotic/arrest_analysis/bacteria/known_peptide_summary.txt",
     output:
         report=RESULTS_DIR + "/prokaryotic/reports/prokaryotic_discovery.html",
     log:

@@ -116,27 +116,24 @@ rule extract_tara_genomes:
         genomes=DATA_DIR + "/phage/tara/genomes.fasta.gz",
     log:
         LOGS_DIR + "/download/phage_tara.log",
+    resources:
+        runtime=360,  # 6 hours for large tarball
+        mem_mb=8000,
     shell:
         """
         set -e
         OUTDIR=$(dirname "{output.genomes}")
-        TMPDIR="${{OUTDIR}}/tmp_extract_$$"
-        mkdir -p "$TMPDIR"
+        mkdir -p "$OUTDIR"
 
-        echo "Extracting tarball contents..." > "{log}"
-        tar -tzf "{input.tarball}" | head -20 >> "{log}"
+        echo "Extracting and concatenating Tara Oceans assemblies..." > "{log}"
+        echo "Input: {input.tarball}" >> "{log}"
+        echo "Output: {output.genomes}" >> "{log}"
 
-        # Extract all files to temp directory
-        tar -xzf "{input.tarball}" -C "$TMPDIR" 2>> "{log}"
+        # Stream extraction directly - extract tar to stdout, filter FASTA content
+        # This avoids needing temp space for the full extraction
+        tar -xzf "{input.tarball}" --to-stdout 2>> "{log}" | gzip > "{output.genomes}"
 
-        # Concatenate all FASTA files (.fasta, .fa, .fna)
-        echo "Concatenating FASTA files..." >> "{log}"
-        find "$TMPDIR" -type f \\( -name "*.fasta" -o -name "*.fa" -o -name "*.fna" \\) \
-            -exec cat {{}} \\; | gzip > "{output.genomes}"
-
-        # Clean up temp directory
-        rm -rf "$TMPDIR"
-
+        echo "Counting sequences..." >> "{log}"
         echo "Extracted $(zcat "{output.genomes}" | grep -c '^>' || echo 0) sequences" >> "{log}"
         """
 
@@ -149,27 +146,24 @@ rule extract_malaspina_genomes:
         genomes=DATA_DIR + "/phage/malaspina/genomes.fasta.gz",
     log:
         LOGS_DIR + "/download/phage_malaspina.log",
+    resources:
+        runtime=360,  # 6 hours for large tarball
+        mem_mb=8000,
     shell:
         """
         set -e
         OUTDIR=$(dirname "{output.genomes}")
-        TMPDIR="${{OUTDIR}}/tmp_extract_$$"
-        mkdir -p "$TMPDIR"
+        mkdir -p "$OUTDIR"
 
-        echo "Extracting tarball contents..." > "{log}"
-        tar -tzf "{input.tarball}" | head -20 >> "{log}"
+        echo "Extracting and concatenating Malaspina assemblies..." > "{log}"
+        echo "Input: {input.tarball}" >> "{log}"
+        echo "Output: {output.genomes}" >> "{log}"
 
-        # Extract all files to temp directory
-        tar -xzf "{input.tarball}" -C "$TMPDIR" 2>> "{log}"
+        # Stream extraction directly - extract tar to stdout, filter FASTA content
+        # This avoids needing temp space for the full extraction
+        tar -xzf "{input.tarball}" --to-stdout 2>> "{log}" | gzip > "{output.genomes}"
 
-        # Concatenate all FASTA files (.fasta, .fa, .fna)
-        echo "Concatenating FASTA files..." >> "{log}"
-        find "$TMPDIR" -type f \\( -name "*.fasta" -o -name "*.fa" -o -name "*.fna" \\) \
-            -exec cat {{}} \\; | gzip > "{output.genomes}"
-
-        # Clean up temp directory
-        rm -rf "$TMPDIR"
-
+        echo "Counting sequences..." >> "{log}"
         echo "Extracted $(zcat "{output.genomes}" | grep -c '^>' || echo 0) sequences" >> "{log}"
         """
 
@@ -195,8 +189,6 @@ rule split_phage_genomes:
         seqs_per_chunk=1000,
     log:
         LOGS_DIR + "/phage/split_{db}.log",
-    conda:
-        "../envs/python.yaml"
     script:
         "../scripts/split_fasta.py"
 
@@ -212,8 +204,6 @@ rule predict_orfs_prodigal:
         gff=temp(RESULTS_DIR + "/phage/{db}/orfs/chunk_{chunk}.gff"),
     log:
         LOGS_DIR + "/phage/prodigal_{db}_chunk_{chunk}.log",
-    conda:
-        "../envs/orfs.yaml"
     threads: 1
     resources:
         runtime=60,
@@ -267,8 +257,6 @@ rule extract_phage_gp_motifs:
         downstream=15,
     log:
         LOGS_DIR + "/phage/extract_gp_{db}.log",
-    conda:
-        "../envs/python.yaml"
     script:
         "../scripts/extract_gp_motifs.py"
 
@@ -281,8 +269,6 @@ rule annotate_phage_domains:
         annotations=RESULTS_DIR + "/phage/{db}/gp_motifs/domain_annotations.tsv.gz",
     log:
         LOGS_DIR + "/phage/annotate_domains_{db}.log",
-    conda:
-        "../envs/python.yaml"
     threads: 8
     resources:
         runtime=480,
@@ -302,8 +288,6 @@ rule filter_phage_interdomain_gp:
         statistics=RESULTS_DIR + "/phage/{db}/gp_motifs/gp_motif_stats.tsv",
     log:
         LOGS_DIR + "/phage/filter_interdomain_{db}.log",
-    conda:
-        "../envs/python.yaml"
     script:
         "../scripts/filter_interdomain_gp.py"
 
@@ -327,8 +311,6 @@ rule merge_prokaryotic_and_phage_motifs:
         summary=RESULTS_DIR + "/combined/source_summary.tsv",
     log:
         LOGS_DIR + "/combined/merge_motifs.log",
-    conda:
-        "../envs/python.yaml"
     script:
         "../scripts/merge_prokaryotic_phage_motifs.py"
 
@@ -345,8 +327,6 @@ rule cluster_combined_motifs:
         coverage=config["prokaryotic"]["clustering_coverage"],
     log:
         LOGS_DIR + "/combined/cluster_motifs.log",
-    conda:
-        "../envs/python.yaml"
     threads: 12
     resources:
         runtime=240,
@@ -373,8 +353,6 @@ rule analyze_phage_gp_distribution:
         plots=directory(RESULTS_DIR + "/phage/analysis/distribution_plots/"),
     log:
         LOGS_DIR + "/phage/analyze_distribution.log",
-    conda:
-        "../envs/python.yaml"
     script:
         "../scripts/analyze_phage_gp_distribution.py"
 
@@ -389,7 +367,5 @@ rule compare_phage_vs_bacterial:
         plots=directory(RESULTS_DIR + "/combined/analysis/comparison_plots/"),
     log:
         LOGS_DIR + "/combined/compare_phage_bacterial.log",
-    conda:
-        "../envs/python.yaml"
     script:
         "../scripts/compare_phage_vs_bacterial.py"

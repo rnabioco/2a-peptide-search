@@ -72,6 +72,8 @@ rule download_mgnify_split:
         base_url=config["databases"]["mgnify"]["base_url"],
     log:
         LOGS_DIR + "/download/mgnify_split_{split_num}.log",
+    resources:
+        mgnify_download=1,
     shell:
         """
         mkdir -p $(dirname {output.fasta})
