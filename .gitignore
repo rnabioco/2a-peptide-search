@@ -18,6 +18,9 @@ data/
 # Pipeline results
 results/
 
+# Pre-migration
+*/legacy/*
+
 # Rendered reports (HTML files can be regenerated)
 *.html
 
