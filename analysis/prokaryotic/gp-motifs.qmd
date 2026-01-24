@@ -87,28 +87,189 @@ Functional stalling GPs are enriched in inter-domain regions:
 
 ## Clustering Results
 
-### Cluster Statistics
+GP motif sequences were clustered using MMseqs2 at 70% sequence identity to identify conserved families.
 
-::: {.callout-note}
-## Placeholder
-Clustering results will be populated after pipeline execution.
-:::
+```{r}
+#| label: setup-clustering
+#| code-fold: true
+#| message: false
+#| warning: false
 
-Expected clusters:
+library(tidyverse)
+library(scales)
 
-| Cluster | Size | Motif | Taxonomy |
-|---------|------|-------|----------|
-| C1 | ~500 | RAGP | Proteobacteria |
-| C2 | ~200 | RAPG | Firmicutes |
-| C3 | ~100 | xAGP | Mixed |
+cluster_file <- here::here("results/prokaryotic/gp_analysis/bacteria/gp_clusters.tsv.gz")
 
-### Conservation Logos
+if (file.exists(cluster_file)) {
+  clusters_df <- read_tsv(cluster_file, show_col_types = FALSE)
+  data_available <- TRUE
+} else {
+  data_available <- FALSE
+  message("Cluster data not found at ", cluster_file)
+}
+```
 
-Per-cluster conservation logos will reveal:
+### Summary Statistics
 
-- Cluster-specific upstream patterns
-- Taxonomic signature residues
-- Functional groupings
+```{r}
+#| label: cluster-summary
+#| code-fold: true
+
+if (data_available) {
+  n_total_motifs <- nrow(clusters_df)
+  n_unique_seqs <- n_distinct(clusters_df$context_sequence)
+  n_clusters <- n_distinct(clusters_df$cluster_id)
+  duplication_ratio <- n_total_motifs / n_unique_seqs
+
+  cluster_stats <- clusters_df |>
+    group_by(cluster_id) |>
+    summarise(
+      total_motifs = n(),
+      unique_seqs = n_distinct(context_sequence),
+      .groups = "drop"
+    )
+
+  n_singletons <- sum(cluster_stats$unique_seqs == 1)
+  pct_singletons <- 100 * n_singletons / n_clusters
+
+  tibble(
+    Metric = c(
+      "Total GP motifs",
+      "Unique sequences",
+      "Total clusters",
+      "Singleton clusters",
+      "Duplication ratio",
+      "Largest cluster (unique)",
+      "Largest cluster (total)"
+    ),
+    Value = c(
+      comma(n_total_motifs),
+      comma(n_unique_seqs),
+      comma(n_clusters),
+      paste0(comma(n_singletons), " (", round(pct_singletons, 1), "%)"),
+      paste0(round(duplication_ratio, 2), "x"),
+      comma(max(cluster_stats$unique_seqs)),
+      comma(max(cluster_stats$total_motifs))
+    )
+  ) |>
+    knitr::kable()
+}
+```
+
+### Cluster Size Distribution
+
+```{r}
+#| label: fig-cluster-size-dist
+#| fig-cap: "Distribution of cluster sizes by unique sequences and total motifs"
+#| code-fold: true
+#| fig-width: 10
+#| fig-height: 4
+
+if (data_available) {
+  plot_data <- cluster_stats |>
+    pivot_longer(
+      cols = c(unique_seqs, total_motifs),
+      names_to = "count_type",
+      values_to = "count"
+    ) |>
+    mutate(count_type = recode(count_type,
+      unique_seqs = "Unique Sequences",
+      total_motifs = "Total Motifs"
+    ))
+
+  ggplot(plot_data, aes(x = count, fill = count_type)) +
+    geom_histogram(bins = 50, alpha = 0.7) +
+    scale_x_log10(labels = comma) +
+    scale_y_log10(labels = comma) +
+    facet_wrap(~count_type, ncol = 2) +
+    labs(
+      x = "Cluster Size",
+      y = "Number of Clusters (log scale)"
+    ) +
+    theme_minimal() +
+    theme(legend.position = "none")
+}
+```
+
+### Top Clusters
+
+```{r}
+#| label: top-clusters-table
+#| code-fold: true
+
+if (data_available) {
+  cluster_stats |>
+    slice_max(unique_seqs, n = 15) |>
+    mutate(duplication = round(total_motifs / unique_seqs, 2)) |>
+    rename(
+      `Cluster ID` = cluster_id,
+      `Unique Seqs` = unique_seqs,
+      `Total Motifs` = total_motifs,
+      Duplication = duplication
+    ) |>
+    knitr::kable()
+}
+```
+
+### Duplication Analysis
+
+The relationship between unique sequences and total motifs reveals how duplicated each cluster is.
+
+```{r}
+#| label: fig-duplication-scatter
+#| fig-cap: "Unique sequences vs total motifs per cluster. Points above the diagonal have duplicated sequences."
+#| code-fold: true
+#| fig-width: 6
+#| fig-height: 6
+
+if (data_available) {
+  multi_clusters <- cluster_stats |>
+    filter(unique_seqs > 1)
+
+  ggplot(multi_clusters, aes(x = unique_seqs, y = total_motifs)) +
+    geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "gray50") +
+    geom_point(alpha = 0.3, size = 1) +
+    scale_x_log10(labels = comma) +
+    scale_y_log10(labels = comma) +
+    labs(
+      x = "Unique Sequences per Cluster",
+      y = "Total Motifs per Cluster"
+    ) +
+    theme_minimal()
+}
+```
+
+### Cluster Size Breakdown
+
+```{r}
+#| label: cluster-size-breakdown
+#| code-fold: true
+
+if (data_available) {
+  cluster_stats |>
+    mutate(size_category = case_when(
+      unique_seqs == 1 ~ "1 (singleton)",
+      unique_seqs <= 5 ~ "2-5",
+      unique_seqs <= 10 ~ "6-10",
+      unique_seqs <= 50 ~ "11-50",
+      unique_seqs <= 100 ~ "51-100",
+      TRUE ~ ">100"
+    )) |>
+    mutate(size_category = factor(size_category,
+      levels = c("1 (singleton)", "2-5", "6-10", "11-50", "51-100", ">100")
+    )) |>
+    group_by(size_category) |>
+    summarise(
+      Clusters = n(),
+      `Unique Seqs` = sum(unique_seqs),
+      `Total Motifs` = sum(total_motifs),
+      .groups = "drop"
+    ) |>
+    mutate(`% Clusters` = round(100 * Clusters / n_clusters, 1)) |>
+    rename(`Size Category` = size_category) |>
+    knitr::kable()
+}
+```
 
 ## Downstream Analysis
 

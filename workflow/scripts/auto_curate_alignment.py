@@ -34,7 +34,7 @@ def parse_hmmer_scores(tblout_path):
         for result in SearchIO.parse(tblout_path, 'hmmer3-tab'):
             for hit in result.hits:
                 # Extract base ID without coordinates
-                hit_id = hit.id.split('/')[0] if '/' in hit.id
+                hit_id = hit.id.split('/')[0] if '/' in hit.id else hit.id
                 scores[hit_id] = {
                     'evalue': hit.evalue,
                     'bitscore': hit.bitscore,

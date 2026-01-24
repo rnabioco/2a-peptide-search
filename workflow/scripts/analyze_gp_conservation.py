@@ -23,9 +23,7 @@ import pandas as pd
 from Bio import AlignIO, SeqIO
 from Bio.Align import AlignInfo
 
-# Import Skylign functions
-sys.path.insert(0, str(Path(__file__).parent))
-from generate_skylign_logos import download_logo, submit_to_skylign
+# logomaker is used for local sequence logo generation (no external API needed)
 
 
 def calculate_shannon_entropy(alignment_column):
@@ -172,35 +170,70 @@ def analyze_cluster(cluster_id, sequences, min_size=5):
     return results, alignment
 
 
-def generate_skylign_logo(alignment, cluster_id, output_dir):
-    """Generate sequence logo using Skylign API."""
+def generate_logo(alignment, cluster_id, output_dir):
+    """Generate sequence logo using logomaker (local, no API needed)."""
+    import logomaker
+    import matplotlib.pyplot as plt
+    from collections import Counter
+
     output_dir = Path(output_dir)
     output_dir.mkdir(parents=True, exist_ok=True)
 
     output_file = output_dir / f"cluster_{cluster_id}.png"
 
-    # Save alignment as Stockholm format in temp file
-    with tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".sto") as tmp_sto:
-        tmp_sto_name = tmp_sto.name
-        AlignIO.write(alignment, tmp_sto, "stockholm")
-
     try:
-        # Submit to Skylign and get UUID
-        click.echo(f"    Submitting to Skylign API...")
-        uuid = submit_to_skylign(
-            tmp_sto_name, processing="obs", retry_attempts=2, retry_delay=3
+        # Standard amino acid alphabet
+        amino_acids = list("ACDEFGHIKLMNPQRSTVWY")
+
+        # Get alignment length
+        alignment_length = alignment.get_alignment_length()
+
+        # Build position frequency matrix
+        counts_matrix = []
+        for i in range(alignment_length):
+            column = [str(record.seq[i]).upper() for record in alignment]
+            counts = Counter(column)
+            # Normalize to frequencies, excluding gaps
+            total = sum(counts.get(aa, 0) for aa in amino_acids)
+            if total > 0:
+                freqs = {aa: counts.get(aa, 0) / total for aa in amino_acids}
+            else:
+                freqs = {aa: 0.0 for aa in amino_acids}
+            counts_matrix.append(freqs)
+
+        # Create DataFrame for logomaker
+        import pandas as pd
+        df = pd.DataFrame(counts_matrix, columns=amino_acids)
+
+        # Convert to information content (bits)
+        logo_df = logomaker.transform_matrix(df, from_type='probability', to_type='information')
+
+        # Create figure
+        fig, ax = plt.subplots(figsize=(max(10, alignment_length * 0.3), 2.5))
+
+        # Generate logo with protein color scheme
+        logo = logomaker.Logo(
+            logo_df,
+            ax=ax,
+            color_scheme='chemistry',
+            font_name='DejaVu Sans Mono'
         )
 
-        # Download logo
-        click.echo(f"    Downloading logo (UUID: {uuid})...")
-        download_logo(uuid, output_file, retry_attempts=2, retry_delay=3)
+        # Style the plot
+        ax.set_xlabel('Position')
+        ax.set_ylabel('Bits')
+        ax.set_title(f'Cluster {cluster_id} (n={len(alignment)})')
+
+        # Save
+        plt.tight_layout()
+        plt.savefig(output_file, dpi=150, bbox_inches='tight')
+        plt.close()
 
         click.echo(f"    Logo saved: {output_file}")
         return str(output_file)
 
     except Exception as e:
-        click.echo(f"    Warning: Failed to generate Skylign logo: {e}", err=True)
-        click.echo(f"    Creating placeholder instead...", err=True)
+        click.echo(f"    Warning: Failed to generate logo: {e}", err=True)
 
         # Fallback to placeholder
         from PIL import Image, ImageDraw
@@ -214,13 +247,6 @@ def generate_skylign_logo(alignment, cluster_id, output_dir):
         )
         img.save(output_file)
         return str(output_file)
-
-    finally:
-        # Cleanup temp file
-        import os
-
-        if os.path.exists(tmp_sto_name):
-            os.unlink(tmp_sto_name)
 
 
 @click.command()
@@ -238,10 +264,11 @@ def generate_skylign_logo(alignment, cluster_id, output_dir):
     help="Output TSV of conservation data",
 )
 @click.option("--logos-dir", default=None, help="Output directory for sequence logos")
+@click.option("--alignments-dir", default=None, help="Output directory for Stockholm alignments")
 @click.option("--min-cluster-size", default=5, help="Minimum cluster size to analyze")
 @click.option("--top-n", default=20, help="Number of top clusters to analyze")
 def main(
-    clusters_file, motifs_file, conservation_file, logos_dir, min_cluster_size, top_n
+    clusters_file, motifs_file, conservation_file, logos_dir, alignments_dir, min_cluster_size, top_n
 ):
     """Analyze conservation patterns within GP motif clusters."""
 
@@ -253,19 +280,11 @@ def main(
     click.echo(f"Loading clusters from {clusters_file}...")
     clusters_df = pd.read_csv(clusters_file, sep="\t", compression="gzip")
 
-    click.echo(f"Loading motifs from {motifs_file}...")
-    motifs_df = pd.read_csv(motifs_file, sep="\t", compression="gzip")
-
-    # Merge to get sequences for each cluster
-    merged = pd.merge(
-        clusters_df,
-        motifs_df[["protein_id", "gp_index", "context_sequence"]],
-        on=["protein_id", "gp_index"],
-        how="left",
-    )
+    # clusters_df already contains context_sequence from parse_gp_clusters.py
+    # No need to merge with motifs_df
 
     # Get cluster sizes
-    cluster_sizes = merged.groupby("cluster_id").size().sort_values(ascending=False)
+    cluster_sizes = clusters_df.groupby("cluster_id").size().sort_values(ascending=False)
     click.echo(f"\nTotal clusters: {len(cluster_sizes)}")
     click.echo(f"Analyzing top {top_n} clusters (min size: {min_cluster_size})")
 
@@ -276,7 +295,7 @@ def main(
         click.echo(f"\n[{i}/{top_n}] Analyzing cluster {cluster_id} (n={size})...")
 
         # Get sequences for this cluster
-        cluster_seqs = merged[merged["cluster_id"] == cluster_id][
+        cluster_seqs = clusters_df[clusters_df["cluster_id"] == cluster_id][
             "context_sequence"
         ].tolist()
 
@@ -288,9 +307,17 @@ def main(
             click.echo(f"  Mean conservation: {result['mean_conservation']:.3f}")
             click.echo(f"  Consensus: {result['consensus_sequence']}")
 
-            # Generate Skylign logo
+            # Save Stockholm alignment
+            if alignments_dir and alignment:
+                alignments_path = Path(alignments_dir)
+                alignments_path.mkdir(parents=True, exist_ok=True)
+                sto_file = alignments_path / f"cluster_{cluster_id}.sto"
+                AlignIO.write(alignment, sto_file, "stockholm")
+                click.echo(f"  Alignment saved: {sto_file}")
+
+            # Generate sequence logo
             if logos_dir and alignment:
-                logo_file = generate_skylign_logo(alignment, cluster_id, logos_dir)
+                logo_file = generate_logo(alignment, cluster_id, logos_dir)
         else:
             click.echo(f"  Skipped (insufficient data)")
 

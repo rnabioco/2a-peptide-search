@@ -23,48 +23,91 @@ def main(cluster_tsv, motifs, clusters_out, representatives_out):
 
     click.echo("Loading GP motifs...")
     motifs_df = pd.read_csv(motifs, sep='\t', compression='gzip')
-    
-    # Create sequence ID mapping
-    motifs_df['seq_id'] = (motifs_df['protein_id'] + '_GP' + 
-                            motifs_df['gp_index'].astype(str) + '_pos' + 
+
+    click.echo("Creating sequence IDs...")
+    # Create sequence ID mapping (replace | with _ to match FASTA IDs)
+    motifs_df['seq_id'] = (motifs_df['protein_id'].str.replace('|', '_', regex=False) + '_GP' +
+                            motifs_df['gp_index'].astype(str) + '_pos' +
                             motifs_df['gp_position'].astype(str))
-    
-    # Assign cluster IDs
-    cluster_map = {}
-    cluster_id = 0
-    for rep in cluster_df['representative'].unique():
-        cluster_id += 1
-        members = cluster_df[cluster_df['representative'] == rep]['member'].tolist()
-        for member in members:
-            cluster_map[member] = cluster_id
-    
-    motifs_df['cluster_id'] = motifs_df['seq_id'].map(cluster_map)
-    
-    # Get cluster sizes
-    cluster_sizes = motifs_df.groupby('cluster_id').size().to_dict()
+
+    click.echo("Assigning cluster IDs...")
+    # Assign numeric cluster IDs to representatives (much faster than loop)
+    rep_to_cluster = pd.DataFrame({
+        'representative': cluster_df['representative'].unique()
+    })
+    rep_to_cluster['cluster_id'] = range(1, len(rep_to_cluster) + 1)
+
+    # Map representatives to cluster IDs, then map members via representatives
+    cluster_df = cluster_df.merge(rep_to_cluster, on='representative')
+
+    # Map by SEQUENCE CONTENT instead of seq_id to handle deduplication
+    # After deduplication, only unique sequences exist in cluster file,
+    # but we need to assign ALL motifs (including duplicates) to clusters
+
+    # Get unique seq_id -> context_sequence mapping from motifs
+    seq_id_to_sequence = motifs_df[['seq_id', 'context_sequence']].drop_duplicates('seq_id')
+
+    # Add sequence content to cluster members
+    cluster_with_seqs = cluster_df.merge(
+        seq_id_to_sequence,
+        left_on='member',
+        right_on='seq_id',
+        how='left'
+    )
+
+    # Create sequence -> cluster_id mapping
+    # Each unique sequence maps to one cluster (via its representative)
+    seq_to_cluster = cluster_with_seqs.set_index('context_sequence')['cluster_id'].to_dict()
+
+    # Map ALL motifs by their sequence content (handles duplicates correctly)
+    motifs_df['cluster_id'] = motifs_df['context_sequence'].map(seq_to_cluster)
+
+    n_unique_clustered = len(cluster_df)
+    click.echo(f"Clustered {n_unique_clustered} unique sequences")
+
+    click.echo("Computing cluster sizes...")
+    # Get cluster sizes using value_counts (faster than groupby.size)
+    # dropna=False to include NaN counts for debugging
+    cluster_sizes = motifs_df['cluster_id'].value_counts(dropna=True).to_dict()
     motifs_df['cluster_size'] = motifs_df['cluster_id'].map(cluster_sizes)
-    
-    click.echo(f"Found {len(cluster_map)} sequences in {cluster_id} clusters")
-    click.echo(f"Largest cluster: {max(cluster_sizes.values())} members")
-    
+
+    n_clusters = len(rep_to_cluster)
+    n_assigned = motifs_df['cluster_id'].notna().sum()
+    n_unassigned = motifs_df['cluster_id'].isna().sum()
+    click.echo(f"Found {len(seq_to_cluster)} unique sequences in {n_clusters} clusters")
+    click.echo(f"Assigned: {n_assigned}, Unassigned: {n_unassigned}")
+    if cluster_sizes:
+        click.echo(f"Largest cluster: {max(cluster_sizes.values())} members")
+    else:
+        click.echo("Warning: No clusters found!")
+
+    click.echo("Saving clusters...")
     # Save clusters
     motifs_df.to_csv(clusters_out, sep='\t', index=False, compression='gzip')
-    
-    # Extract representative sequences
-    representatives = cluster_df.groupby('representative').first().reset_index()
+
+    click.echo("Extracting representative sequences...")
+    # Extract representative sequences - use merge instead of loop
+    # Get unique representatives with their cluster IDs
+    rep_df = cluster_df.drop_duplicates('representative')[['representative', 'cluster_id']]
+    rep_df = rep_df.rename(columns={'representative': 'seq_id'})
+
+    # Merge with motifs to get sequences
+    rep_with_seqs = rep_df.merge(
+        motifs_df[['seq_id', 'context_sequence']].drop_duplicates('seq_id'),
+        on='seq_id'
+    )
+
+    # Create SeqRecords
     rep_seqs = []
-    
-    for _, row in representatives.iterrows():
-        seq_id = row['representative']
-        motif_row = motifs_df[motifs_df['seq_id'] == seq_id].iloc[0]
-        
+    for _, row in rep_with_seqs.iterrows():
+        size = cluster_sizes.get(row['cluster_id'], 0)
         record = SeqRecord(
-            Seq(motif_row['context_sequence']),
-            id=f"cluster_{motif_row['cluster_id']}",
-            description=f"representative={seq_id} size={cluster_sizes[motif_row['cluster_id']]}"
+            Seq(row['context_sequence']),
+            id=f"cluster_{row['cluster_id']}",
+            description=f"representative={row['seq_id']} size={size}"
         )
         rep_seqs.append(record)
-    
+
     SeqIO.write(rep_seqs, representatives_out, 'fasta')
     click.echo(f"Wrote {len(rep_seqs)} representative sequences")
 

@@ -90,7 +90,7 @@ def submit_to_skylign(file_path, api_url="http://skylign.org", processing="hmm",
                 raise click.ClickException(f"Failed to submit to Skylign after {retry_attempts} attempts: {e}")
 
 
-def download_logo(uuid, output_path, api_url="http://skylign.org", retry_attempts=3, retry_delay=5):
+def download_logo(uuid, output_path, api_url="http://skylign.org", retry_attempts=10, retry_delay=3):
     """
     Download PNG logo from Skylign using UUID.
 
@@ -98,7 +98,7 @@ def download_logo(uuid, output_path, api_url="http://skylign.org", retry_attempt
         uuid: UUID returned from submission
         output_path: Path to save PNG logo
         api_url: Base URL for Skylign API
-        retry_attempts: Number of retry attempts
+        retry_attempts: Number of retry attempts (increased for async processing)
         retry_delay: Delay in seconds between retries
     """
     url = f"{api_url}/logo/{uuid}"
@@ -106,10 +106,25 @@ def download_logo(uuid, output_path, api_url="http://skylign.org", retry_attempt
         'Accept': 'image/png'
     }
 
+    # Initial delay to let Skylign process the HMM
+    time.sleep(2)
+
     for attempt in range(retry_attempts):
         try:
             response = requests.get(url, headers=headers, timeout=30)
             response.raise_for_status()
+
+            # Check if response is actually a PNG (starts with PNG magic bytes)
+            # PNG files start with: 0x89 0x50 0x4E 0x47 (‰PNG)
+            if len(response.content) < 8 or response.content[:4] != b'\x89PNG':
+                # Not a PNG - job might still be processing
+                error_text = response.content.decode('utf-8', errors='ignore')
+                if attempt < retry_attempts - 1:
+                    click.echo(f"    Job not ready (attempt {attempt + 1}): {error_text[:50]}. Retrying in {retry_delay}s...")
+                    time.sleep(retry_delay)
+                    continue
+                else:
+                    raise ValueError(f"Skylign did not return a PNG: {error_text[:100]}")
 
             # Save PNG content
             output_path = Path(output_path)
@@ -122,7 +137,7 @@ def download_logo(uuid, output_path, api_url="http://skylign.org", retry_attempt
 
         except requests.exceptions.RequestException as e:
             if attempt < retry_attempts - 1:
-                click.echo(f"Download attempt {attempt + 1} failed: {e}. Retrying in {retry_delay}s...")
+                click.echo(f"    Download attempt {attempt + 1} failed: {e}. Retrying in {retry_delay}s...")
                 time.sleep(retry_delay)
             else:
                 raise click.ClickException(f"Failed to download logo after {retry_attempts} attempts: {e}")

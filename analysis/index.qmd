@@ -39,7 +39,7 @@ We distinguish two classes based on conserved sequence features:
 ```{mermaid}
 %%| label: fig-pipeline
 %%| fig-cap: "Complete workflow for 2A peptide and ribosomal stalling peptide discovery"
-flowchart LR
+flowchart TB
     subgraph inputs[" "]
         direction TB
         Seeds["🧬 Seed Alignments<br/><small>Curated 2A sequences</small>"]
