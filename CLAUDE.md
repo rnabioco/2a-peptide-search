@@ -34,9 +34,12 @@ workflow/
     ├── logos.smk               # Sequence logo generation
     └── report.smk              # Report generation
 
-cluster/slurm/                   # SLURM cluster configuration
-├── config.yaml                  # SLURM resource specifications
-└── README.md                    # SLURM setup and usage guide
+cluster/
+├── slurm-bodhi/                 # Active SLURM profile (amc-bodhi)
+│   └── config.yaml              # Bodhi resource specs (rna partition / rbi account)
+└── slurm/                       # Legacy SLURM profile (Alpine - amc-general)
+    ├── config.yaml
+    └── README.md
 
 resources/seed-alignments/       # Curated starting alignments (version controlled)
 results/                         # All pipeline outputs (gitignored)
@@ -44,8 +47,9 @@ data/                           # Downloaded databases (gitignored)
 legacy/                         # Archived historical results and scripts
 
 pixi.toml                        # Pixi environment and dependency specification
-submit-slurm.sh                  # SLURM orchestrator submission script
-submit-test.sh                   # Quick test submission script
+scripts/run-pipeline-bodhi.sh    # Active bodhi SLURM submission script
+scripts/submit-standard.sh       # Legacy Alpine submission script
+scripts/submit-test.sh           # Legacy Alpine test submission script
 ```
 
 ## Common Commands
@@ -67,18 +71,24 @@ pixi run dag
 pixi run snakemake --cores 12
 ```
 
-**SLURM Cluster (Alpine):**
+**SLURM Cluster (amc-bodhi):**
 ```bash
-# Configure account in cluster/slurm/config.yaml first
-# Then submit orchestrator job:
-sbatch submit-slurm.sh
+# Submit orchestrator job (default target: all):
+sbatch scripts/run-pipeline-bodhi.sh
 
-# Or test first:
-sbatch submit-test.sh
+# Run a specific target:
+sbatch scripts/run-pipeline-bodhi.sh test
+sbatch scripts/run-pipeline-bodhi.sh download_all
+sbatch scripts/run-pipeline-bodhi.sh iter1
+sbatch scripts/run-pipeline-bodhi.sh iter2
 
-# Using profile directly:
-pixi run snakemake --profile cluster/slurm
+# Using profile directly (interactive):
+pixi run snakemake --profile cluster/slurm-bodhi
 ```
+
+Bodhi cluster: CPU jobs run on `partition=rna`, `account=rbi`. Adjust
+per-rule resources in `cluster/slurm-bodhi/config.yaml` if rules OOM
+or hit walltime.
 
 ### Testing with UniProt only
 
@@ -86,10 +96,10 @@ pixi run snakemake --profile cluster/slurm
 # Local
 pixi run test
 
-# SLURM
-sbatch submit-test.sh
+# SLURM (bodhi)
+sbatch scripts/run-pipeline-bodhi.sh test
 # or
-pixi run snakemake --profile cluster/slurm test
+pixi run snakemake --profile cluster/slurm-bodhi test
 ```
 
 ### Specific pipeline stages
@@ -182,23 +192,20 @@ Major protein databases searched:
 
 ## SLURM Cluster Usage
 
-The pipeline is configured for the CU Boulder Alpine cluster with comprehensive SLURM support:
+Active cluster: **amc-bodhi** (`partition=rna`, `account=rbi`).
+Profile: `cluster/slurm-bodhi/`. The Alpine profile in `cluster/slurm/`
+is retained as legacy reference.
 
-### Setup
-1. Edit `cluster/slurm/config.yaml` and set your account:
-   ```yaml
-   slurm_account: amc-general  # Change to your allocation
-   ```
+### Submit
+```bash
+sbatch scripts/run-pipeline-bodhi.sh [target] [snakemake_args...]
+```
 
-2. Submit orchestrator job:
-   ```bash
-   sbatch submit-slurm.sh [target]
-   ```
-
-### Resource Specifications
-- Small jobs (downloads, model building): 1-2 CPUs, 2-4GB, 10-60 min
-- Medium jobs (alignment processing): 2-4 CPUs, 8-16GB, 30-60 min
-- Large jobs (HMM searches): 12 CPUs, 16GB, up to 24 hours
+### Resource Specifications (per-rule overrides in `cluster/slurm-bodhi/config.yaml`)
+- Small jobs (logos, downloads, model building): 1–2 CPUs, 1–4 GB, 10–60 min
+- Medium jobs (alignment processing): 2–4 CPUs, 8–16 GB, 30–60 min
+- Large jobs (HMM searches): 12 CPUs, 16 GB, up to 24 hours
+- Reference Proteomes download/extract: hours-scale; the 2026_01 tarball is ~311 GB
 
 ### Monitoring
 ```bash
@@ -206,22 +213,20 @@ The pipeline is configured for the CU Boulder Alpine cluster with comprehensive 
 squeue -u $USER
 
 # View orchestrator log
-tail -f logs/orchestrator_*.out
+tail -f logs/pipeline_*.out
 
-# Check individual rule logs
-ls logs/
+# Per-rule SLURM logs
+ls logs/slurm/
 
-# Cancel jobs
+# Cancel all your jobs
 scancel -u $USER
 ```
 
-See `cluster/slurm/README.md` for complete SLURM documentation.
-
 ## Troubleshooting
 
-- **Out of memory**: Increase `mem_mb` in `cluster/slurm/config.yaml` or reduce `--cores` for local runs
+- **Out of memory**: Increase `mem_mb` in `cluster/slurm-bodhi/config.yaml` or reduce `--cores` for local runs
 - **Download fails**: Check URLs in `workflow/config.yaml` are current
 - **Dependency issues**: Run `pixi install` to update environment, or `pixi update` to upgrade packages
 - **Missing checkpoint**: Manually create the checkpoint file to continue pipeline
-- **SLURM job fails**: Check `.snakemake/slurm_logs/` and increase resources in cluster config
-- **Timeout on cluster**: Increase `runtime` in `cluster/slurm/config.yaml` for specific rules
+- **SLURM job fails**: Check `logs/slurm/` and increase resources in cluster config
+- **Timeout on cluster**: Increase `runtime` in `cluster/slurm-bodhi/config.yaml` for specific rules

@@ -97,6 +97,7 @@ rule download_all:
             db=config["databases_to_search"],
             file=[DB_FILES[db] for db in config["databases_to_search"]],
         ),
+        DATA_DIR + "/uniprot_release.txt",
 
 
 # Build seed models from curated alignments

@@ -1,0 +1,150 @@
+# Snakemake SLURM Profile - 2A Peptide Search Pipeline (amc-bodhi)
+# =================================================================
+# Bodhi cluster configuration.
+# Usage: snakemake --profile cluster/slurm-bodhi
+#
+# Bodhi partitions:
+#   - rna: CPU jobs (account: rbi)
+#   - gpu: GPU jobs (account: gpu_rbi)  # not used by this pipeline
+
+executor: slurm
+jobs: 200
+latency-wait: 180
+restart-times: 2
+rerun-incomplete: true
+keep-going: true
+printshellcmds: true
+
+# Job naming - rule + wildcards for readable job names
+jobname: "2a-{rule}-{wildcards}-{jobid}"
+
+# Slurm job logs
+slurm-logdir: "logs/slurm"
+
+# Default resources for all jobs
+default-resources:
+  slurm_partition: "rna"
+  slurm_account: "rbi"
+  runtime: 120          # 2 hours
+  mem_mb: 8000          # 8 GB
+  cpus_per_task: 4
+
+# Rule-specific resources
+set-resources:
+  # ============================================================================
+  # Database Download Rules
+  # ============================================================================
+  download_uniprot:
+    runtime: 60
+    mem_mb: 2000
+    cpus_per_task: 1
+
+  download_uniprot_relnotes:
+    runtime: 10
+    mem_mb: 1000
+    cpus_per_task: 1
+
+  download_reference_proteomes:
+    runtime: 720         # 12 hours - 311GB tarball, network-bound
+    mem_mb: 2000
+    cpus_per_task: 1
+
+  extract_reference_proteomes:
+    runtime: 240         # 4 hours - extract + concatenate hundreds of GB
+    mem_mb: 8000
+    cpus_per_task: 4
+
+  download_uniparc:
+    runtime: 480         # 8 hours - very large file
+    mem_mb: 4000
+    cpus_per_task: 1
+
+  download_mgnify:
+    runtime: 480         # 8 hours - very large file
+    mem_mb: 4000
+    cpus_per_task: 1
+
+  download_mgnify_split:
+    runtime: 240
+    mem_mb: 2000
+    cpus_per_task: 1
+
+  merge_mgnify_splits:
+    runtime: 60
+    mem_mb: 4000
+    cpus_per_task: 1
+
+  # ============================================================================
+  # HMM Building Rules
+  # ============================================================================
+  build_seed_models:
+    runtime: 10
+    mem_mb: 2000
+    cpus_per_task: 1
+
+  build_refined_model:
+    runtime: 30
+    mem_mb: 4000
+    cpus_per_task: 1
+
+  build_final_models:
+    runtime: 30
+    mem_mb: 4000
+    cpus_per_task: 1
+
+  # ============================================================================
+  # HMM Search Rules (resource intensive)
+  # ============================================================================
+  hmmsearch:
+    runtime: 1440        # 24 hours max for large databases
+    mem_mb: 16000
+    cpus_per_task: 12
+
+  # ============================================================================
+  # Alignment Processing Rules
+  # ============================================================================
+  filter_alignment:
+    runtime: 30
+    mem_mb: 8000
+    cpus_per_task: 2
+
+  merge_database_alignments:
+    runtime: 60
+    mem_mb: 16000
+    cpus_per_task: 4
+
+  # ============================================================================
+  # Reporting Rules
+  # ============================================================================
+  collect_statistics:
+    runtime: 30
+    mem_mb: 4000
+    cpus_per_task: 2
+
+  generate_report:
+    runtime: 60
+    mem_mb: 8000
+    cpus_per_task: 4
+
+  # ============================================================================
+  # Sequence Logo Generation Rules (Skylign API calls)
+  # ============================================================================
+  generate_logo_seed:
+    runtime: 10
+    mem_mb: 2000
+    cpus_per_task: 1
+
+  generate_logo_iter1:
+    runtime: 10
+    mem_mb: 2000
+    cpus_per_task: 1
+
+  generate_logo_iter2:
+    runtime: 10
+    mem_mb: 2000
+    cpus_per_task: 1
+
+  generate_logo_final:
+    runtime: 10
+    mem_mb: 2000
+    cpus_per_task: 1

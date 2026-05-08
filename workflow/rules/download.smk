@@ -18,6 +18,19 @@ rule download_uniprot:
         """
 
 
+rule download_uniprot_relnotes:
+    """Capture UniProt release version for provenance (e.g. Pfam submission)."""
+    output:
+        relnotes=DATA_DIR + "/uniprot_release.txt",
+    log:
+        LOGS_DIR + "/download/uniprot_relnotes.log",
+    shell:
+        """
+        mkdir -p $(dirname {output.relnotes})
+        wget -c -o {log} https://ftp.uniprot.org/pub/databases/uniprot/current_release/relnotes.txt -O {output.relnotes}
+        """
+
+
 rule download_reference_proteomes:
     """Download Reference Proteomes database."""
     output:

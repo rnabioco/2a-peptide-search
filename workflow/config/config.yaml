@@ -24,8 +24,8 @@ databases:
     size: "small"  # ~500k sequences
 
   reference_proteomes:
-    url: "https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/reference_proteomes/Reference_Proteomes_2024_02.tar.gz"
-    description: "Reference proteomes used by Pfam"
+    url: "https://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/reference_proteomes/Reference_Proteomes_2026_01.tar.gz"
+    description: "Reference proteomes used by Pfam (release 2026_01)"
     size: "medium"  # representative proteomes
 
   uniparc:
