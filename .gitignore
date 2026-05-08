@@ -18,6 +18,9 @@ data/
 # Pipeline results
 results/
 
+# Scratch / working outputs
+scratch/
+
 # Pre-migration
 */legacy/*
 
